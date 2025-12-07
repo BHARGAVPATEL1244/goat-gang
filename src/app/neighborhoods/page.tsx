@@ -1,0 +1,43 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { NeighborhoodDB } from '@/lib/types';
+import { getNeighborhoods } from '@/app/actions/neighborhoods';
+import NeighborhoodCard from '@/components/NeighborhoodCard';
+import { Loader2 } from 'lucide-react';
+
+export default function NeighborhoodsPage() {
+    const [neighborhoods, setNeighborhoods] = useState<NeighborhoodDB[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadData() {
+            const data = await getNeighborhoods();
+            setNeighborhoods(data);
+            setLoading(false);
+        }
+        loadData();
+    }, []);
+
+    if (loading) return <div className="flex justify-center p-20"><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>;
+
+    return (
+        <div className="space-y-12">
+            <div className="text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">Our Neighborhoods</h1>
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    Choose your path. Whether you are a hardcore derby player or a casual farmer, we have a home for you.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {neighborhoods.map((hood, index) => (
+                    <NeighborhoodCard key={hood.id} neighborhood={hood} index={index} />
+                ))}
+                {neighborhoods.length === 0 && (
+                    <div className="text-center text-gray-500">No neighborhoods found. Check back soon!</div>
+                )}
+            </div>
+        </div>
+    );
+}

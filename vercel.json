@@ -1,0 +1,4 @@
+{
+    "framework": "nextjs",
+    "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ] && [ $(git diff --name-only HEAD^ HEAD | grep -v '^goat-gang-bot/' | wc -l) -eq 0 ]; then echo \"🛑 Cancelled (Bot change only)\"; exit 0; else echo \"✅ Proceeding\"; exit 1; fi"
+}

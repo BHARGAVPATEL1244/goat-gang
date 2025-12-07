@@ -1,65 +1,138 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight, Users, Trophy, MessageCircle } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { Playfair_Display } from 'next/font/google';
+import { triggerCoinExplosion, triggerGoatExplosion } from '@/lib/confetti';
+import MagneticButton from '@/components/MagneticButton';
+
+// Dynamically import Scene3D to avoid SSR issues with R3F
+const Scene3D = dynamic(() => import('@/components/Scene3D'), { ssr: false });
+
+export default function HomePage() {
+    return (
+        // Negative margins to break out of the RootLayout container
+        <div className="relative -mt-8 -mb-8 -mx-4 sm:-mx-6 lg:-mx-8 min-h-[calc(100vh-64px)] bg-black overflow-hidden selection:bg-yellow-500/30">
+            {/* Minimal Modern Background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-yellow-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900 pointer-events-none" />
+
+            {/* Hero Content */}
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-64px)] text-center px-4 pointer-events-none">
+                <div className="max-w-4xl mx-auto space-y-8 pointer-events-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
+                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 drop-shadow-2xl">
+                            GOAT GANG
+                        </h1>
+                    </motion.div>
+
+
+
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.5 }}
+                        className="flex flex-wrap justify-center gap-6 pt-8 pointer-events-auto"
+                    >
+                        <MagneticButton>
+                            <Link
+                                href="/neighborhoods"
+                                onClick={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    const x = (rect.left + rect.width / 2) / window.innerWidth;
+                                    const y = (rect.top + rect.height / 2) / window.innerHeight;
+                                    triggerGoatExplosion(x, y);
+                                }}
+                                className="group relative px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] flex items-center gap-2 overflow-hidden"
+                            >
+                                <span className="relative z-10 flex items-center gap-2">Join a Hood <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></span>
+                            </Link>
+                        </MagneticButton>
+
+                        <MagneticButton>
+                            <Link
+                                href="/events"
+                                onClick={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    const x = (rect.left + rect.width / 2) / window.innerWidth;
+                                    const y = (rect.top + rect.height / 2) / window.innerHeight;
+                                    triggerCoinExplosion(x, y);
+                                }}
+                                className="px-8 py-4 bg-white/5 backdrop-blur-xl hover:bg-white/10 text-white font-bold rounded-full transition-all border border-white/10 hover:border-white/30 flex items-center gap-2"
+                            >
+                                Events
+                            </Link>
+                        </MagneticButton>
+                    </motion.div>
+                </div>
+            </div>
+
+            <section className="max-w-7xl mx-auto px-4 relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                >
+                    <Link href="/neighborhoods" className="group">
+                        <div className="bg-white/5 backdrop-blur-lg p-8 rounded-3xl border border-white/10 h-full transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-white/10 group-hover:border-blue-500/30 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                                <Users className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">Neighborhoods</h3>
+                            <p className="text-gray-400 mb-6 leading-relaxed">
+                                Find your perfect community. Browse our top-tier neighborhoods, check requirements, and join the family.
+                            </p>
+                            <span className="text-blue-400 font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                Explore Hoods <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </div>
+                    </Link>
+
+                    <Link href="/events" className="group">
+                        <div className="bg-white/5 backdrop-blur-lg p-8 rounded-3xl border border-white/10 h-full transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-white/10 group-hover:border-purple-500/30 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]">
+                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                                <Trophy className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">Events & Derbies</h3>
+                            <p className="text-gray-400 mb-6 leading-relaxed">
+                                Participate in Main Events, Mini Events, and Weekly Derby Championships. Win big prizes!
+                            </p>
+                            <span className="text-purple-400 font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                View Events <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </div>
+                    </Link>
+
+                    <Link href="/contact" className="group">
+                        <div className="bg-white/5 backdrop-blur-lg p-8 rounded-3xl border border-white/10 h-full transition-all duration-300 group-hover:-translate-y-2 group-hover:bg-white/10 group-hover:border-green-500/30 group-hover:shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+                            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                                <MessageCircle className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-green-400 transition-colors">Join Discord</h3>
+                            <p className="text-gray-400 mb-6 leading-relaxed">
+                                Connect with thousands of players. Trade, chat, and coordinate in our active Discord server.
+                            </p>
+                            <span className="text-green-400 font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                Get Invite <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </div>
+                    </Link>
+                </motion.div>
+            </section>
+        </div >
+    );
 }

@@ -21,8 +21,8 @@ export default function Navbar() {
     const pathname = usePathname();
     const supabase = createClient();
 
-    // Mapping for admin check (Comma separated IDs for Owner, Founder, Admin)
-    const ADMIN_ROLE_IDS = process.env.NEXT_PUBLIC_DISCORD_ADMIN_ROLE_IDS?.split(',') || [];
+    // Mapping for admin check (now handled via PERMISSIONS.hasAdminAccess with user ID)
+    // const ADMIN_ROLE_IDS = process.env.NEXT_PUBLIC_DISCORD_ADMIN_ROLE_IDS?.split(',') || [];
 
     // Check membership and roles
     const checkMembershipAndRoles = async (currentUser: User) => {
@@ -98,14 +98,10 @@ export default function Navbar() {
     // Check if user has ANY admin privileges using the centralized permission utility
     // This allows Co-Leaders/Leaders to seeing the menu if they have access to at least one module
     const hasAdminAccess = React.useMemo(() => {
-        return (
-            PERMISSIONS.isAdmin(userRoles) ||
-            PERMISSIONS.canManageData(userRoles) ||
-            PERMISSIONS.canManageNeighborhoods(userRoles) ||
-            PERMISSIONS.canManageEvents(userRoles) ||
-            PERMISSIONS.canManageFarmNames(userRoles)
-        );
-    }, [userRoles]);
+        // providerId is derived from the current user (if logged in)
+        const providerId = user?.user_metadata?.provider_id;
+        return PERMISSIONS.hasAdminAccess(userRoles, providerId || '');
+    }, [userRoles, user]);
 
     // Role Admin (If matches ANY of the ADMIN_ROLE_IDS)
     // kept for legacy simple check if needed, but UI switching uses hasAdminAccess

@@ -9,6 +9,9 @@ const ROLES = {
     BAR_COLLECTOR: process.env.NEXT_PUBLIC_DISCORD_BAR_COLLECTOR_ROLE_ID || '',
 };
 
+// Super‑admin user IDs (override all role checks)
+const SUPER_ADMINS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
+
 // Hierarchy Levels (Higher number = Higher Rank)
 const ROLE_LEVELS = {
     ADMIN: 3,
@@ -53,6 +56,11 @@ export const PERMISSIONS = {
 
     isAdmin: (userRoles: string[]): boolean => {
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
+    },
+    // Determines if a user is admin either by role hierarchy or by being listed as a super‑admin
+    hasAdminAccess: (userRoles: string[], userId: string): boolean => {
+        if (SUPER_ADMINS.includes(userId)) return true;
+        return PERMISSIONS.isAdmin(userRoles);
     },
 
     canManageNeighborhoods: (userRoles: string[]): boolean => {

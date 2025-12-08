@@ -6,8 +6,8 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const BOT_API_URL = 'http://localhost:3001'; // Should be env var in prod
-const BOT_API_KEY = process.env.API_KEY || 'goat_gang_secret_key_12345'; // Should be env var
+const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:3001'; // Should be env var in prod
+const BOT_API_KEY = process.env.BOT_API_KEY || process.env.API_KEY || 'goat_gang_secret_key_12345'; // Should be env var
 
 export async function POST(request: Request) {
     try {

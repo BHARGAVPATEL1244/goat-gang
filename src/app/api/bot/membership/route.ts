@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BOT_API_URL = 'http://localhost:3001'; // Should be env var
+const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:3001'; // Should be env var
 const BOT_API_KEY = process.env.BOT_API_KEY || process.env.API_KEY || 'goat_gang_secret_key_12345';
 
 export const dynamic = 'force-dynamic';

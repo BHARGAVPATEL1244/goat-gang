@@ -60,7 +60,10 @@ export const PERMISSIONS = {
     // Determines if a user is admin either by role hierarchy or by being listed as a super‑admin
     hasAdminAccess: (userRoles: string[], userId: string): boolean => {
         if (SUPER_ADMINS.includes(userId)) return true;
-        return PERMISSIONS.isAdmin(userRoles);
+        // Check if user has ANY access level (Co-Leader or above) OR the specific Bar Collector role
+        // This ensures anyone who can access ANY part of the dashboard sees the link
+        return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.CO_LEADER) ||
+            PERMISSIONS.hasRole(userRoles, ROLES.BAR_COLLECTOR);
     },
 
     canManageNeighborhoods: (userRoles: string[]): boolean => {

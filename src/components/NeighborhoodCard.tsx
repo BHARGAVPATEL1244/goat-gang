@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { NeighborhoodDB } from '@/lib/types';
 import { Trophy, Users, Hash, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 interface NeighborhoodCardProps {
     neighborhood: NeighborhoodDB;
@@ -73,11 +74,15 @@ export default function NeighborhoodCard({ neighborhood, index }: NeighborhoodCa
             {/* Image Section */}
             <div className="h-64 overflow-hidden relative bg-black/50 flex items-center justify-center p-6">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-900/90 z-10" />
-                <img
-                    src={neighborhood.image}
-                    alt={neighborhood.name}
-                    className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-110 relative z-0"
-                />
+                <div className="relative w-full h-full">
+                    <Image
+                        src={neighborhood.image}
+                        alt={neighborhood.name}
+                        fill
+                        className="object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-110 relative z-0"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                </div>
 
                 {/* Floating Tag */}
                 <div className="absolute top-4 right-4 z-20">

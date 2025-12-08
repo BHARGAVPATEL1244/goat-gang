@@ -93,7 +93,6 @@ export default function FarmNamesManager() {
     };
 
     const handleUpdate = async (member: Member) => {
-        console.log("Debug: Updating Member:", member);
         if (!member.id) {
             toast.error("Critical Error: Member ID is missing!");
             return;

@@ -292,14 +292,18 @@ export default function EmbedBuilderPage() {
                                 }}
                             />
 
-                            <EmbedEditor
-                                embed={embeds[activeEmbedIndex]}
-                                onChange={(updatedEmbed) => {
-                                    const newEmbeds = [...embeds];
-                                    newEmbeds[activeEmbedIndex] = updatedEmbed;
-                                    setEmbeds(newEmbeds);
-                                }}
-                            />
+                            {embeds[activeEmbedIndex] ? (
+                                <EmbedEditor
+                                    embed={embeds[activeEmbedIndex]}
+                                    onChange={(updatedEmbed) => {
+                                        const newEmbeds = [...embeds];
+                                        newEmbeds[activeEmbedIndex] = updatedEmbed;
+                                        setEmbeds(newEmbeds);
+                                    }}
+                                />
+                            ) : (
+                                <div className="text-gray-500 text-center py-10">Select an embed to edit</div>
+                            )}
 
                             {/* Attachments Section */}
                             <div className="mt-8 border-t border-gray-700 pt-6">

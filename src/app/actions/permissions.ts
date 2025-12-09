@@ -1,10 +1,11 @@
 'use server';
 
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/server';
 import { RolePermission } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
 
 export async function getRolePermissions() {
+    const supabase = await createClient();
     const { data, error } = await supabase
         .from('role_permissions')
         .select('*')
@@ -19,6 +20,7 @@ export async function getRolePermissions() {
 }
 
 export async function createRolePermission(permission: Partial<RolePermission>) {
+    const supabase = await createClient();
     const { data, error } = await supabase
         .from('role_permissions')
         .insert([permission])
@@ -35,6 +37,7 @@ export async function createRolePermission(permission: Partial<RolePermission>) 
 }
 
 export async function updateRolePermission(id: string, permission: Partial<RolePermission>) {
+    const supabase = await createClient();
     const { data, error } = await supabase
         .from('role_permissions')
         .update(permission)
@@ -52,6 +55,7 @@ export async function updateRolePermission(id: string, permission: Partial<RoleP
 }
 
 export async function deleteRolePermission(id: string) {
+    const supabase = await createClient();
     const { error } = await supabase
         .from('role_permissions')
         .delete()

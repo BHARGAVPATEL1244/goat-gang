@@ -69,9 +69,22 @@ export default function EmbedBuilderPage() {
     const [selectedChannel, setSelectedChannel] = useState('');
     const [messageId, setMessageId] = useState('');
 
+    interface EmbedData {
+        title: string;
+        description: string;
+        color: number;
+        url: string;
+        timestamp: string;
+        footer: { text: string; icon_url: string };
+        image: { url: string };
+        thumbnail: { url: string };
+        author: { name: string; icon_url: string; url: string };
+        fields: { name: string; value: string; inline: boolean }[];
+    }
+
     // Embed State
     const [activeEmbedIndex, setActiveEmbedIndex] = useState(0);
-    const [embeds, setEmbeds] = useState([{
+    const [embeds, setEmbeds] = useState<EmbedData[]>([{
         title: 'New Embed',
         description: 'This is a description.',
         color: 0x0099ff,

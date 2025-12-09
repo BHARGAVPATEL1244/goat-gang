@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -95,7 +95,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <>
-            <AdminNav />
+            <div className="sticky top-0 z-40 bg-gray-900">
+                <Suspense fallback={<div className="h-16 bg-gray-800 animate-pulse" />}>
+                    <AdminNav />
+                </Suspense>
+            </div>
             {children}
         </>
     );

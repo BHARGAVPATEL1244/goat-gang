@@ -11,7 +11,9 @@ import { getRolePermissions } from '@/app/actions/permissions';
 
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function AdminPage() {
+import { Suspense } from 'react';
+
+function AdminDashboardContent() {
     const router = useRouter();
     const supabase = createClient();
     const searchParams = useSearchParams();
@@ -188,7 +190,6 @@ export default function AdminPage() {
                     {activeView === 'events' && showEvents && <AdminEvents />}
 
                     {/* Fallback for when we stay on this page but have no internal view selected yet (should be caught by useEffect redirect above) */}
-                    {/* If we are here, it means we MIGHT be redirecting or just have an invalid state temporarily. */}
                     {!['management', 'leaderboard', 'neighborhoods', 'events'].includes(activeView) && (
                         <div className="text-center text-gray-500 py-12">
                             Redirecting...
@@ -197,5 +198,13 @@ export default function AdminPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AdminPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading Dashboard...</div>}>
+            <AdminDashboardContent />
+        </Suspense>
     );
 }

@@ -13,11 +13,17 @@ export default function AdminNav() {
     const supabase = createClient();
     const [userRoles, setUserRoles] = useState<string[]>([]);
     const [providerId, setProviderId] = useState<string>('');
+    const [dbPermissions, setDbPermissions] = useState<any[]>([]);
 
     useEffect(() => {
         let isMounted = true;
         const fetchPermissions = async () => {
             try {
+                // Fetch DB Rules
+                const { getRolePermissions } = await import('@/app/actions/permissions');
+                const rules = await getRolePermissions();
+                if (isMounted) setDbPermissions(rules);
+
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user && isMounted) {
                     const pid = session.user.app_metadata?.provider === 'discord'
@@ -52,11 +58,11 @@ export default function AdminNav() {
         return () => { isMounted = false; };
     }, []);
 
-    const showData = PERMISSIONS.canManageData(userRoles);
-    const showNeighborhoods = PERMISSIONS.canManageNeighborhoods(userRoles);
-    const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles);
-    const showEvents = PERMISSIONS.canManageEvents(userRoles);
-    const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles);
+    const showData = PERMISSIONS.canManageData(userRoles, dbPermissions);
+    const showNeighborhoods = PERMISSIONS.canManageNeighborhoods(userRoles, dbPermissions);
+    const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles, dbPermissions);
+    const showEvents = PERMISSIONS.canManageEvents(userRoles, dbPermissions);
+    const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles, dbPermissions);
     const isAdmin = PERMISSIONS.hasAdminAccess(userRoles, providerId);
 
     console.log('AdminNav Debug:', {
@@ -141,6 +147,18 @@ export default function AdminNav() {
                                 }`}
                         >
                             Farm Names
+                        </Link>
+                    )}
+
+                    {PERMISSIONS.canManagePermissions(userRoles) && (
+                        <Link
+                            href="/admin/permissions"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${isPageActive('/admin/permissions')
+                                ? 'bg-purple-900/50 text-purple-200 border border-purple-700 shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            Permissions
                         </Link>
                     )}
 

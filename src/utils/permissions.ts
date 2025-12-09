@@ -2,12 +2,19 @@
  * Centralized RBAC Permissions Logic with Hierarchy
  */
 
+import { RolePermission } from '@/lib/types';
+
 const ROLES = {
     ADMIN: (process.env.NEXT_PUBLIC_DISCORD_ADMIN_ROLE_IDS || '').split(','),
     LEADER: process.env.NEXT_PUBLIC_DISCORD_LEADER_ROLE_ID || '',
     CO_LEADER: process.env.NEXT_PUBLIC_DISCORD_COLEADER_ROLE_ID || '',
     BAR_COLLECTOR: process.env.NEXT_PUBLIC_DISCORD_BAR_COLLECTOR_ROLE_ID || '',
 };
+
+// ... (rest of constants)
+
+
+
 
 // Super‑admin user IDs (override all role checks)
 const SUPER_ADMINS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
@@ -58,37 +65,66 @@ export const PERMISSIONS = {
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
     },
     // Determines if a user is admin either by role hierarchy or by being listed as a super‑admin
-    hasAdminAccess: (userRoles: string[], userId: string): boolean => {
+    hasAdminAccess: (userRoles: string[], userId: string, dbPermissions?: RolePermission[]): boolean => {
         if (SUPER_ADMINS.includes(userId)) return true;
-        // Check if user has ANY access level (Co-Leader or above) OR the specific Bar Collector role
-        // This ensures anyone who can access ANY part of the dashboard sees the link
+
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'VIEW_ADMIN_DASHBOARD') || PERMISSIONS.isAdmin(userRoles);
+        }
+
+        // Fallback or Legacy check
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.CO_LEADER) ||
             PERMISSIONS.hasRole(userRoles, ROLES.BAR_COLLECTOR);
     },
 
-    canManageNeighborhoods: (userRoles: string[]): boolean => {
-        // Requires ADMIN Level (Admin only)
+    canManageNeighborhoods: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_NEIGHBORHOODS') || PERMISSIONS.isAdmin(userRoles);
+        }
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
     },
 
-    canManageEvents: (userRoles: string[]): boolean => {
-        // Requires ADMIN Level (Admin only)
+    canManageEvents: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_EVENTS') || PERMISSIONS.isAdmin(userRoles);
+        }
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
     },
 
-    canManageFarmNames: (userRoles: string[]): boolean => {
-        // Requires CO_LEADER Level 
-        // (Automatically includes Leader and Admin due to >= check)
+    canManageFarmNames: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_FARM_NAMES') || PERMISSIONS.isAdmin(userRoles);
+        }
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.CO_LEADER);
     },
 
-    canManageData: (userRoles: string[]): boolean => {
-        // Special Case: Admin OR Bar Collector (Lateral Permission)
+    canManageData: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_FARM_DATA') || PERMISSIONS.isAdmin(userRoles);
+        }
         return PERMISSIONS.isAdmin(userRoles) || PERMISSIONS.hasRole(userRoles, ROLES.BAR_COLLECTOR);
     },
 
-    canViewBarLeaderboard: (userRoles: string[]): boolean => {
-        // Special Case: Admin OR Bar Collector
+    canViewBarLeaderboard: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'VIEW_BAR_LEADERBOARD') || PERMISSIONS.isAdmin(userRoles);
+        }
         return PERMISSIONS.isAdmin(userRoles) || PERMISSIONS.hasRole(userRoles, ROLES.BAR_COLLECTOR);
+    },
+
+    canManagePermissions: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        // Permissions management is restricted to Super Admins (via isAdmin) for now to prevent lockout
+        // or specifically granted via DB if we want self-managing admins.
+        // Let's allow it if explicitly granted 'MANAGE_PERMISSIONS' (if we add that key) 
+        // OR simply restrict to hardcoded Admins for safety during transition.
+        return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
+    },
+
+    /**
+     * Checks if user has a specific permission based on the DB check.
+     */
+    hasPermission: (userRoles: string[], rolePermissions: RolePermission[], requiredPermission: string): boolean => {
+        const matchingRules = rolePermissions.filter(rule => userRoles.includes(rule.role_id));
+        return matchingRules.some(rule => rule.permissions.includes(requiredPermission));
     }
 };

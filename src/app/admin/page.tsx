@@ -17,6 +17,7 @@ export default function AdminPage() {
     const initialView = (searchParams.get('view') as 'management' | 'leaderboard' | 'neighborhoods' | 'events') || 'management';
     const [activeView, setActiveView] = useState<'management' | 'leaderboard' | 'neighborhoods' | 'events'>(initialView);
     const [userRoles, setUserRoles] = useState<string[]>([]);
+    const [dbPermissions, setDbPermissions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const viewInitialized = React.useRef(false);
 
@@ -31,6 +32,11 @@ export default function AdminPage() {
 
         const fetchPermissions = async () => {
             try {
+                // Fetch DB Rules
+                const { getRolePermissions } = await import('@/app/actions/permissions');
+                const rules = await getRolePermissions();
+                if (isMounted) setDbPermissions(rules);
+
                 // Fetch roles from our Bot API or re-use session logic
                 // Since Layout guards access, we know we are roughly allowed, but passing roles down is cleaner.
                 // For now, let's fetch again or stored in local/context. 
@@ -80,10 +86,10 @@ export default function AdminPage() {
                             // Only auto-select if NO view param is active (i.e. we are at root /admin)
                             const currentParams = new URLSearchParams(window.location.search);
                             if (!currentParams.get('view')) {
-                                if (PERMISSIONS.canManageData(finalRoles)) setActiveView('management');
-                                else if (PERMISSIONS.canViewBarLeaderboard(finalRoles)) setActiveView('leaderboard');
-                                else if (PERMISSIONS.canManageNeighborhoods(finalRoles)) setActiveView('neighborhoods');
-                                else if (PERMISSIONS.canManageEvents(finalRoles)) setActiveView('events');
+                                if (PERMISSIONS.canManageData(finalRoles, rules)) setActiveView('management');
+                                else if (PERMISSIONS.canViewBarLeaderboard(finalRoles, rules)) setActiveView('leaderboard');
+                                else if (PERMISSIONS.canManageNeighborhoods(finalRoles, rules)) setActiveView('neighborhoods');
+                                else if (PERMISSIONS.canManageEvents(finalRoles, rules)) setActiveView('events');
                             }
                             viewInitialized.current = true;
                         }

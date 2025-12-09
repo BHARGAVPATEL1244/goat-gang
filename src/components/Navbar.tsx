@@ -17,6 +17,7 @@ export default function Navbar() {
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [userRoles, setUserRoles] = useState<string[]>([]);
     const [loadingRoles, setLoadingRoles] = useState(false);
+    const [dbPermissions, setDbPermissions] = useState<any[]>([]);
 
     const pathname = usePathname();
     const supabase = createClient();
@@ -55,6 +56,15 @@ export default function Navbar() {
 
     useEffect(() => {
         const getUser = async () => {
+            // Fetch DB Rules
+            try {
+                const { getRolePermissions } = await import('@/app/actions/permissions');
+                const rules = await getRolePermissions();
+                setDbPermissions(rules);
+            } catch (error) {
+                console.error('Failed to load permissions', error);
+            }
+
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
             if (user) checkMembershipAndRoles(user);
@@ -100,8 +110,8 @@ export default function Navbar() {
     const hasAdminAccess = React.useMemo(() => {
         // providerId is derived from the current user (if logged in)
         const providerId = user?.user_metadata?.provider_id;
-        return PERMISSIONS.hasAdminAccess(userRoles, providerId || '');
-    }, [userRoles, user]);
+        return PERMISSIONS.hasAdminAccess(userRoles, providerId || '', dbPermissions);
+    }, [userRoles, user, dbPermissions]);
 
     // Role Admin (If matches ANY of the ADMIN_ROLE_IDS)
     // kept for legacy simple check if needed, but UI switching uses hasAdminAccess

@@ -55,3 +55,11 @@ export interface EventDB {
     sponsors: { name: string; amount: string }[];
     created_at?: string;
 }
+
+export interface RolePermission {
+    id: string;
+    role_id: string;
+    role_name: string;
+    permissions: string[];
+    created_at?: string;
+}

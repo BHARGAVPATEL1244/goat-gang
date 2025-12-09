@@ -6,8 +6,9 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const BOT_API_URL = process.env.BOT_API_URL || 'https://goat-gang-bot.onrender.com';
-const BOT_API_KEY = process.env.BOT_API_KEY || process.env.API_KEY || 'goat_gang_secret_key_12345'; // Should be env var
+let BOT_API_URL = process.env.BOT_API_URL || 'https://goat-gang-bot.onrender.com';
+BOT_API_URL = BOT_API_URL.replace(/\/$/, '').replace(/\/api$/, '');
+const BOT_API_KEY = process.env.BOT_API_KEY || process.env.API_KEY || 'goat_gang_secret_key_12345';
 
 export async function POST(request: Request) {
     try {

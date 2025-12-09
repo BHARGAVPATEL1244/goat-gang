@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
-const BOT_API_URL = process.env.BOT_API_URL || 'https://goat-gang-bot.onrender.com'; // Default to Render if env missing
+let BOT_API_URL = process.env.BOT_API_URL || 'https://goat-gang-bot.onrender.com';
+// Fix common misconfiguration: remove trailing /api if present because the bot routes are root-level
+BOT_API_URL = BOT_API_URL.replace(/\/$/, '').replace(/\/api$/, '');
 const BOT_API_KEY = process.env.BOT_API_KEY || process.env.API_KEY || 'goat_gang_secret_key_12345';
 
 export const dynamic = 'force-dynamic';

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { PERMISSIONS } from '@/utils/permissions';
+import { getRolePermissions } from '@/app/actions/permissions';
 
 export default function AdminNav() {
     const pathname = usePathname();
@@ -20,7 +21,6 @@ export default function AdminNav() {
         const fetchPermissions = async () => {
             try {
                 // Fetch DB Rules
-                const { getRolePermissions } = await import('@/app/actions/permissions');
                 const rules = await getRolePermissions();
                 if (isMounted) setDbPermissions(rules);
 

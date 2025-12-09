@@ -7,6 +7,7 @@ import Leaderboard from '@/components/Leaderboard';
 import AdminNeighborhoods from '@/components/AdminNeighborhoods';
 import AdminEvents from '@/components/AdminEvents';
 import { PERMISSIONS } from '@/utils/permissions';
+import { getRolePermissions } from '@/app/actions/permissions';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -33,7 +34,6 @@ export default function AdminPage() {
         const fetchPermissions = async () => {
             try {
                 // Fetch DB Rules
-                const { getRolePermissions } = await import('@/app/actions/permissions');
                 const rules = await getRolePermissions();
                 if (isMounted) setDbPermissions(rules);
 

@@ -7,7 +7,9 @@ import { createClient } from '@/utils/supabase/client';
 import { PERMISSIONS } from '@/utils/permissions';
 import { getRolePermissions } from '@/app/actions/permissions';
 
-export default function AdminNav() {
+import { Suspense } from 'react';
+
+function AdminNavContent() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentView = searchParams.get('view');
@@ -211,5 +213,13 @@ export default function AdminNav() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AdminNav() {
+    return (
+        <Suspense fallback={<div className="h-14 bg-gray-800 animate-pulse border-b border-gray-700" />}>
+            <AdminNavContent />
+        </Suspense>
     );
 }

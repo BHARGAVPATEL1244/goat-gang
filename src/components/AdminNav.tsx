@@ -72,14 +72,16 @@ export default function AdminNav() {
     const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles, dbPermissions);
     const showEvents = PERMISSIONS.canManageEvents(userRoles, dbPermissions);
     const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles, dbPermissions);
-    const isAdmin = PERMISSIONS.hasAdminAccess(userRoles, providerId);
+    const showEmbeds = PERMISSIONS.canManageEmbeds(userRoles, dbPermissions);
+    const showGiveaways = PERMISSIONS.canManageGiveaways(userRoles, dbPermissions);
 
     console.log('AdminNav Debug:', {
         providerId,
         userRoles,
-        isAdmin,
         showData,
         showNeighborhoods,
+        showEmbeds,
+        showGiveaways,
         adminUserIds: (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(','),
         adminRole: PERMISSIONS.ROLES.ADMIN[0]
     });
@@ -171,27 +173,28 @@ export default function AdminNav() {
                         </Link>
                     )}
 
-                    {isAdmin && (
-                        <>
-                            <Link
-                                href="/admin/embed-builder"
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname.startsWith('/admin/embed-builder')
-                                    ? 'bg-gray-700 text-white shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                    }`}
-                            >
-                                Embed Builder
-                            </Link>
-                            <Link
-                                href="/admin/giveaways"
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname.startsWith('/admin/giveaways')
-                                    ? 'bg-gray-700 text-white shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                    }`}
-                            >
-                                Giveaways
-                            </Link>
-                        </>
+                    {showEmbeds && (
+                        <Link
+                            href="/admin/embed-builder"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname.startsWith('/admin/embed-builder')
+                                ? 'bg-gray-700 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            Embed Builder
+                        </Link>
+                    )}
+
+                    {showGiveaways && (
+                        <Link
+                            href="/admin/giveaways"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname.startsWith('/admin/giveaways')
+                                ? 'bg-gray-700 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            Giveaways
+                        </Link>
                     )}
                 </div>
             </div>

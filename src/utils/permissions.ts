@@ -112,6 +112,20 @@ export const PERMISSIONS = {
         return PERMISSIONS.isAdmin(userRoles) || PERMISSIONS.hasRole(userRoles, ROLES.BAR_COLLECTOR);
     },
 
+    canManageEmbeds: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_EMBEDS') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles);
+    },
+
+    canManageGiveaways: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_GIVEAWAYS') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles);
+    },
+
     canManagePermissions: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
         // Permissions management is restricted to Super Admins (via isAdmin) for now to prevent lockout
         // or specifically granted via DB if we want self-managing admins.

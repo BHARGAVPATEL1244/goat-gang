@@ -5,13 +5,14 @@ import { RolePermission } from '@/lib/types';
 import { getRolePermissions, createRolePermission, updateRolePermission, deleteRolePermission } from '@/app/actions/permissions';
 import { Plus, Trash2, Save, X, Edit2, Loader2, Shield } from 'lucide-react';
 
-const AVAILABLE_PERMISSIONS = [
-    { key: 'VIEW_ADMIN_DASHBOARD', label: 'View Admin Dashboard', description: 'Basic access to /admin' },
-    { key: 'MANAGE_FARM_DATA', label: 'Manage Farm Data', description: 'Edit/Add Data in Management Tab' },
-    { key: 'MANAGE_NEIGHBORHOODS', label: 'Manage Neighborhoods', description: 'Edit/Add Neighborhoods' },
-    { key: 'MANAGE_EVENTS', label: 'Manage Events', description: 'Edit/Add Events' },
-    { key: 'MANAGE_FARM_NAMES', label: 'Manage Farm Names', description: 'Access Farm Name Change Tool' },
-    { key: 'VIEW_BAR_LEADERBOARD', label: 'View Bar Leaderboard', description: 'Access Bar Collector Leaderboard' },
+{ key: 'VIEW_ADMIN_DASHBOARD', label: 'View Admin Dashboard', description: 'Basic access to /admin' },
+{ key: 'MANAGE_FARM_DATA', label: 'Manage Farm Data', description: 'Edit/Add Data in Management Tab' },
+{ key: 'MANAGE_NEIGHBORHOODS', label: 'Manage Neighborhoods', description: 'Edit/Add Neighborhoods' },
+{ key: 'MANAGE_EVENTS', label: 'Manage Events', description: 'Edit/Add Events' },
+{ key: 'MANAGE_FARM_NAMES', label: 'Manage Farm Names', description: 'Access Farm Name Change Tool' },
+{ key: 'VIEW_BAR_LEADERBOARD', label: 'View Bar Leaderboard', description: 'Access Bar Collector Leaderboard' },
+{ key: 'MANAGE_EMBEDS', label: 'Manage Embeds', description: 'Create and Edit Embed Messages' },
+{ key: 'MANAGE_GIVEAWAYS', label: 'Manage Giveaways', description: 'Create and Manage Giveaways' },
 ];
 
 export default function AdminPermissionsManager() {
@@ -157,13 +158,13 @@ export default function AdminPermissionsManager() {
                                     key={perm.key}
                                     onClick={() => handleTogglePermission(perm.key)}
                                     className={`p-3 rounded-lg border cursor-pointer transition-colors flex items-start gap-3 ${newRule.permissions?.includes(perm.key)
-                                            ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-500'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                                        ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-500'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
                                         }`}
                                 >
                                     <div className={`w-5 h-5 rounded border flex items-center justify-center mt-0.5 ${newRule.permissions?.includes(perm.key)
-                                            ? 'bg-purple-500 border-purple-500'
-                                            : 'border-gray-400'
+                                        ? 'bg-purple-500 border-purple-500'
+                                        : 'border-gray-400'
                                         }`}>
                                         {newRule.permissions?.includes(perm.key) && <div className="w-2 h-2 bg-white rounded-sm" />}
                                     </div>

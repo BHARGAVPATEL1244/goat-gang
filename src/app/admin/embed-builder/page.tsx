@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import EmbedPreview from '@/components/EmbedPreview';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PERMISSIONS } from '@/utils/permissions';
+import { getRolePermissions } from '@/app/actions/permissions';
+import { Loader2 } from 'lucide-react';
 
 // Searchable Select Component
 function SearchableSelect({ options, value, onChange, placeholder }: { options: any[], value: string, onChange: (val: string) => void, placeholder: string }) {
@@ -52,16 +55,86 @@ function SearchableSelect({ options, value, onChange, placeholder }: { options: 
 }
 
 function EmbedBuilderContent() {
+    const supabase = createClient();
     const router = useRouter();
     const searchParams = useSearchParams();
     const embedId = searchParams.get('id');
 
+    // Access Control State
+    const [loadingAccess, setLoadingAccess] = useState(true);
+    const [hasAccess, setHasAccess] = useState(false);
+
+    // Existing State
     const [guilds, setGuilds] = useState<any[]>([]);
     const [channels, setChannels] = useState<any[]>([]);
     const [selectedGuild, setSelectedGuild] = useState('');
     const [selectedChannel, setSelectedChannel] = useState('');
     const [messageId, setMessageId] = useState('');
     const [attachments, setAttachments] = useState<{ name: string, data: string }[]>([]);
+
+    // Permission Check Effect
+    useEffect(() => {
+        const checkAccess = async () => {
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session?.user) {
+                router.replace('/');
+                return;
+            }
+
+            // 1. Fetch DB Permissions
+            const dbPerms = await getRolePermissions();
+
+            // 2. Fetch User Roles (Bot)
+            let userRoles: string[] = [];
+            const pid = session.user.app_metadata?.provider === 'discord'
+                ? session.user.user_metadata?.provider_id
+                : null;
+
+            if (pid) {
+                // Check Super Admin Override first
+                const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
+                if (ADMIN_USER_IDS.includes(pid)) {
+                    // Inject Admin Role
+                    userRoles = [...userRoles, PERMISSIONS.ROLES.ADMIN[0]];
+                }
+
+                try {
+                    const res = await fetch(`/api/bot/membership?userId=${pid}`);
+                    const data = await res.json();
+                    if (data.user?.roles) {
+                        userRoles = [...userRoles, ...data.user.roles];
+                    }
+                } catch (e) {
+                    console.error('Bot role fetch failed', e);
+                }
+            }
+
+            // 3. Verify Access
+            const canManage = PERMISSIONS.canManageEmbeds(userRoles, dbPerms);
+            if (!canManage) {
+                router.replace('/admin'); // Redirect to dashboard which handles its own access logic or shows denied
+            } else {
+                setHasAccess(true);
+                setLoadingAccess(false);
+            }
+        };
+
+        checkAccess();
+    }, []);
+
+    if (loadingAccess) {
+        return (
+            <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            </div>
+        );
+    }
+
+    if (!hasAccess) return null; // Should have redirected
+
+    // ... rest of component ...
 
     const [activeEmbedIndex, setActiveEmbedIndex] = useState(0);
     const [embeds, setEmbeds] = useState([{

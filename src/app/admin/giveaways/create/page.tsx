@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { PERMISSIONS } from '@/utils/permissions';
+import { getRolePermissions } from '@/app/actions/permissions';
+import { Loader2 } from 'lucide-react';
 
-// Reusing SearchableSelect (Ideally should be a shared component)
+// SearchableSelect (Ideally shared)
 function SearchableSelect({ options, value, onChange, placeholder }: { options: any[], value: string, onChange: (val: string) => void, placeholder: string }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -51,8 +55,46 @@ function SearchableSelect({ options, value, onChange, placeholder }: { options: 
 
 export default function CreateGiveawayPage() {
     const router = useRouter();
+    const supabase = createClient();
     const [guilds, setGuilds] = useState<any[]>([]);
     const [channels, setChannels] = useState<any[]>([]);
+
+    // Access Control
+    const [loadingAccess, setLoadingAccess] = useState(true);
+    const [hasAccess, setHasAccess] = useState(false);
+
+    useEffect(() => {
+        const checkAccess = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) {
+                router.replace('/');
+                return;
+            }
+
+            const dbPerms = await getRolePermissions();
+            let userRoles: string[] = [];
+
+            const pid = session.user.app_metadata?.provider === 'discord' ? session.user.user_metadata?.provider_id : null;
+            if (pid) {
+                const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
+                if (ADMIN_USER_IDS.includes(pid)) userRoles.push(PERMISSIONS.ROLES.ADMIN[0]);
+
+                try {
+                    const res = await fetch(`/api/bot/membership?userId=${pid}`);
+                    const data = await res.json();
+                    if (data.user?.roles) userRoles = [...userRoles, ...data.user.roles];
+                } catch (e) { console.error(e); }
+            }
+
+            if (!PERMISSIONS.canManageGiveaways(userRoles, dbPerms)) {
+                router.replace('/admin');
+            } else {
+                setHasAccess(true);
+                setLoadingAccess(false);
+            }
+        };
+        checkAccess();
+    }, []);
 
     const [formData, setFormData] = useState({
         guildId: '',
@@ -127,6 +169,16 @@ export default function CreateGiveawayPage() {
             setStatus(`Error: ${err.message}`);
         }
     };
+
+    if (loadingAccess) {
+        return (
+            <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            </div>
+        );
+    }
+
+    if (!hasAccess) return null;
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-8 flex justify-center">

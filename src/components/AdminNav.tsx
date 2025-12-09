@@ -90,7 +90,12 @@ export default function AdminNav() {
         showEmbeds,
         showGiveaways,
         adminUserIds: (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(','),
-        adminRole: PERMISSIONS.ROLES.ADMIN[0]
+        adminRole: PERMISSIONS.ROLES.ADMIN[0],
+        isAdmin: PERMISSIONS.isAdmin(userRoles),
+        canManageEmbeds: PERMISSIONS.canManageEmbeds(userRoles, dbPermissions),
+        canManageGiveaways: PERMISSIONS.canManageGiveaways(userRoles, dbPermissions),
+        dbPermissions: dbPermissions,
+        roleLevel: PERMISSIONS.getRoleLevel(userRoles)
     });
 
     const isTabActive = (view: string) => pathname === '/admin' && currentView === view;

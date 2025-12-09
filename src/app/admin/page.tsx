@@ -38,10 +38,6 @@ export default function AdminPage() {
                 if (isMounted) setDbPermissions(rules);
 
                 // Fetch roles from our Bot API or re-use session logic
-                // Since Layout guards access, we know we are roughly allowed, but passing roles down is cleaner.
-                // For now, let's fetch again or stored in local/context. 
-                // To keep it simple and robust, we fetch from the membership endpoint again.
-                // Optimization: AdminLayout could pass this context, but for now we fetch.
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user && isMounted) {
                     const providerId = session.user.app_metadata?.provider === 'discord'
@@ -54,63 +50,44 @@ export default function AdminPage() {
                         return;
                     }
 
-                    const res = await fetch(`/api/bot/membership?userId=${providerId}`);
-                    const data = await res.json();
+                    let finalRoles: string[] = [];
+
+                    // 1. Try fetching from Bot
+                    try {
+                        const res = await fetch(`/api/bot/membership?userId=${providerId}`);
+                        const data = await res.json();
+                        if (isMounted && data.user?.roles) {
+                            finalRoles = data.user.roles;
+                        }
+                    } catch (e) {
+                        console.warn('Bot role fetch failed', e);
+                    }
 
                     if (!isMounted) return;
 
-                    // console.log('[AdminPage] Fetched Roles:', data.user?.roles);
-                    // console.log('[AdminPage] Can Manage Data:', PERMISSIONS.canManageData(data.user?.roles || []));
+                    // 2. Super Admin Override
+                    const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
 
-                    if (data.user?.roles) {
-                        let finalRoles = data.user.roles;
-
-                        // SUPER ADMIN OVERRIDE
-                        // If user is in the hardcoded ADMIN_USER_IDS list, inject the Admin Role ID
-                        // This ensures they get full access even if the Bot API doesn't see the role
-                        const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
-
-                        if (providerId && ADMIN_USER_IDS.includes(providerId)) {
-                            // console.log('[AdminPage] Super Admin detected. Granting full access.');
-                            // Add the first configured Admin Role ID to ensure they pass permissions checks
-                            const adminRoleId = PERMISSIONS.ROLES.ADMIN[0];
-                            if (adminRoleId && !finalRoles.includes(adminRoleId)) {
-                                finalRoles = [...finalRoles, adminRoleId];
-                            }
+                    if (providerId && ADMIN_USER_IDS.includes(providerId)) {
+                        const adminRoleId = PERMISSIONS.ROLES.ADMIN[0];
+                        if (adminRoleId && !finalRoles.includes(adminRoleId)) {
+                            finalRoles = [...finalRoles, adminRoleId];
                         }
+                    }
 
-                        setUserRoles(finalRoles);
+                    setUserRoles(finalRoles);
 
-                        // Only set initial view if we haven't done so yet
-                        if (!viewInitialized.current) {
-                            // Only auto-select if NO view param is active (i.e. we are at root /admin)
-                            const currentParams = new URLSearchParams(window.location.search);
-                            if (!currentParams.get('view')) {
-                                if (PERMISSIONS.canManageData(finalRoles, rules)) setActiveView('management');
-                                else if (PERMISSIONS.canViewBarLeaderboard(finalRoles, rules)) setActiveView('leaderboard');
-                                else if (PERMISSIONS.canManageNeighborhoods(finalRoles, rules)) setActiveView('neighborhoods');
-                                else if (PERMISSIONS.canManageEvents(finalRoles, rules)) setActiveView('events');
-                            }
-                            viewInitialized.current = true;
+                    // Only set initial view if we haven't done so yet
+                    if (!viewInitialized.current) {
+                        // Only auto-select if NO view param is active (i.e. we are at root /admin)
+                        const currentParams = new URLSearchParams(window.location.search);
+                        if (!currentParams.get('view')) {
+                            if (PERMISSIONS.canManageData(finalRoles, rules)) setActiveView('management');
+                            else if (PERMISSIONS.canViewBarLeaderboard(finalRoles, rules)) setActiveView('leaderboard');
+                            else if (PERMISSIONS.canManageNeighborhoods(finalRoles, rules)) setActiveView('neighborhoods');
+                            else if (PERMISSIONS.canManageEvents(finalRoles, rules)) setActiveView('events');
                         }
-                    } else {
-                        // Even if roles are empty, check for Super Admin
-                        const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
-
-                        if (providerId && ADMIN_USER_IDS.includes(providerId)) {
-                            // console.log('[AdminPage] Super Admin detected (No Bot Roles). Granting full access.');
-                            const adminRoleId = PERMISSIONS.ROLES.ADMIN[0];
-                            if (adminRoleId) {
-                                const finalRoles = [adminRoleId];
-                                setUserRoles(finalRoles);
-                                if (!viewInitialized.current) {
-                                    setActiveView('management');
-                                    viewInitialized.current = true;
-                                }
-                            }
-                        } else {
-                            console.warn('[AdminPage] No roles found in Bot API response');
-                        }
+                        viewInitialized.current = true;
                     }
                 }
             } catch (error) {

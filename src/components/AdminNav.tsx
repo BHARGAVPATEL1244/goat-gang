@@ -31,23 +31,32 @@ export default function AdminNav() {
                         : null;
                     if (pid) setProviderId(pid);
 
-                    if (pid) {
-                        const res = await fetch(`/api/bot/membership?userId=${pid}`);
-                        const data = await res.json();
+                    let finalRoles: string[] = [];
 
-                        if (isMounted && data.user?.roles) {
-                            let finalRoles = data.user.roles;
-                            // Super Admin Override
-                            const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
-                            if (ADMIN_USER_IDS.includes(pid)) {
-                                const adminRoleId = PERMISSIONS.ROLES.ADMIN[0];
-                                if (adminRoleId && !finalRoles.includes(adminRoleId)) {
-                                    finalRoles = [...finalRoles, adminRoleId];
-                                }
+                    // 1. Try fetching from Bot
+                    if (pid) {
+                        try {
+                            const res = await fetch(`/api/bot/membership?userId=${pid}`);
+                            const data = await res.json();
+                            if (data.user?.roles) {
+                                finalRoles = data.user.roles;
                             }
-                            setUserRoles(finalRoles);
+                        } catch (err) {
+                            console.warn('Bot role fetch failed, falling back to basic checks', err);
                         }
                     }
+
+                    // 2. Super Admin Override (Always Apply)
+                    const ADMIN_USER_IDS = (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(',');
+                    if (pid && ADMIN_USER_IDS.includes(pid)) {
+                        const adminRoleId = PERMISSIONS.ROLES.ADMIN[0];
+                        // If configured, inject it. If not, we trust isAdmin check but roles might ideally need one.
+                        if (adminRoleId && !finalRoles.includes(adminRoleId)) {
+                            finalRoles = [...finalRoles, adminRoleId];
+                        }
+                    }
+
+                    if (isMounted) setUserRoles(finalRoles);
                 }
             } catch (error) {
                 console.error('AdminNav permission checks failed', error);

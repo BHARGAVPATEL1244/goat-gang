@@ -65,11 +65,18 @@ export const PERMISSIONS = {
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
     },
     // Determines if a user is admin either by role hierarchy or by being listed as a super‑admin
+    // Determines if a user is admin either by role hierarchy or by being listed as a super‑admin
     hasAdminAccess: (userRoles: string[], userId: string, dbPermissions?: RolePermission[]): boolean => {
         if (SUPER_ADMINS.includes(userId)) return true;
 
         if (dbPermissions) {
-            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'VIEW_ADMIN_DASHBOARD') || PERMISSIONS.isAdmin(userRoles);
+            // Check if user has ANY permission in the DB
+            const userPermissions = dbPermissions.filter(rule => userRoles.includes(rule.role_id));
+            if (userPermissions.some(rule => rule.permissions.length > 0)) {
+                return true;
+            }
+            // Fallback for Admins who might not be in DB yet but are Level 3
+            return PERMISSIONS.isAdmin(userRoles);
         }
 
         // Fallback or Legacy check

@@ -5,14 +5,15 @@ import { RolePermission } from '@/lib/types';
 import { getRolePermissions, createRolePermission, updateRolePermission, deleteRolePermission } from '@/app/actions/permissions';
 import { Plus, Trash2, Save, X, Edit2, Loader2, Shield } from 'lucide-react';
 
-{ key: 'VIEW_ADMIN_DASHBOARD', label: 'View Admin Dashboard', description: 'Basic access to /admin' },
-{ key: 'MANAGE_FARM_DATA', label: 'Manage Farm Data', description: 'Edit/Add Data in Management Tab' },
-{ key: 'MANAGE_NEIGHBORHOODS', label: 'Manage Neighborhoods', description: 'Edit/Add Neighborhoods' },
-{ key: 'MANAGE_EVENTS', label: 'Manage Events', description: 'Edit/Add Events' },
-{ key: 'MANAGE_FARM_NAMES', label: 'Manage Farm Names', description: 'Access Farm Name Change Tool' },
-{ key: 'VIEW_BAR_LEADERBOARD', label: 'View Bar Leaderboard', description: 'Access Bar Collector Leaderboard' },
-{ key: 'MANAGE_EMBEDS', label: 'Manage Embeds', description: 'Create and Edit Embed Messages' },
-{ key: 'MANAGE_GIVEAWAYS', label: 'Manage Giveaways', description: 'Create and Manage Giveaways' },
+const AVAILABLE_PERMISSIONS = [
+    { key: 'VIEW_ADMIN_DASHBOARD', label: 'View Admin Dashboard', description: 'Basic access to /admin' },
+    { key: 'MANAGE_FARM_DATA', label: 'Manage Bar Data', description: 'Edit/Add Data in Management Tab' },
+    { key: 'MANAGE_NEIGHBORHOODS', label: 'Manage Neighborhoods', description: 'Edit/Add Neighborhoods' },
+    { key: 'MANAGE_EVENTS', label: 'Manage Events', description: 'Edit/Add Events' },
+    { key: 'MANAGE_FARM_NAMES', label: 'Manage Farm Names', description: 'Access Farm Name Change Tool' },
+    { key: 'VIEW_BAR_LEADERBOARD', label: 'View Bar Leaderboard', description: 'Access Bar Collector Leaderboard' },
+    { key: 'MANAGE_EMBEDS', label: 'Manage Embeds', description: 'Create and Edit Embed Messages' },
+    { key: 'MANAGE_GIVEAWAYS', label: 'Manage Giveaways', description: 'Create and Manage Giveaways' },
 ];
 
 export default function AdminPermissionsManager() {

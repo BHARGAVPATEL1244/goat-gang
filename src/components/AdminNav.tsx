@@ -64,7 +64,14 @@ export default function AdminNav() {
         };
 
         fetchPermissions();
-        return () => { isMounted = false; };
+
+        // Auto-refresh permissions every 10s
+        const intervalId = setInterval(fetchPermissions, 10000);
+
+        return () => {
+            isMounted = false;
+            clearInterval(intervalId);
+        };
     }, []);
 
     const showData = PERMISSIONS.canManageData(userRoles, dbPermissions);

@@ -76,19 +76,6 @@ export default function AdminPage() {
                     }
 
                     setUserRoles(finalRoles);
-
-                    // Only set initial view if we haven't done so yet
-                    if (!viewInitialized.current) {
-                        // Only auto-select if NO view param is active (i.e. we are at root /admin)
-                        const currentParams = new URLSearchParams(window.location.search);
-                        if (!currentParams.get('view')) {
-                            if (PERMISSIONS.canManageData(finalRoles, rules)) setActiveView('management');
-                            else if (PERMISSIONS.canViewBarLeaderboard(finalRoles, rules)) setActiveView('leaderboard');
-                            else if (PERMISSIONS.canManageNeighborhoods(finalRoles, rules)) setActiveView('neighborhoods');
-                            else if (PERMISSIONS.canManageEvents(finalRoles, rules)) setActiveView('events');
-                        }
-                        viewInitialized.current = true;
-                    }
                 }
             } catch (error) {
                 console.error('Error fetching permissions:', error);
@@ -97,15 +84,14 @@ export default function AdminPage() {
             }
         };
 
-        // Initial Fetch
         fetchPermissions();
 
-        // Poll every 5 seconds
-        const intervalId = setInterval(fetchPermissions, 5000);
+        // Real-time Poll: Refresh roles/permissions every 10s to pick up server changes
+        const pollInterval = setInterval(fetchPermissions, 10000);
 
         return () => {
             isMounted = false;
-            clearInterval(intervalId);
+            clearInterval(pollInterval);
         };
     }, []);
 

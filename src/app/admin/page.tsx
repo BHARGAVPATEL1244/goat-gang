@@ -84,68 +84,130 @@ export default function AdminPage() {
             }
         };
 
-        fetchPermissions();
-
-        // Real-time Poll: Refresh roles/permissions every 10s to pick up server changes
-        const pollInterval = setInterval(fetchPermissions, 10000);
-
-        return () => {
-            isMounted = false;
-            clearInterval(pollInterval);
+    }
+            } catch (error) {
+    console.error('Error fetching permissions:', error);
+} finally {
+    if (isMounted) setLoading(false);
+}
         };
+
+fetchPermissions();
+
+// Real-time Poll: Refresh roles/permissions every 10s to pick up server changes
+const pollInterval = setInterval(fetchPermissions, 10000);
+
+return () => {
+    isMounted = false;
+    clearInterval(pollInterval);
+};
     }, []);
 
-    if (loading) return (
-        <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
-        </div>
-    );
+// --- Access Control & Redirection Logic ---
+const showData = PERMISSIONS.canManageData(userRoles, dbPermissions);
+const showNeighborhoods = PERMISSIONS.canManageNeighborhoods(userRoles, dbPermissions);
+const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles, dbPermissions);
+const showEvents = PERMISSIONS.canManageEvents(userRoles, dbPermissions);
+const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles, dbPermissions);
+const showEmbeds = PERMISSIONS.canManageEmbeds(userRoles, dbPermissions);
+const showGiveaways = PERMISSIONS.canManageGiveaways(userRoles, dbPermissions);
+const showPermissions = PERMISSIONS.canManagePermissions(userRoles, dbPermissions); // or just roles if no DB perm key yet
 
-    const showData = PERMISSIONS.canManageData(userRoles);
-    const showNeighborhoods = PERMISSIONS.canManageNeighborhoods(userRoles);
-    const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles);
-    const showEvents = PERMISSIONS.canManageEvents(userRoles);
-    const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles);
+useEffect(() => {
+    if (loading) return;
 
-    // Check if user has ANY access
-    const hasAnyAccess = showData || showNeighborhoods || showBarLeaderboard || showEvents || showFarmNames;
+    // 1. Identify Valid Internal Views (Tabs on this page)
+    const validInternalViews: string[] = [];
+    if (showData) validInternalViews.push('management');
+    if (showBarLeaderboard) validInternalViews.push('leaderboard');
+    if (showNeighborhoods) validInternalViews.push('neighborhoods');
+    if (showEvents) validInternalViews.push('events');
 
-    if (!hasAnyAccess) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 bg-gray-900 rounded-3xl mt-12 mb-12 border border-gray-800">
-                <h1 className="text-3xl font-bold text-red-500 mb-4">Access Denied</h1>
-                <p className="text-gray-400 max-w-md">
-                    You do not have the required roles to view any Admin Dashboard modules.
-                </p>
-                <div className="mt-6 text-xs text-gray-500 font-mono text-left bg-black p-4 rounded max-w-lg overflow-auto">
-                    <p className="font-bold text-yellow-500 mb-2">Debug Info:</p>
-                    <p>Your Roles: {userRoles.join(', ') || 'None'}</p>
-                    <p className="font-bold text-green-400">Your Level: {PERMISSIONS.getRoleLevel(userRoles)}</p>
-                    <p className="mt-2 text-blue-400">Required Config:</p>
-                    <p>Admin IDs: {PERMISSIONS.ROLES.ADMIN.join(', ')}</p>
-                    <p>Leader ID: {PERMISSIONS.ROLES.LEADER}</p>
-                    <p>Co-Leader ID: {PERMISSIONS.ROLES.CO_LEADER}</p>
-                    <p>Can Manage Farm Names: {showFarmNames ? 'YES' : 'NO'}</p>
-                    <p>Can View Bar Leaderboard: {showBarLeaderboard ? 'YES' : 'NO'}</p>
-                </div>
-            </div>
-        );
+    // 2. Identify Valid External Routes (Separate pages)
+    const validExternalRoutes: string[] = [];
+    if (showFarmNames) validExternalRoutes.push('/admin/farm-names');
+    if (showEmbeds) validExternalRoutes.push('/admin/embed-builder');
+    if (showGiveaways) validExternalRoutes.push('/admin/giveaways');
+    if (showPermissions) validExternalRoutes.push('/admin/permissions');
+
+    // 3. check if current view is valid
+    const isCurrentViewValid = validInternalViews.includes(activeView);
+
+    if (!isCurrentViewValid) {
+        if (validInternalViews.length > 0) {
+            // If we have other internal views, switch to the first one
+            const fallback = validInternalViews[0] as 'management' | 'leaderboard' | 'neighborhoods' | 'events';
+            console.log(`[AdminPage] Redirecting to internal view: ${fallback}`);
+            setActiveView(fallback);
+            // Optional: Update URL without full reload if desired, but state update is enough for rendering
+        } else if (validExternalRoutes.length > 0) {
+            // No internal views, but we have external ones? Redirect away!
+            console.log(`[AdminPage] Redirecting to external route: ${validExternalRoutes[0]}`);
+            // Use window.location or router.replace to actually leave this page
+            // router.replace might be subtle if this component unmounts, but it's correct next.js way
+            // We'll use the router imported above (wait, need to import useRouter if not present)
+            // Actually AdminPage doesn't have useRouter imported yet, only useSearchParams.
+            // We need to add useRouter.
+            window.location.href = validExternalRoutes[0]; // Hard redirect to be safe/simple for now, or add useRouter
+        }
     }
+}, [loading, activeView, showData, showNeighborhoods, showBarLeaderboard, showEvents, showFarmNames, showEmbeds, showGiveaways, showPermissions]);
 
+
+if (loading) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+    </div>
+);
+
+// Check if user has ANY access (Internal OR External)
+const hasAnyAccess = showData || showNeighborhoods || showBarLeaderboard || showEvents || showFarmNames || showEmbeds || showGiveaways || showPermissions;
+
+if (!hasAnyAccess) {
     return (
-        <div className="p-6 md:p-12">
-            <div className="mb-4 text-xs font-mono bg-black text-gray-300 p-2 rounded">
-                <span className="text-yellow-500 font-bold">DEBUG:</span> Level: {PERMISSIONS.getRoleLevel(userRoles)} | Roles: {userRoles.length}
-            </div>
-            <div className="max-w-7xl mx-auto space-y-8">
-                {/* Content Area */}
-                <div>
-                    {activeView === 'management' && showData && <AdminPanel />}
-                    {activeView === 'leaderboard' && showBarLeaderboard && <Leaderboard allowRequestView={true} isAdmin={true} />}
-                    {activeView === 'neighborhoods' && showNeighborhoods && <AdminNeighborhoods />}
-                    {activeView === 'events' && showEvents && <AdminEvents />}
-                </div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 bg-gray-900 rounded-3xl mt-12 mb-12 border border-gray-800">
+            <h1 className="text-3xl font-bold text-red-500 mb-4">Access Denied</h1>
+            <p className="text-gray-400 max-w-md">
+                You do not have the required roles to view any Admin Dashboard modules.
+            </p>
+            <div className="mt-6 text-xs text-gray-500 font-mono text-left bg-black p-4 rounded max-w-lg overflow-auto">
+                <p className="font-bold text-yellow-500 mb-2">Debug Info:</p>
+                <p>Your Roles: {userRoles.join(', ') || 'None'}</p>
+                <p className="font-bold text-green-400">Your Level: {PERMISSIONS.getRoleLevel(userRoles)}</p>
+                <p className="mt-2 text-blue-400">Access Check:</p>
+                <p>Data: {showData ? 'YES' : 'NO'}</p>
+                <p>Farm Names: {showFarmNames ? 'YES' : 'NO'}</p>
+                <p>Leaderboard: {showBarLeaderboard ? 'YES' : 'NO'}</p>
             </div>
         </div>
     );
+}
+
+return (
+    <div className="p-6 md:p-12">
+        {/* Debug Banner (Dev only ideally, keeping for user testing) */}
+        <div className="mb-4 text-xs font-mono bg-black text-gray-300 p-2 rounded flex justify-between">
+            <span><span className="text-yellow-500 font-bold">DEBUG:</span> Level: {PERMISSIONS.getRoleLevel(userRoles)}</span>
+            <span>Active View: {activeView}</span>
+        </div>
+
+        <div className="max-w-7xl mx-auto space-y-8">
+            {/* Content Area */}
+            <div>
+                {activeView === 'management' && showData && <AdminPanel />}
+                {activeView === 'leaderboard' && showBarLeaderboard && <Leaderboard allowRequestView={true} isAdmin={true} />}
+                {activeView === 'neighborhoods' && showNeighborhoods && <AdminNeighborhoods />}
+                {activeView === 'events' && showEvents && <AdminEvents />}
+
+                {/* Fallback for when we stay on this page but have no internal view selected yet (should be caught by useEffect redirect above) */}
+                {/* If we are here, it means we MIGHT be redirecting or just have an invalid state temporarily. */}
+                {!['management', 'leaderboard', 'neighborhoods', 'events'].includes(activeView) && (
+                    <div className="text-center text-gray-500 py-12">
+                        Redirecting...
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+);
 }

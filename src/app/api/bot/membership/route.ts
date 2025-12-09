@@ -14,6 +14,12 @@ export async function GET(request: Request) {
             return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
         }
 
+        console.log('[API Debug] Connecting to Bot:', {
+            url: BOT_API_URL,
+            endpoint: `${BOT_API_URL}/members/${userId}`,
+            hasKey: !!BOT_API_KEY
+        });
+
         const botRes = await fetch(`${BOT_API_URL}/members/${userId}`, {
             headers: {
                 'x-api-key': BOT_API_KEY

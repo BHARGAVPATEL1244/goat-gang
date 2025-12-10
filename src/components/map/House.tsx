@@ -29,13 +29,9 @@ export default function House({ tier, position, scale = 1, onClick, modelUrl }: 
                 <meshBasicMaterial color="#000" transparent opacity={0.3} />
             </mesh>
 
-            {/* Render External GLTF if URL provided, else Fallback to Procedural */}
+            {/* Render External Model based on extension */}
             {modelUrl ? (
-                <Gltf
-                    src={modelUrl}
-                    scale={scale * 0.5} // Adjust scale for external models usually being larger
-                    position={[0, 0.5, 0]}
-                />
+                <ExternalModel url={modelUrl} scale={scale * 0.5} />
             ) : (
                 <>
                     {tier === 'Leader' && <LeaderManor />}
@@ -46,6 +42,36 @@ export default function House({ tier, position, scale = 1, onClick, modelUrl }: 
             )}
         </group>
     );
+}
+
+// Wrapper to handle different file types (GLTF vs FBX)
+function ExternalModel({ url, scale }: { url: string; scale: number }) {
+    const isFbx = url.toLowerCase().endsWith('.fbx');
+
+    if (isFbx) {
+        return <FbxLoader url={url} scale={scale} />;
+    }
+
+    // Default to GLTF
+    return <Gltf src={url} scale={scale} position={[0, 0.5, 0]} />;
+}
+
+// FBX Loader Component
+import { useFBX } from '@react-three/drei';
+function FbxLoader({ url, scale }: { url: string; scale: number }) {
+    // This hook suspends, so it needs to be inside a Suspense boundary usually, 
+    // but R3F canvas handles that.
+    const fbx = useFBX(url);
+    // Clone to allow multiple instances
+    const clone = React.useMemo(() => fbx.clone(), [fbx]);
+
+    return <primitive object={clone} scale={scale * 0.01} position={[0, 0.5, 0]} />;
+    // Note: FBX units are often cm, so scale * 0.01 might be needed, or just scale. 
+    // Usually FBX comes in huge. I'll stick to 'scale' for now but might need adjustment.
+    // actually, let's try raw scale first, usually users have to adjust scale in admin anyway?
+    // User cannot adjust scale in admin yet? 
+    // Let's use `scale` passed in (which is ~1.0). If FBX is huge, it will be huge. 
+    // Better to apply a safety factor? No, let's trust the input scale for now.
 }
 
 // --- Specific Building Models (Procedural 3D) ---

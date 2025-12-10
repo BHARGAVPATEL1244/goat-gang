@@ -52,10 +52,18 @@ export default function MapManagerPage() {
                 leader_name: formData.leader_name
             };
 
+            let error;
             if (editingId) {
-                await supabase.from('map_districts').update(payload).eq('id', editingId);
+                const res = await supabase.from('map_districts').update(payload).eq('id', editingId);
+                error = res.error;
             } else {
-                await supabase.from('map_districts').insert([payload]);
+                const res = await supabase.from('map_districts').insert([payload]);
+                error = res.error;
+            }
+
+            if (error) {
+                console.error('Supabase Error:', error);
+                throw error;
             }
 
             setEditingId(null);

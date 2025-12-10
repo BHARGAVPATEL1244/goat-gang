@@ -38,19 +38,19 @@ function HexTile({ q, r, type, hoodName, onClick }: DistrictProps) {
     return (
         <group position={[x, 0, z]} onClick={(e) => { e.stopPropagation(); onClick(); }}>
             {/* Hexagon Ground Top */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow castShadow>
+            <mesh receiveShadow castShadow>
                 <cylinderGeometry args={[SIZE, SIZE, 0.5, 6]} />
                 <meshStandardMaterial color={groundColor} roughness={1} />
             </mesh>
 
             {/* Hexagon Ground Sides (Dirt/Darker Grass) */}
-            <mesh position={[0, -0.4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <mesh position={[0, -0.4, 0]}>
                 <cylinderGeometry args={[SIZE * 0.98, SIZE * 0.9, 0.5, 6]} />
                 <meshStandardMaterial color="#5d4037" roughness={1} />
             </mesh>
 
             {/* Selection Highlight */}
-            <lineSegments position={[0, 0.26, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <lineSegments position={[0, 0.26, 0]}>
                 <edgesGeometry args={[new THREE.CylinderGeometry(SIZE, SIZE, 0.5, 6)]} />
                 <lineBasicMaterial color="#ffffff" transparent opacity={0.3} linewidth={1} />
             </lineSegments>

@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { Text } from '@react-three/drei';
+import * as THREE from 'three';
 import House from './House';
 
 // CUSTOM GLTF MODELS
@@ -88,21 +89,21 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
     return (
         <group>
             {/* Ambient Environment - Ground */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.1, 0]}>
+            <mesh receiveShadow position={[0, -0.1, 0]}>
                 <cylinderGeometry args={[15, 15, 1, 32]} />
                 <meshStandardMaterial color="#3b7d34" />
             </mesh>
 
             {/* Village Green (Center) */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
+            <mesh receiveShadow position={[0, 0, 0]}>
                 <cylinderGeometry args={[4.5, 4.5, 1.1, 32]} />
                 <meshStandardMaterial color="#5da642" />
             </mesh>
 
             {/* Dirt Path Ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0.01, 0]}>
+            <mesh receiveShadow position={[0, 0.01, 0]}>
                 <ringGeometry args={[3.5, 4.5, 32]} />
-                <meshStandardMaterial color="#d4a373" />
+                <meshStandardMaterial color="#d4a373" side={THREE.DoubleSide} />
             </mesh>
 
             {/* Back Button Signpost */}

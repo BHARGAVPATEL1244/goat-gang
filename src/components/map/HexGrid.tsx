@@ -21,6 +21,13 @@ const COLORS = {
     side: '#5aa33d'
 };
 
+// Mirroring models from MemberVillage
+const BASE_MODELS_PATH = '/models/KayKit Medieval Builder Pack 1.0/Models/objects/gltf';
+const HOUSE_MODELS: Record<string, string> = {
+    Leader: `${BASE_MODELS_PATH}/castle.gltf.glb`,
+    CoLeader: `${BASE_MODELS_PATH}/market.gltf.glb`,
+};
+
 function HexTile({ q, r, type, hoodName, onClick }: DistrictProps) {
     // Convert Axial (q,r) to Cartesian (x,z)
     // Size = 2.0 (distance from center to corner)
@@ -62,6 +69,7 @@ function HexTile({ q, r, type, hoodName, onClick }: DistrictProps) {
                         tier={isCapital ? 'Leader' : 'CoLeader'}
                         position={[0, 0.25, 0]}
                         scale={isCapital ? 1.6 : 1.3}
+                        modelUrl={isCapital ? HOUSE_MODELS.Leader : HOUSE_MODELS.CoLeader}
                     />
                     <Html position={[0, 3.5, 0]} center distanceFactor={12} zIndexRange={[100, 0]}>
                         <div className={`

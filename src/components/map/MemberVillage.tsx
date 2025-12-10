@@ -52,24 +52,42 @@ const getElderModel = (id: string) => {
     return ELDER_MODELS[index];
 };
 
-// Helper to calculate positions in a spiral/ring for the village
-const getVillagePositions = (count: number, radius: number = 6) => { // Increased base radius from 4 to 6
+// Helper to calculate positions in a more city-like Grid/Spiral
+const getVillagePositions = (count: number) => {
     const pos = [];
-    pos.push({ x: 0, z: 0, r: 0 }); // Center
-    for (let i = 0; i < 6; i++) {
-        const angle = (i / 6) * Math.PI * 2;
-        // Spread inner ring slightly more
-        pos.push({ x: Math.cos(angle) * (radius * 0.5), z: Math.sin(angle) * (radius * 0.5), r: -angle });
-    }
-    for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2;
-        // Outer ring spread out more
-        pos.push({ x: Math.cos(angle) * (radius * 1.0), z: Math.sin(angle) * (radius * 1.0), r: -angle });
-    }
-    // Extra ring for overflow if needed
-    for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2 + 0.2; // Offset
-        pos.push({ x: Math.cos(angle) * (radius * 1.5), z: Math.sin(angle) * (radius * 1.5), r: -angle });
+    pos.push({ x: 0, z: 0, r: 0 }); // Center Leader
+
+    // Grid spacing
+    const spacing = 5;
+    let x = 0;
+    let z = 0;
+    let dx = 0;
+    let dz = -1;
+    let t = spacing;
+
+    // Max interactions to avoid infinite loop fallback
+    for (let i = 1; i < 40; i++) {
+        // Spiral Step
+        if (x === z || (x < 0 && x === -z) || (x > 0 && x === 1 - z)) {
+            t = dx;
+            dx = -dz;
+            dz = t;
+        }
+        x += dx;
+        z += dz;
+
+        // Apply spacing
+        const px = x * spacing;
+        const pz = z * spacing;
+
+        // Add some "organic" noise to offsets so it's not a perfect robot grid
+        const noiseX = (Math.random() - 0.5) * 1.5;
+        const noiseZ = (Math.random() - 0.5) * 1.5;
+
+        // Random slight rotation for charm
+        const rot = (Math.random() - 0.5) * 0.5;
+
+        pos.push({ x: px + noiseX, z: pz + noiseZ, r: rot });
     }
     return pos;
 };
@@ -157,15 +175,15 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
 
     return (
         <group>
-            {/* Ambient Environment - Ground */}
+            {/* Ambient Environment - Expanded Ground for City */}
             <mesh receiveShadow position={[0, -0.1, 0]}>
-                <cylinderGeometry args={[15, 15, 1, 32]} />
+                <cylinderGeometry args={[25, 25, 1, 64]} />
                 <meshStandardMaterial color="#3b7d34" />
             </mesh>
 
-            {/* Village Green (Center) */}
+            {/* Town Square (Center Paved Area) */}
             <mesh receiveShadow position={[0, 0, 0]}>
-                <cylinderGeometry args={[4.5, 4.5, 1.1, 32]} />
+                <cylinderGeometry args={[6.5, 6.5, 1.1, 32]} />
                 <meshStandardMaterial color="#5da642" />
             </mesh>
 

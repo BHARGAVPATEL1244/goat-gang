@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { NeighborhoodDB } from '@/lib/types';
-import { getNeighborhoods } from '@/app/actions/neighborhoods';
 import NeighborhoodCard from '@/components/NeighborhoodCard';
 import { Loader2 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client'; // Added proper import
 
 export default function NeighborhoodsPage() {
     const [neighborhoods, setNeighborhoods] = useState<NeighborhoodDB[]>([]);
@@ -12,8 +12,24 @@ export default function NeighborhoodsPage() {
 
     useEffect(() => {
         async function loadData() {
-            const data = await getNeighborhoods();
-            setNeighborhoods(data);
+            const supabase = createClient();
+            const { data } = await supabase.from('map_districts').select('*');
+
+            if (data) {
+                // Adapt to NeighborhoodDB shape expected by Card
+                const adapted = data.map((d: any) => ({
+                    id: d.id.toString(), // Fix: Convert number ID to string
+                    name: d.name || 'Unnamed',
+                    image: d.image || '',
+                    leader: d.leader_name || 'None',
+                    tag: d.tag || '',
+                    text_color: '#ffffff',
+                    requirements: d.hood_reqs_text ? d.hood_reqs_text.split('\n') : [],
+                    derby_requirements: d.derby_reqs_text ? d.derby_reqs_text.split('\n') : [],
+                }));
+                const sorted = adapted.sort((a: any, b: any) => a.name.localeCompare(b.name));
+                setNeighborhoods(sorted);
+            }
             setLoading(false);
         }
         loadData();

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Plus, Edit, Trash, Save, Hexagon } from 'lucide-react';
+import NeighborhoodCard from '@/components/NeighborhoodCard'; // Added import
 
 export default function MapManagerPage() {
     const supabase = createClient();
@@ -22,7 +23,8 @@ export default function MapManagerPage() {
         r: 0,
         hood_reqs_text: '',
         derby_reqs_text: '',
-        leader_name: ''
+        leader_name: '',
+        image: '' // Added image field
     });
 
     useEffect(() => {
@@ -49,7 +51,8 @@ export default function MapManagerPage() {
                 r: formData.r,
                 hood_reqs_text: formData.hood_reqs_text,
                 derby_reqs_text: formData.derby_reqs_text,
-                leader_name: formData.leader_name
+                leader_name: formData.leader_name,
+                image: formData.image
             };
 
             let error;
@@ -69,7 +72,7 @@ export default function MapManagerPage() {
             setEditingId(null);
             setFormData({
                 name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0,
-                hood_reqs_text: '', derby_reqs_text: '', leader_name: ''
+                hood_reqs_text: '', derby_reqs_text: '', leader_name: '', image: ''
             });
             loadDistricts();
         } catch (error) {
@@ -77,9 +80,9 @@ export default function MapManagerPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (hood: any) => {
         if (!confirm('Delete this district?')) return;
-        await supabase.from('map_districts').delete().eq('id', id);
+        await supabase.from('map_districts').delete().eq('id', hood.id);
         loadDistricts();
     };
 
@@ -89,9 +92,12 @@ export default function MapManagerPage() {
             ...d,
             hood_reqs_text: d.hood_reqs_text || '',
             derby_reqs_text: d.derby_reqs_text || '',
-            leader_name: d.leader_name || ''
+            leader_name: d.leader_name || '',
+            image: d.image || ''
         };
         setFormData(safeData);
+        // Scroll to form
+        document.getElementById('editor-form')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleSync = async (d: any) => {
@@ -114,6 +120,21 @@ export default function MapManagerPage() {
         }
     };
 
+    // Helper to adapt District to NeighborhoodDB for Card
+    const adaptToCard = (d: any) => ({
+        id: d.id.toString(), // Fix: Convert number ID to string
+        name: d.name || 'Unnamed',
+        image: d.image || '', // Ensure empty string if null, Card handles it
+        // Use leader_name for leader
+        leader: d.leader_name || 'None',
+        tag: d.tag || '',
+        // text_color not in map_districts, use white or add col later
+        text_color: '#ffffff',
+        // splitting raw text into arrays for card
+        requirements: d.hood_reqs_text ? d.hood_reqs_text.split('\n') : [],
+        derby_requirements: d.derby_reqs_text ? d.derby_reqs_text.split('\n') : [],
+    });
+
     return (
         <div className="p-8 text-white min-h-screen">
             <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
@@ -121,13 +142,13 @@ export default function MapManagerPage() {
             </h1>
 
             {/* Editor Form */}
-            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
+            <div id="editor-form" className="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
                 <h2 className="text-lg font-semibold mb-4 text-gray-300">
                     {editingId ? 'Edit District' : 'Add New District'}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <input
-                        type="text" placeholder="Hood Name (e.g. Goat Alpha)"
+                        type="text" placeholder="Hood Name"
                         className="bg-gray-900 border border-gray-700 rounded p-2"
                         value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -137,9 +158,14 @@ export default function MapManagerPage() {
                         value={formData.leader_name} onChange={e => setFormData({ ...formData, leader_name: e.target.value })}
                     />
                     <input
-                        type="text" placeholder="Tag (e.g. #XYZ)"
+                        type="text" placeholder="Tag (#XYZ)"
                         className="bg-gray-900 border border-gray-700 rounded p-2"
                         value={formData.tag} onChange={e => setFormData({ ...formData, tag: e.target.value })}
+                    />
+                    <input
+                        type="text" placeholder="Image URL (e.g. /goats/pic.png)"
+                        className="bg-gray-900 border border-gray-700 rounded p-2"
+                        value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })}
                     />
                     <select
                         className="bg-gray-900 border border-gray-700 rounded p-2"
@@ -152,12 +178,12 @@ export default function MapManagerPage() {
                     {/* Hex Coordinates */}
                     <div className="flex gap-2">
                         <input
-                            type="number" placeholder="Q" title="Hex Coordinate Q"
+                            type="number" placeholder="Q"
                             className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
                             value={formData.q} onChange={e => setFormData({ ...formData, q: parseInt(e.target.value) })}
                         />
                         <input
-                            type="number" placeholder="R" title="Hex Coordinate R"
+                            type="number" placeholder="R"
                             className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
                             value={formData.r} onChange={e => setFormData({ ...formData, r: parseInt(e.target.value) })}
                         />
@@ -171,24 +197,16 @@ export default function MapManagerPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div>
-                        <label className="text-xs text-gray-400 mb-1 block">Hood Requirements (Detailed)</label>
-                        <textarea
-                            rows={4}
-                            placeholder="Must be level 85+..."
-                            className="w-full bg-gray-900 border border-gray-700 rounded p-2"
-                            value={formData.hood_reqs_text} onChange={e => setFormData({ ...formData, hood_reqs_text: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <label className="text-xs text-gray-400 mb-1 block">Derby Requirements (Detailed)</label>
-                        <textarea
-                            rows={4}
-                            placeholder="Must finish all tasks..."
-                            className="w-full bg-gray-900 border border-gray-700 rounded p-2"
-                            value={formData.derby_reqs_text} onChange={e => setFormData({ ...formData, derby_reqs_text: e.target.value })}
-                        />
-                    </div>
+                    <textarea
+                        rows={3} placeholder="Requirements (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        value={formData.hood_reqs_text} onChange={e => setFormData({ ...formData, hood_reqs_text: e.target.value })}
+                    />
+                    <textarea
+                        rows={3} placeholder="Derby Rules (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        value={formData.derby_reqs_text} onChange={e => setFormData({ ...formData, derby_reqs_text: e.target.value })}
+                    />
                 </div>
 
                 <div className="mt-4 flex gap-2">
@@ -196,48 +214,36 @@ export default function MapManagerPage() {
                         <Save className="w-4 h-4" /> Save
                     </button>
                     {editingId && (
-                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
+                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '', image: '' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
                             Cancel
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {districts.map((d) => (
-                    <div key={d.id} className="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-start group hover:border-gray-600 transition-colors">
-                        <div>
-                            <h3 className="font-bold text-lg text-white">{d.name || 'Unnamed Hood'}</h3>
-                            <div className="text-xs text-blue-400 mb-1">Leader: {d.leader_name || 'None'}</div>
-                            <div className="text-xs text-gray-500 mb-2 flex gap-2">
-                                <span className={`px-1.5 rounded ${d.type === 'Capital' ? 'bg-yellow-900/50 text-yellow-500' : 'bg-green-900/50 text-green-500'}`}>
-                                    {d.type}
-                                </span>
-                                <span>Tag: {d.tag}</span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                                <div>Coords: ({d.q}, {d.r})</div>
-                                <div className="font-mono text-xs opacity-50">{d.hood_id ? `Role: ${d.hood_id}` : 'No Role ID'}</div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-800 w-full">
-                            <div className="flex gap-2 w-full">
-                                <button onClick={() => startEdit(d)} className="flex-1 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs">
-                                    <Edit className="w-3 h-3" /> Edit
-                                </button>
-                                <button onClick={() => handleDelete(d.id)} className="flex-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs">
-                                    <Trash className="w-3 h-3" /> Delete
-                                </button>
-                            </div>
-                            {d.hood_id && (
-                                <button onClick={() => handleSync(d)} className="w-full bg-indigo-900/30 hover:bg-indigo-900/50 text-indigo-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs font-bold border border-indigo-900/50">
-                                    <span className="text-lg">↻</span> Sync Members
-                                </button>
-                            )}
+            {/* Render List using NeighborhoodCard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {districts.map((d, index) => (
+                    // We must adapt 'd' (map district) to 'NeighborhoodDB' shape for the card
+                    <div key={d.id} className="h-full">
+                        <NeighborhoodCard
+                            neighborhood={adaptToCard(d)}
+                            index={index}
+                            onEdit={() => startEdit(d)}
+                            onSync={() => handleSync(d)}
+                            onDelete={() => handleDelete(d)}
+                        />
+                        {/* Optional small text for debug info not in card */}
+                        <div className="text-center mt-2 text-xs text-mono text-gray-600">
+                            Coords: ({d.q}, {d.r}) | ID: {d.hood_id || 'NaN'}
                         </div>
                     </div>
                 ))}
+                {districts.length === 0 && (
+                    <div className="col-span-3 text-center text-gray-500 py-10">
+                        No districts found. Add one above!
+                    </div>
+                )}
             </div>
         </div>
     );

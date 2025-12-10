@@ -40,57 +40,121 @@ export default function House({ tier, position, scale = 1, onClick }: HouseProps
     );
 }
 
-// --- Specific Building Models (GLTF) ---
-
-// We use clones of loaded GLTFs to instantiate them cheaply
-import { useGLTF, Clone } from '@react-three/drei';
-
-// URLs for consistent low-poly assets (Market/Kenney style)
-const MODEL_URLS = {
-    manor: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/house-c/model.gltf',
-    barn: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/silo/model.gltf', // Using silo as part of barn
-    cottage: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/house-2/model.gltf',
-    cabin: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/cabin/model.gltf',
-};
-
-// Preload them
-Object.values(MODEL_URLS).forEach(url => useGLTF.preload(url));
+// --- Specific Building Models (Procedural 3D) ---
+// Note: We use detailed primitives because external GLTF URLs are unreliable.
+// These are composed of multiple meshes to look like "Real" 3D assets.
 
 function LeaderManor() {
-    const { scene } = useGLTF(MODEL_URLS.manor);
     return (
-        <group scale={1.8} position={[0, 0, 0]}>
-            <Clone object={scene} />
+        <group position={[0, 0, 0]}>
+            {/* Main Body (Whitewashed) */}
+            <mesh position={[0, 0.75, 0]}>
+                <boxGeometry args={[1.8, 1.5, 1.2]} />
+                <meshStandardMaterial color="#fdfaf3" />
+            </mesh>
+            {/* Roof (Slate Blue) */}
+            <mesh position={[0, 1.8, 0]} rotation={[0, Math.PI / 4, 0]}>
+                <coneGeometry args={[1.5, 1.2, 4]} />
+                <meshStandardMaterial color="#34495e" />
+            </mesh>
+            {/* Entrance Columns */}
+            <mesh position={[0.5, 0.5, 0.65]}>
+                <cylinderGeometry args={[0.1, 0.1, 1]} />
+                <meshStandardMaterial color="#fff" />
+            </mesh>
+            <mesh position={[-0.5, 0.5, 0.65]}>
+                <cylinderGeometry args={[0.1, 0.1, 1]} />
+                <meshStandardMaterial color="#fff" />
+            </mesh>
+            {/* Door (Gold) */}
+            <mesh position={[0, 0.4, 0.61]}>
+                <planeGeometry args={[0.4, 0.8]} />
+                <meshStandardMaterial color="#d4af37" />
+            </mesh>
+            {/* Chimney */}
+            <mesh position={[0.6, 1.8, 0]}>
+                <boxGeometry args={[0.3, 0.8, 0.3]} />
+                <meshStandardMaterial color="#7f8c8d" />
+            </mesh>
         </group>
     );
 }
 
 function FarmBarn() {
-    // Barn + Silo combo (Using just Silo model or similar large structure if Barn not available)
-    // Actually let's use a large house for now as Barn URL might be tricky to guess perfectly
-    const { scene } = useGLTF(MODEL_URLS.manor); // Reuse manor but red? No, let's use primitive if model fails, but for now reuse
-    // Better: Use a reliable primitive for Barn if no URL, but let's try to make it look unique
     return (
-        <group scale={1.5}>
-            <Clone object={scene} inject={<meshStandardMaterial color="#c0392b" />} /> {/* Tint it? */}
+        <group position={[0, 0, 0]}>
+            {/* Main Barn (Classic Red) */}
+            <mesh position={[0, 0.6, 0]}>
+                <boxGeometry args={[1.4, 1.2, 1.8]} />
+                <meshStandardMaterial color="#c0392b" />
+            </mesh>
+            {/* Roof (Curved/Gambrel approximation using Cylinder segment or plain prism) */}
+            <mesh position={[0, 1.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.9, 0.9, 1.8, 3]} /> {/* Triangular prism on side */}
+                <meshStandardMaterial color="#ecf0f1" />
+            </mesh>
+            {/* Big Barn Door (White X) */}
+            <mesh position={[0, 0.5, 0.91]}>
+                <planeGeometry args={[0.8, 0.8]} />
+                <meshStandardMaterial color="#fff" />
+            </mesh>
+            <mesh position={[0, 0.5, 0.92]}>
+                <planeGeometry args={[0.7, 0.7]} />
+                <meshBasicMaterial color="#3e2723" /> {/* Dark interior */}
+            </mesh>
+            {/* Silo Next to it */}
+            <mesh position={[1, 0.7, 0]}>
+                <cylinderGeometry args={[0.4, 0.4, 1.4, 16]} />
+                <meshStandardMaterial color="#95a5a6" metallic roughness={0.5} />
+            </mesh>
+            <mesh position={[1, 1.6, 0]}>
+                <sphereGeometry args={[0.4]} />
+                <meshStandardMaterial color="#bdc3c7" metallic roughness={0.5} />
+            </mesh>
         </group>
     );
 }
 
 function Cottage() {
-    const { scene } = useGLTF(MODEL_URLS.cottage);
     return (
-        <group scale={1.5} position={[0, 0, 0]}>
-            <Clone object={scene} />
+        <group position={[0, 0, 0]}>
+            {/* Blue Cottage Body */}
+            <mesh position={[0, 0.5, 0]}>
+                <boxGeometry args={[1.2, 1.0, 1.2]} />
+                <meshStandardMaterial color="#3498db" />
+            </mesh>
+            {/* Thatch Roof (Yellowish/Brown) */}
+            <mesh position={[0, 1.3, 0]} rotation={[0, Math.PI / 4, 0]}>
+                <coneGeometry args={[1.1, 1.1, 4]} />
+                <meshStandardMaterial color="#e67e22" />
+            </mesh>
+            {/* Flower Box */}
+            <mesh position={[0, 0.2, 0.65]}>
+                <boxGeometry args={[0.8, 0.2, 0.2]} />
+                <meshStandardMaterial color="#27ae60" />
+            </mesh>
         </group>
     );
 }
 
 function LogCabin() {
-    const { scene } = useGLTF(MODEL_URLS.cabin);
     return (
-        <group scale={1.2} position={[0, 0, 0]}>
-            <Clone object={scene} />
+        <group position={[0, 0, 0]}>
+            {/* Logs Body (Brown strips? Simplified to block for now) */}
+            <mesh position={[0, 0.4, 0]}>
+                <boxGeometry args={[1.0, 0.8, 1.0]} />
+                <meshStandardMaterial color="#795548" /> {/* Wood Brown */}
+            </mesh>
+            {/* Green Roof */}
+            <mesh position={[0, 1.0, 0]} rotation={[0, Math.PI / 4, 0]}>
+                <coneGeometry args={[0.9, 0.8, 4]} />
+                <meshStandardMaterial color="#2e7d32" />
+            </mesh>
+            {/* Door */}
+            <mesh position={[0, 0.3, 0.51]}>
+                <planeGeometry args={[0.3, 0.5]} />
+                <meshStandardMaterial color="#3e2723" />
+            </mesh>
         </group>
     );
 }

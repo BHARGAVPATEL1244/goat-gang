@@ -173,20 +173,28 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
             occupied.add(`${x},${z}`);
         }
 
-        // Generate Roads for the Grid
-        // A simple approach: Fill a 9x9 grid with roads, skipping where houses are?
-        // Or render roads connecting everything.
-        // Let's iterate a grid range and place roads where there are NO houses
-        // to create "Streets".
-        for (let rx = -5; rx <= 5; rx++) {
-            for (let rz = -5; rz <= 5; rz++) {
-                if (occupied.has(`${rx},${rz}`)) continue; // Skip house spots
+        // Generate Roads - SOLID PLAZA GRID
+        // We want a paved city look, so we pave everything within a certain radius
+        const plazaRadius = 7; // Pave the center densely
+        const roadSpacing = 3.5; // Match scale 3.5 roughly (FBX scale is tricky, trial and error) -> If scale 3.5, road tile is approx 3.5 units?
+        // Logic: if scale 3.5, and original tile is ~100cm (1unit), then it's 3.5 units.
+        // Let's assume tile covers 'roadSpacing'.
 
-                // Add road
+        for (let rx = -plazaRadius; rx <= plazaRadius; rx++) {
+            for (let rz = -plazaRadius; rz <= plazaRadius; rz++) {
+                // Check if distance is circular
+                if (rx * rx + rz * rz > plazaRadius * plazaRadius) continue;
+
+                // Skip if there's a house exactly here?
+                // No, houses are placed on "grid units" of spacing 5.
+                // Roads are spacing 3.5. They might clump.
+                // Better visual hack: Just lay a huge paved floor instead of tiles?
+                // Or tile effectively. Let's try tiling with spacing 3.0.
+
                 rPos.push({
-                    x: rx * spacing,
-                    z: rz * spacing,
-                    r: (Math.random() < 0.5 ? 0 : Math.PI / 2) // Random rotation 90deg
+                    x: rx * 3.0,
+                    z: rz * 3.0,
+                    r: 0
                 });
             }
         }

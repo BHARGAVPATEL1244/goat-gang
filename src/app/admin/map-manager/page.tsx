@@ -94,6 +94,26 @@ export default function MapManagerPage() {
         setFormData(safeData);
     };
 
+    const handleSync = async (d: any) => {
+        if (!d.hood_id) return alert('No Discord Role ID set for this hood!');
+        if (!confirm(`Sync members for ${d.name} from Discord?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/sync-hood', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hood_id: d.hood_id, hood_db_id: d.id })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            alert(`Success! Synced ${data.count} members.`);
+        } catch (err: any) {
+            alert('Sync Failed: ' + err.message);
+        }
+    };
+
     return (
         <div className="p-8 text-white min-h-screen">
             <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
@@ -198,15 +218,23 @@ export default function MapManagerPage() {
                             </div>
                             <div className="text-sm text-gray-400">
                                 <div>Coords: ({d.q}, {d.r})</div>
+                                <div className="font-mono text-xs opacity-50">{d.hood_id ? `Role: ${d.hood_id}` : 'No Role ID'}</div>
                             </div>
                         </div>
-                        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-800">
-                            <button onClick={() => startEdit(d)} className="flex-1 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 py-2 rounded flex items-center justify-center gap-2 transition-colors">
-                                <Edit className="w-4 h-4" /> Edit
-                            </button>
-                            <button onClick={() => handleDelete(d.id)} className="flex-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 py-2 rounded flex items-center justify-center gap-2 transition-colors">
-                                <Trash className="w-4 h-4" /> Delete
-                            </button>
+                        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-800 w-full">
+                            <div className="flex gap-2 w-full">
+                                <button onClick={() => startEdit(d)} className="flex-1 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs">
+                                    <Edit className="w-3 h-3" /> Edit
+                                </button>
+                                <button onClick={() => handleDelete(d.id)} className="flex-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs">
+                                    <Trash className="w-3 h-3" /> Delete
+                                </button>
+                            </div>
+                            {d.hood_id && (
+                                <button onClick={() => handleSync(d)} className="w-full bg-indigo-900/30 hover:bg-indigo-900/50 text-indigo-400 py-2 rounded flex items-center justify-center gap-2 transition-colors text-xs font-bold border border-indigo-900/50">
+                                    <span className="text-lg">↻</span> Sync Members
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

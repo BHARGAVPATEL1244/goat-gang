@@ -26,15 +26,36 @@ export default function MapPage() {
     // Load members when entering village
     useEffect(() => {
         if (viewMode === 'VILLAGE' && selectedDistrict) {
-            // TODO: Fetch real members. For now dummy data.
-            setVillageMembers([
-                { id: '1', name: selectedDistrict.leader_name || 'Leader', role: 'Leader' },
-                { id: '2', name: 'Co-Lead 1', role: 'CoLeader' },
-                { id: '3', name: 'Elder Bob', role: 'Elder' },
-                { id: '4', name: 'Farmer Joe', role: 'Member' },
-                // Add more dummies to test layout
-                ...Array.from({ length: 15 }).map((_, i) => ({ id: `m${i}`, name: `Member ${i}`, role: 'Member' }))
-            ]);
+            async function fetchMembers() {
+                // If it's a real hood (Discord Role ID exists or hood_id)
+                if (selectedDistrict.hood_id) {
+                    const { data } = await supabase
+                        .from('hood_memberships')
+                        .select('*')
+                        .eq('hood_id', selectedDistrict.hood_id);
+
+                    if (data && data.length > 0) {
+                        const realMembers = data.map(m => ({
+                            id: m.user_id,
+                            name: m.nickname || m.username || 'Member', // Fallback
+                            role: m.rank
+                        }));
+                        setVillageMembers(realMembers);
+                    } else {
+                        // No synced members yet? Fallback to leader only or empty
+                        setVillageMembers([
+                            { id: 'leader', name: selectedDistrict.leader_name || 'Leader', role: 'Leader' }
+                        ]);
+                    }
+                } else {
+                    // Demo Mode (No ID)
+                    setVillageMembers([
+                        { id: '1', name: selectedDistrict.leader_name || 'Leader', role: 'Leader' },
+                        { id: '2', name: 'Demo Member', role: 'Member' }
+                    ]);
+                }
+            }
+            fetchMembers();
         }
     }, [viewMode, selectedDistrict]);
 

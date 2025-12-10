@@ -48,19 +48,31 @@ const getElderModel = (id: string) => {
     return ELDER_MODELS[index];
 };
 
-const getVillagePositions = (count: number, radius: number = 4) => {
+// Helper to calculate positions in a spiral/ring for the village
+const getVillagePositions = (count: number, radius: number = 6) => { // Increased base radius from 4 to 6
     const pos = [];
     pos.push({ x: 0, z: 0, r: 0 }); // Center
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
-        pos.push({ x: Math.cos(angle) * (radius * 0.4), z: Math.sin(angle) * (radius * 0.4), r: -angle });
+        // Spread inner ring slightly more
+        pos.push({ x: Math.cos(angle) * (radius * 0.5), z: Math.sin(angle) * (radius * 0.5), r: -angle });
     }
     for (let i = 0; i < 12; i++) {
         const angle = (i / 12) * Math.PI * 2;
-        pos.push({ x: Math.cos(angle) * (radius * 0.8), z: Math.sin(angle) * (radius * 0.8), r: -angle });
+        // Outer ring spread out more
+        pos.push({ x: Math.cos(angle) * (radius * 1.0), z: Math.sin(angle) * (radius * 1.0), r: -angle });
+    }
+    // Extra ring for overflow if needed
+    for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2 + 0.2; // Offset
+        pos.push({ x: Math.cos(angle) * (radius * 1.5), z: Math.sin(angle) * (radius * 1.5), r: -angle });
     }
     return pos;
 };
+
+// ... inside component ...
+
+
 
 interface Member {
     id: string;
@@ -153,11 +165,7 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                 <meshStandardMaterial color="#5da642" />
             </mesh>
 
-            {/* Dirt Path Ring */}
-            <mesh receiveShadow position={[0, 0.01, 0]}>
-                <ringGeometry args={[3.5, 4.5, 32]} />
-                <meshStandardMaterial color="#d4a373" side={THREE.DoubleSide} />
-            </mesh>
+
 
             {/* Back Button Signpost */}
             <group position={[0, 2, -8]} onClick={onBack} onPointerOver={() => document.body.style.cursor = 'pointer'} onPointerOut={() => document.body.style.cursor = 'auto'}>
@@ -201,10 +209,11 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                 // Determine Scale based on Role for Hierarchy
                 let roleScale = 1.0;
                 let nameTagHeight = 3.5;
-                if (member.role === 'Leader') { roleScale = 1.8; nameTagHeight = 6.0; }
-                else if (member.role === 'CoLeader') { roleScale = 1.5; nameTagHeight = 5.0; }
-                else if (member.role === 'Elder') { roleScale = 1.2; nameTagHeight = 4.0; }
-                else { roleScale = 1.0; nameTagHeight = 3.5; }
+                // Bumped up all scales slightly
+                if (member.role === 'Leader') { roleScale = 2.0; nameTagHeight = 6.5; } // Leader still dominant
+                else if (member.role === 'CoLeader') { roleScale = 1.6; nameTagHeight = 5.5; } // Big
+                else if (member.role === 'Elder') { roleScale = 1.35; nameTagHeight = 4.5; } // Noticeable
+                else { roleScale = 1.15; nameTagHeight = 4.0; } // Bigger base size
 
                 return (
                     <group

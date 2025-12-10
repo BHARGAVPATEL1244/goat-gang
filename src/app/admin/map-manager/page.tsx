@@ -5,8 +5,11 @@ import { createClient } from '@/utils/supabase/client';
 import { Plus, Edit, Trash, Save, Hexagon } from 'lucide-react';
 import NeighborhoodCard from '@/components/NeighborhoodCard'; // Added import
 
+import { useRouter } from 'next/navigation'; // Added import
+
 export default function MapManagerPage() {
     const supabase = createClient();
+    const router = useRouter(); // Hook must be here
     const [districts, setDistricts] = useState<any[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -224,6 +227,7 @@ export default function MapManagerPage() {
                             onEdit={() => startEdit(d)}
                             onSync={() => handleSync(d)}
                             onDelete={() => handleDelete(d)}
+                            onManageMembers={() => router.push(`/admin/hood-members?hood_id=${d.hood_id}&name=${encodeURIComponent(d.name)}`)}
                         />
                         {/* Optional small text for debug info not in card */}
                         <div className="text-center mt-2 text-xs text-mono text-gray-600">
@@ -237,6 +241,6 @@ export default function MapManagerPage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

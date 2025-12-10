@@ -11,9 +11,10 @@ interface NeighborhoodCardProps {
     onEdit?: (hood: NeighborhoodDB) => void;
     onSync?: (hood: NeighborhoodDB) => void;
     onDelete?: (hood: NeighborhoodDB) => void;
+    onManageMembers?: (neighborhood: any) => void;
 }
 
-export default function NeighborhoodCard({ neighborhood, index, onEdit, onSync, onDelete }: NeighborhoodCardProps) {
+export default function NeighborhoodCard({ neighborhood, index, onEdit, onSync, onDelete, onManageMembers }: NeighborhoodCardProps) {
     const [copied, setCopied] = React.useState(false);
     const divRef = React.useRef<HTMLDivElement>(null);
     const [xy, setXY] = React.useState({ x: 0, y: 0 });
@@ -54,20 +55,25 @@ export default function NeighborhoodCard({ neighborhood, index, onEdit, onSync, 
             />
 
             {/* Admin Controls - Moved to top right or integrated differently since image is gone */}
-            {(onEdit || onSync || onDelete) && (
+            {(onEdit || onSync || onDelete || onManageMembers) && (
                 <div className="absolute top-4 right-4 z-30 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    {onManageMembers && (
+                        <button onClick={(e) => { e.stopPropagation(); onManageMembers(neighborhood); }} className="p-2 bg-green-600/80 hover:bg-green-500 text-white rounded-full backdrop-blur shadow-lg" title="Manage Members">
+                            <Users className="w-4 h-4" />
+                        </button>
+                    )}
                     {onEdit && (
-                        <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-2 bg-blue-600/80 hover:bg-blue-500 text-white rounded-full backdrop-blur shadow-lg">
+                        <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-2 bg-blue-600/80 hover:bg-blue-500 text-white rounded-full backdrop-blur shadow-lg" title="Edit Details">
                             <Edit className="w-4 h-4" />
                         </button>
                     )}
                     {onSync && (
-                        <button onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-2 bg-indigo-600/80 hover:bg-indigo-500 text-white rounded-full backdrop-blur shadow-lg">
+                        <button onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-2 bg-indigo-600/80 hover:bg-indigo-500 text-white rounded-full backdrop-blur shadow-lg" title="Sync from Discord">
                             <RefreshCw className="w-4 h-4" />
                         </button>
                     )}
                     {onDelete && (
-                        <button onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-2 bg-red-600/80 hover:bg-red-500 text-white rounded-full backdrop-blur shadow-lg">
+                        <button onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-2 bg-red-600/80 hover:bg-red-500 text-white rounded-full backdrop-blur shadow-lg" title="Delete">
                             <Trash className="w-4 h-4" />
                         </button>
                     )}

@@ -138,13 +138,13 @@ function AdminNavContent() {
 
                     {showNeighborhoods && (
                         <Link
-                            href="/admin?view=neighborhoods"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isTabActive('neighborhoods')
+                            href="/admin/map-manager"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isPageActive('/admin/map-manager')
                                 ? 'bg-gray-700 text-white shadow-sm'
                                 : 'text-gray-400 hover:text-white hover:bg-gray-700'
                                 }`}
                         >
-                            Neighborhoods
+                            Map Manager
                         </Link>
                     )}
 

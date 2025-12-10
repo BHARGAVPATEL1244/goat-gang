@@ -45,7 +45,7 @@ export default function House({ tier, position, scale = 1, onClick, modelUrl }: 
 }
 
 // Wrapper to handle different file types (GLTF vs FBX)
-function ExternalModel({ url, scale }: { url: string; scale: number }) {
+export function ExternalModel({ url, scale }: { url: string; scale: number }) {
     const isFbx = url.toLowerCase().endsWith('.fbx');
 
     if (isFbx) {

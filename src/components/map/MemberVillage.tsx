@@ -3,12 +3,13 @@
 import React, { useMemo } from 'react';
 import { Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
-import House from './House';
+import House, { ExternalModel } from './House';
 
 // CUSTOM GLTF MODELS
 // CUSTOM GLTF/FBX MODELS
 const BASE_MODELS_PATH = '/models/Medieval Village Pack - Dec 2020/Buildings/FBX';
 const PROPS_PATH = '/models/Medieval Village Pack - Dec 2020/Props/FBX';
+const ROAD_MODEL = `${PROPS_PATH}/Path_Square.fbx`;
 
 const LEADER_MODEL = `${BASE_MODELS_PATH}/Inn.fbx`; // Inn looks big and leader-like
 const COLEADER_MODEL = `${BASE_MODELS_PATH}/Visual_House_VS_House_1.fbx`; // Fallback or House 1
@@ -135,7 +136,64 @@ const parseMemberName = (rawName: string) => {
 };
 
 export default function MemberVillage({ hoodName, members, onBack, leaderModel, coleaderModel }: MemberVillageProps) {
-    const positions = useMemo(() => getVillagePositions(30), []);
+    // Use memo for grid/road positions to be efficient
+    const { housePositions, roadPositions } = useMemo(() => {
+        // Calculate Spiral House Positions
+        const hPos = [];
+        const rPos = [];
+        const occupied = new Set<string>();
+
+        // Center Leader
+        hPos.push({ x: 0, z: 0, r: 0 });
+        occupied.add(`0,0`);
+
+        // Spiral Algorithm
+        const spacing = 5;
+        let x = 0;
+        let z = 0;
+        let dx = 0;
+        let dz = -1;
+        let t = spacing;
+
+        // Generate houses
+        for (let i = 1; i < 35; i++) { // Increased count to ensure enough spots
+            if (x === z || (x < 0 && x === -z) || (x > 0 && x === 1 - z)) {
+                t = dx; dx = -dz; dz = t;
+            }
+            x += dx; z += dz;
+
+            // House Position
+            const px = x * spacing;
+            const pz = z * spacing;
+            // Add noise
+            const noiseX = (Math.random() - 0.5) * 1.5;
+            const noiseZ = (Math.random() - 0.5) * 1.5;
+            const rot = (Math.random() - 0.5) * 0.5;
+            hPos.push({ x: px + noiseX, z: pz + noiseZ, r: rot });
+            occupied.add(`${x},${z}`);
+        }
+
+        // Generate Roads for the Grid
+        // A simple approach: Fill a 9x9 grid with roads, skipping where houses are?
+        // Or render roads connecting everything.
+        // Let's iterate a grid range and place roads where there are NO houses
+        // to create "Streets".
+        for (let rx = -5; rx <= 5; rx++) {
+            for (let rz = -5; rz <= 5; rz++) {
+                if (occupied.has(`${rx},${rz}`)) continue; // Skip house spots
+
+                // Add road
+                rPos.push({
+                    x: rx * spacing,
+                    z: rz * spacing,
+                    r: (Math.random() < 0.5 ? 0 : Math.PI / 2) // Random rotation 90deg
+                });
+            }
+        }
+
+        return { housePositions: hPos, roadPositions: rPos };
+    }, []);
+
     const [hoveredMember, setHoveredMember] = React.useState<string | null>(null);
 
     // Pre-calculate custom models if provided
@@ -144,15 +202,15 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
 
     // ... arrangedMembers logic ...
     const arrangedMembers = useMemo(() => {
-        const slots = Array(30).fill(null);
+        const slots = Array(housePositions.length).fill(null);
         const leader = members.find(m => m.role === 'Leader');
         if (leader) slots[0] = leader;
         let currentIndex = 1;
         members.filter(m => m.role !== 'Leader').forEach(m => {
-            if (currentIndex < 30) slots[currentIndex++] = m;
+            if (currentIndex < housePositions.length) slots[currentIndex++] = m;
         });
         return slots;
-    }, [members]);
+    }, [members, housePositions]);
 
     // ... decorations ...
     const decorations = useMemo(() => {
@@ -225,7 +283,8 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
             {/* Houses logic */}
             {arrangedMembers.map((member, i) => {
                 if (!member) return null;
-                const pos = positions[i];
+                const pos = housePositions[i];
+                if (!pos) return null; // Safe guard
                 const isLeader = member.role === 'Leader';
                 const isHovered = hoveredMember === member.id;
 
@@ -295,6 +354,13 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                     </group>
                 );
             })}
+
+            {/* Roads */}
+            {roadPositions.map((r, i) => (
+                <group key={`road-${i}`} position={[r.x, 0, r.z]} rotation={[0, r.r, 0]}>
+                    <ExternalModel url={ROAD_MODEL} scale={3.5} />
+                </group>
+            ))}
         </group>
     );
 }

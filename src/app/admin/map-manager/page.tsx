@@ -23,8 +23,7 @@ export default function MapManagerPage() {
         r: 0,
         hood_reqs_text: '',
         derby_reqs_text: '',
-        leader_name: '',
-        image: '' // Added image field
+        leader_name: ''
     });
 
     useEffect(() => {
@@ -51,8 +50,7 @@ export default function MapManagerPage() {
                 r: formData.r,
                 hood_reqs_text: formData.hood_reqs_text,
                 derby_reqs_text: formData.derby_reqs_text,
-                leader_name: formData.leader_name,
-                image: formData.image
+                leader_name: formData.leader_name
             };
 
             let error;
@@ -72,7 +70,7 @@ export default function MapManagerPage() {
             setEditingId(null);
             setFormData({
                 name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0,
-                hood_reqs_text: '', derby_reqs_text: '', leader_name: '', image: ''
+                hood_reqs_text: '', derby_reqs_text: '', leader_name: ''
             });
             loadDistricts();
         } catch (error) {
@@ -92,8 +90,7 @@ export default function MapManagerPage() {
             ...d,
             hood_reqs_text: d.hood_reqs_text || '',
             derby_reqs_text: d.derby_reqs_text || '',
-            leader_name: d.leader_name || '',
-            image: d.image || ''
+            leader_name: d.leader_name || ''
         };
         setFormData(safeData);
         // Scroll to form
@@ -124,7 +121,7 @@ export default function MapManagerPage() {
     const adaptToCard = (d: any) => ({
         id: d.id.toString(), // Fix: Convert number ID to string
         name: d.name || 'Unnamed',
-        image: d.image || '', // Ensure empty string if null, Card handles it
+        image: '', // No image support in UI anymore
         // Use leader_name for leader
         leader: d.leader_name || 'None',
         tag: d.tag || '',
@@ -161,11 +158,6 @@ export default function MapManagerPage() {
                         type="text" placeholder="Tag (#XYZ)"
                         className="bg-gray-900 border border-gray-700 rounded p-2"
                         value={formData.tag} onChange={e => setFormData({ ...formData, tag: e.target.value })}
-                    />
-                    <input
-                        type="text" placeholder="Image URL (e.g. /goats/pic.png)"
-                        className="bg-gray-900 border border-gray-700 rounded p-2"
-                        value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })}
                     />
                     <select
                         className="bg-gray-900 border border-gray-700 rounded p-2"
@@ -214,7 +206,7 @@ export default function MapManagerPage() {
                         <Save className="w-4 h-4" /> Save
                     </button>
                     {editingId && (
-                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '', image: '' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
+                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
                             Cancel
                         </button>
                     )}

@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Gltf } from '@react-three/drei';
 import * as THREE from 'three';
 
 type HouseTier = 'Leader' | 'CoLeader' | 'Elder' | 'Member';
@@ -11,9 +12,10 @@ interface HouseProps {
     position: [number, number, number];
     scale?: number;
     onClick?: () => void;
+    modelUrl?: string | null; // Optional external model
 }
 
-export default function House({ tier, position, scale = 1, onClick }: HouseProps) {
+export default function House({ tier, position, scale = 1, onClick, modelUrl }: HouseProps) {
     const mesh = useRef<THREE.Group>(null);
 
     // Subtle Float Animation
@@ -25,17 +27,27 @@ export default function House({ tier, position, scale = 1, onClick }: HouseProps
 
     return (
         <group ref={mesh} position={position} scale={scale} onClick={(e) => { e.stopPropagation(); onClick?.(); }}>
-            {/* Shadow Blob */}
+            {/* Shadow Blob - Always render shadow for grounding */}
             <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
                 <circleGeometry args={[1.0, 32]} />
                 <meshBasicMaterial color="#000" transparent opacity={0.3} />
             </mesh>
 
-            {/* Render Specific Geometry based on Tier */}
-            {tier === 'Leader' && <LeaderManor />}
-            {tier === 'CoLeader' && <FarmBarn />}
-            {tier === 'Elder' && <Cottage />}
-            {tier === 'Member' && <LogCabin />}
+            {/* Render External GLTF if URL provided, else Fallback to Procedural */}
+            {modelUrl ? (
+                <Gltf
+                    src={modelUrl}
+                    scale={scale * 0.5} // Adjust scale for external models usually being larger
+                    position={[0, 0.5, 0]}
+                />
+            ) : (
+                <>
+                    {tier === 'Leader' && <LeaderManor />}
+                    {tier === 'CoLeader' && <FarmBarn />}
+                    {tier === 'Elder' && <Cottage />}
+                    {tier === 'Member' && <LogCabin />}
+                </>
+            )}
         </group>
     );
 }

@@ -4,6 +4,20 @@ import React, { useMemo } from 'react';
 import { Text } from '@react-three/drei';
 import House from './House';
 
+// CUSTOM GLTF MODELS
+const BASE_MODELS_PATH = '/models/KayKit Medieval Builder Pack 1.0/Models/objects/gltf';
+
+const HOUSE_MODELS: Record<string, string | null> = {
+    // Leader gets a Castle!
+    Leader: `${BASE_MODELS_PATH}/castle.gltf.glb`,
+    // Co-Leader gets the Market (managing the hood)
+    CoLeader: `${BASE_MODELS_PATH}/market.gltf.glb`,
+    // Elders get standard Houses
+    Elder: `${BASE_MODELS_PATH}/house.gltf.glb`,
+    // Members get Lumbermills (working hard!) - or swap for house if preferred
+    Member: `${BASE_MODELS_PATH}/lumbermill.gltf.glb`
+};
+
 // Helper to calculate positions in a spiral/ring for the village
 const getVillagePositions = (count: number, radius: number = 4) => {
     const pos = [];
@@ -133,6 +147,7 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
                             tier={member.role}
                             scale={isLeader ? 1.5 : 1.0}
                             position={[0, 0, 0]}
+                            modelUrl={HOUSE_MODELS[member.role]}
                         />
 
                         {/* Name Tag - Floating above */}

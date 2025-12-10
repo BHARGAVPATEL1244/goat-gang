@@ -119,7 +119,7 @@ export default function Navbar() {
 
     // --- Menu Structure ---
     const communityLinks = [
-        { href: '/neighborhoods', label: 'Neighborhoods' },
+        { href: '/map', label: 'Neighborhoods' },
         { href: '/events', label: 'Events' },
         { href: '/leaderboard', label: 'Leaderboard' },
         { href: '/contact', label: 'Contact' },

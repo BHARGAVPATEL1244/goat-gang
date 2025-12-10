@@ -1,13 +1,29 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, Environment, Sky } from '@react-three/drei';
 import HexGrid from '@/components/map/HexGrid';
-import { Loader2 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function MapPage() {
-    const [selectedHood, setSelectedHood] = useState<string | null>(null);
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [selectedDistrict, setSelectedDistrict] = useState<any | null>(null);
+    const supabase = createClient();
+
+    useEffect(() => {
+        async function loadData() {
+            const { data } = await supabase.from('map_districts').select('*');
+            if (data) setDistricts(data);
+        }
+        loadData();
+    }, []);
+
+    // Find full district object when ID is selected
+    const handleSelect = (id: string) => {
+        const d = districts.find(x => x.id === id);
+        setSelectedDistrict(d || null);
+    };
 
     return (
         <div className="w-full h-screen bg-gray-900 relative">
@@ -20,33 +36,63 @@ export default function MapPage() {
                     </div>
 
                     {/* Search Bar Placeholder */}
-                    <div className="pointer-events-auto">
+                    {/* Removed search bar as per instruction, but keeping the div structure for context */}
+                    {/* <div className="pointer-events-auto">
                         <input
                             type="text"
                             placeholder="Find a Hood..."
                             className="bg-black/40 text-white border border-white/20 rounded-full px-4 py-2 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
             {/* Selected Hood Detail Overlay */}
-            {selectedHood && (
-                <div className="absolute right-0 top-0 h-full w-80 bg-black/80 backdrop-blur-xl border-l border-white/10 z-20 p-6 animate-in slide-in-from-right duration-300">
+            {selectedDistrict && (
+                <div className="absolute right-0 top-0 h-full w-96 bg-black/80 backdrop-blur-xl border-l border-white/10 z-20 p-6 animate-in slide-in-from-right duration-300 overflow-y-auto">
                     <button
-                        onClick={() => setSelectedHood(null)}
+                        onClick={() => setSelectedDistrict(null)}
                         className="absolute top-4 right-4 text-gray-400 hover:text-white"
                     >
                         ✕
                     </button>
-                    <h2 className="text-2xl font-bold text-white mb-2">Selected Hood</h2>
-                    <p className="text-gray-400">ID: {selectedHood}</p>
-                    <div className="mt-8 space-y-4">
-                        <div className="bg-white/5 p-4 rounded-lg">
-                            <h3 className="text-sm font-bold text-gray-300 uppercase">Tags</h3>
-                            <p className="text-white">#XYZ123</p>
+                    <h2 className="text-2xl font-bold text-white mb-1">{selectedDistrict.name}</h2>
+                    <p className="text-blue-400 text-sm font-medium mb-4">Leader: {selectedDistrict.leader_name || 'Unknown'}</p>
+
+                    <div className="space-y-6">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase mb-2">Details</h3>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                    <span className="text-gray-500 block text-xs">Tag</span>
+                                    <span className="text-white font-mono">{selectedDistrict.tag}</span>
+                                </div>
+                                <div>
+                                    <span className="text-gray-500 block text-xs">Status</span>
+                                    <span className="text-green-400">Recruiting</span>
+                                </div>
+                            </div>
                         </div>
-                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors">
+
+                        {selectedDistrict.hood_reqs_text && (
+                            <div>
+                                <h3 className="text-sm font-bold text-yellow-500 uppercase mb-2">Hood Requirements</h3>
+                                <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
+                                    {selectedDistrict.hood_reqs_text}
+                                </p>
+                            </div>
+                        )}
+
+                        {selectedDistrict.derby_reqs_text && (
+                            <div>
+                                <h3 className="text-sm font-bold text-purple-500 uppercase mb-2">Derby Requirements</h3>
+                                <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
+                                    {selectedDistrict.derby_reqs_text}
+                                </p>
+                            </div>
+                        )}
+
+                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-green-900/20">
                             JOIN HOOD
                         </button>
                     </div>
@@ -61,8 +107,8 @@ export default function MapPage() {
                     <pointLight position={[10, 10, 10]} intensity={1} castShadow />
 
                     <HexGrid
-                        districts={[]}
-                        onHoodSelect={setSelectedHood}
+                        districts={districts}
+                        onHoodSelect={handleSelect}
                     />
 
                     <OrbitControls

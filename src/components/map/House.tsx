@@ -105,11 +105,11 @@ function FarmBarn() {
             {/* Silo Next to it */}
             <mesh position={[1, 0.7, 0]}>
                 <cylinderGeometry args={[0.4, 0.4, 1.4, 16]} />
-                <meshStandardMaterial color="#95a5a6" metallic roughness={0.5} />
+                <meshStandardMaterial color="#95a5a6" metalness={1} roughness={0.5} />
             </mesh>
             <mesh position={[1, 1.6, 0]}>
                 <sphereGeometry args={[0.4]} />
-                <meshStandardMaterial color="#bdc3c7" metallic roughness={0.5} />
+                <meshStandardMaterial color="#bdc3c7" metalness={1} roughness={0.5} />
             </mesh>
         </group>
     );

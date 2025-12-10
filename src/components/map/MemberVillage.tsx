@@ -77,6 +77,25 @@ interface MemberVillageProps {
     coleaderModel?: string;
 }
 
+// Helper to parse name and level from "Name [Lvl] [Lvl2]"
+const parseMemberName = (rawName: string) => {
+    // 1. Extract Name (before first [)
+    const nameMatch = rawName.split('[')[0].trim();
+
+    // 2. Extract Levels (in [])
+    const levelMatches = rawName.match(/\[(\d+)\]/g);
+    let level = '';
+
+    if (levelMatches && levelMatches.length > 0) {
+        // Default to first level found
+        // Logic for 2nd level requires knowing if this is the user's "2nd hood"
+        // For now, we default to the first one as it's the safest assumption without cross-hood context
+        level = levelMatches[0].replace('[', '').replace(']', '');
+    }
+
+    return { name: nameMatch || rawName, level };
+};
+
 export default function MemberVillage({ hoodName, members, onBack, leaderModel, coleaderModel }: MemberVillageProps) {
     const positions = useMemo(() => getVillagePositions(30), []);
     const [hoveredMember, setHoveredMember] = React.useState<string | null>(null);
@@ -176,6 +195,9 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                 const isLeader = member.role === 'Leader';
                 const isHovered = hoveredMember === member.id;
 
+                // Parse Name and Level
+                const { name: displayName, level } = parseMemberName(member.name);
+
                 return (
                     <group
                         key={member.id || i}
@@ -196,8 +218,8 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                         {isHovered && (
                             <group position={[0, isLeader ? 5.5 : 3.5, 0]}>
                                 <mesh position={[0, 0, -0.1]}>
-                                    <planeGeometry args={[member.name.length * 0.3 + 1, 0.8]} />
-                                    <meshBasicMaterial color="black" transparent opacity={0.6} />
+                                    <planeGeometry args={[displayName.length * 0.3 + 1, 1.2]} />
+                                    <meshBasicMaterial color="black" transparent opacity={0.7} />
                                 </mesh>
                                 <Text
                                     fontSize={0.4}
@@ -206,17 +228,18 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                                     outlineColor="black"
                                     anchorX="center"
                                     anchorY="middle"
+                                    position={[0, 0.2, 0]}
                                 >
-                                    {member.name}
+                                    {displayName}
                                 </Text>
                                 <Text
-                                    position={[0, -0.5, 0]}
+                                    position={[0, -0.2, 0]}
                                     fontSize={0.25}
                                     color="#fbbf24"
                                     anchorX="center"
                                     anchorY="middle"
                                 >
-                                    {member.role.toUpperCase()}
+                                    {level ? `Lvl ${level}` : member.role.toUpperCase()}
                                 </Text>
                             </group>
                         )}

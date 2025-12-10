@@ -9,7 +9,7 @@ import House from './House';
 const BASE_MODELS_PATH = '/models/KayKit Medieval Builder Pack 1.0/Models/objects/gltf';
 
 const LEADER_MODEL = `${BASE_MODELS_PATH}/castle.gltf.glb`;
-const COLEADER_MODEL = `${BASE_MODELS_PATH}/market.gltf.glb`;
+const COLEADER_MODEL = `${BASE_MODELS_PATH}/watchtower.gltf.glb`;
 const MEMBER_MODEL = `${BASE_MODELS_PATH}/house.gltf.glb`; // Default simple house
 
 // Helper to resolve short names to full paths
@@ -198,6 +198,14 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                 // Parse Name and Level
                 const { name: displayName, level } = parseMemberName(member.name);
 
+                // Determine Scale based on Role for Hierarchy
+                let roleScale = 1.0;
+                let nameTagHeight = 3.5;
+                if (member.role === 'Leader') { roleScale = 1.8; nameTagHeight = 6.0; }
+                else if (member.role === 'CoLeader') { roleScale = 1.5; nameTagHeight = 5.0; }
+                else if (member.role === 'Elder') { roleScale = 1.2; nameTagHeight = 4.0; }
+                else { roleScale = 1.0; nameTagHeight = 3.5; }
+
                 return (
                     <group
                         key={member.id || i}
@@ -209,7 +217,7 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                         {/* Note: Rotated +Math.PI to face center */}
                         <House
                             tier={member.role}
-                            scale={isLeader ? 1.5 : 1.0}
+                            scale={roleScale}
                             position={[0, 0, 0]}
                             modelUrl={getModelForMember(member)}
                         />
@@ -217,7 +225,7 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                         {/* Name Tag - ONLY VISIBLE ON HOVER - Faces Camera */}
                         {isHovered && (
                             <Billboard
-                                position={[0, isLeader ? 5.5 : 3.5, 0]}
+                                position={[0, nameTagHeight, 0]}
                                 follow={true}
                                 lockX={false}
                                 lockY={false}

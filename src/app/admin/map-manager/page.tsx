@@ -225,6 +225,8 @@ export default function MapManagerPage() {
                                 <option value="keep">Keep / Fort</option>
                                 <option value="watchtower">Watchtower</option>
                                 <option value="barracks">Barracks</option>
+                                <option value="lumbermill">Lumbermill</option>
+                                <option value="mine">Mine</option>
                                 <option value="archeryrange">Archery Range</option>
                             </select>
                         </div>
@@ -239,6 +241,9 @@ export default function MapManagerPage() {
                                 <option value="mill">Windmill</option>
                                 <option value="watermill">Watermill</option>
                                 <option value="barracks">Barracks</option>
+                                <option value="watchtower">Watchtower</option>
+                                <option value="lumbermill">Lumbermill</option>
+                                <option value="mine">Mine</option>
                                 <option value="archeryrange">Archery Range</option>
                                 <option value="house">Standard House</option>
                             </select>

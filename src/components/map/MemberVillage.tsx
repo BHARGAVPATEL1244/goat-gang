@@ -23,6 +23,9 @@ const resolveModelUrl = (shortName?: string) => {
         'watchtower': `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
         'barracks': `${BASE_MODELS_PATH}/barracks.gltf.glb`,
         'archeryrange': `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
+        'lumbermill': `${BASE_MODELS_PATH}/lumbermill.gltf.glb`,
+        'mine': `${BASE_MODELS_PATH}/mine.gltf.glb`,
+        'well': `${BASE_MODELS_PATH}/well.gltf.glb`,
         'keep': `${BASE_MODELS_PATH}/keep.gltf.glb`, // Need to verify if exists, fallback to castle
         'house': `${BASE_MODELS_PATH}/house.gltf.glb`,
     };
@@ -36,7 +39,8 @@ const ELDER_MODELS = [
     `${BASE_MODELS_PATH}/barracks.gltf.glb`,
     `${BASE_MODELS_PATH}/watermill.gltf.glb`,
     `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
-    `${BASE_MODELS_PATH}/library.gltf.glb`
+    `${BASE_MODELS_PATH}/mine.gltf.glb`, // Replaced library
+    `${BASE_MODELS_PATH}/lumbermill.gltf.glb` // Added variety
 ];
 
 const getElderModel = (id: string) => {

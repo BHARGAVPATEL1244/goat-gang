@@ -166,7 +166,7 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
                 return (
                     <group
                         key={member.id || i}
-                        position={[pos.x, 0.5, pos.z]}
+                        position={[pos.x, 0, pos.z]}
                         rotation={[0, pos.r + Math.PI, 0]}
                         onPointerOver={(e) => { e.stopPropagation(); setHoveredMember(member.id); document.body.style.cursor = 'pointer'; }}
                         onPointerOut={(e) => { e.stopPropagation(); setHoveredMember(null); document.body.style.cursor = 'auto'; }}

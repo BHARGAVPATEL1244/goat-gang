@@ -67,7 +67,7 @@ function HexTile({ q, r, type, hoodName, onClick }: DistrictProps) {
                 <>
                     <House
                         tier={isCapital ? 'Leader' : 'CoLeader'}
-                        position={[0, 0.25, 0]}
+                        position={[0, 0, 0]}
                         scale={isCapital ? 1.6 : 1.3}
                         modelUrl={isCapital ? HOUSE_MODELS.Leader : HOUSE_MODELS.CoLeader}
                     />

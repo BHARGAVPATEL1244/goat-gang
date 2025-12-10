@@ -222,7 +222,6 @@ export default function MapManagerPage() {
                                 onChange={e => setFormData({ ...formData, leader_model: e.target.value })}
                             >
                                 <option value="castle">Castle (Default)</option>
-                                <option value="keep">Keep / Fort</option>
                                 <option value="watchtower">Watchtower</option>
                                 <option value="barracks">Barracks</option>
                                 <option value="lumbermill">Lumbermill</option>

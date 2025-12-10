@@ -26,7 +26,9 @@ export default function MapManagerPage() {
         r: 0,
         hood_reqs_text: '',
         derby_reqs_text: '',
-        leader_name: ''
+        leader_name: '',
+        leader_model: 'castle', // New Field
+        coleader_model: 'market' // New Field
     });
 
     useEffect(() => {
@@ -53,7 +55,9 @@ export default function MapManagerPage() {
                 r: formData.r,
                 hood_reqs_text: formData.hood_reqs_text,
                 derby_reqs_text: formData.derby_reqs_text,
-                leader_name: formData.leader_name
+                leader_name: formData.leader_name,
+                leader_model: formData.leader_model,
+                coleader_model: formData.coleader_model
             };
 
             let error;
@@ -73,7 +77,7 @@ export default function MapManagerPage() {
             setEditingId(null);
             setFormData({
                 name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0,
-                hood_reqs_text: '', derby_reqs_text: '', leader_name: ''
+                hood_reqs_text: '', derby_reqs_text: '', leader_name: '', leader_model: 'castle', coleader_model: 'market'
             });
             loadDistricts();
         } catch (error) {
@@ -93,7 +97,9 @@ export default function MapManagerPage() {
             ...d,
             hood_reqs_text: d.hood_reqs_text || '',
             derby_reqs_text: d.derby_reqs_text || '',
-            leader_name: d.leader_name || ''
+            leader_name: d.leader_name || '',
+            leader_model: d.leader_model || 'castle',
+            coleader_model: d.coleader_model || 'market'
         };
         setFormData(safeData);
         // Scroll to form
@@ -204,12 +210,48 @@ export default function MapManagerPage() {
                     />
                 </div>
 
+                {/* VISUAL CUSTOMIZATION */}
+                <div className="mt-4 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+                    <h3 className="text-sm font-bold text-gray-400 uppercase mb-3 text-xs tracking-wider">House Visuals</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Leader House</label>
+                            <select
+                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm"
+                                value={formData.leader_model}
+                                onChange={e => setFormData({ ...formData, leader_model: e.target.value })}
+                            >
+                                <option value="castle">Castle (Default)</option>
+                                <option value="keep">Keep / Fort</option>
+                                <option value="watchtower">Watchtower</option>
+                                <option value="barracks">Barracks</option>
+                                <option value="archeryrange">Archery Range</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Co-Leader House</label>
+                            <select
+                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm"
+                                value={formData.coleader_model}
+                                onChange={e => setFormData({ ...formData, coleader_model: e.target.value })}
+                            >
+                                <option value="market">Market (Default)</option>
+                                <option value="mill">Windmill</option>
+                                <option value="watermill">Watermill</option>
+                                <option value="barracks">Barracks</option>
+                                <option value="archeryrange">Archery Range</option>
+                                <option value="house">Standard House</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mt-4 flex gap-2">
                     <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm font-bold flex items-center gap-2">
                         <Save className="w-4 h-4" /> Save
                     </button>
                     {editingId && (
-                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
+                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '', leader_model: 'castle', coleader_model: 'market' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
                             Cancel
                         </button>
                     )}

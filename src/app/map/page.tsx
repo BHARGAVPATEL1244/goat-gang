@@ -189,6 +189,8 @@ export default function MapPage() {
                             hoodName={selectedDistrict?.name}
                             members={villageMembers}
                             onBack={exitVillage}
+                            leaderModel={selectedDistrict?.leader_model} // New Prop
+                            coleaderModel={selectedDistrict?.coleader_model} // New Prop
                         />
                     )}
 

@@ -12,17 +12,33 @@ const LEADER_MODEL = `${BASE_MODELS_PATH}/castle.gltf.glb`;
 const COLEADER_MODEL = `${BASE_MODELS_PATH}/market.gltf.glb`;
 const MEMBER_MODEL = `${BASE_MODELS_PATH}/house.gltf.glb`; // Default simple house
 
-// Pool of "Upgraded" buildings for Elders
+// Helper to resolve short names to full paths
+const resolveModelUrl = (shortName?: string) => {
+    if (!shortName) return null;
+    const map: Record<string, string> = {
+        'castle': `${BASE_MODELS_PATH}/castle.gltf.glb`,
+        'market': `${BASE_MODELS_PATH}/market.gltf.glb`,
+        'mill': `${BASE_MODELS_PATH}/mill.gltf.glb`,
+        'watermill': `${BASE_MODELS_PATH}/watermill.gltf.glb`,
+        'watchtower': `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
+        'barracks': `${BASE_MODELS_PATH}/barracks.gltf.glb`,
+        'archeryrange': `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
+        'keep': `${BASE_MODELS_PATH}/keep.gltf.glb`, // Need to verify if exists, fallback to castle
+        'house': `${BASE_MODELS_PATH}/house.gltf.glb`,
+    };
+    return map[shortName] || map['castle']; // Fallback
+};
+
+// ... Elder pool ...
 const ELDER_MODELS = [
     `${BASE_MODELS_PATH}/mill.gltf.glb`,
     `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
     `${BASE_MODELS_PATH}/barracks.gltf.glb`,
     `${BASE_MODELS_PATH}/watermill.gltf.glb`,
     `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
-    `${BASE_MODELS_PATH}/library.gltf.glb` // Assuming library exists or fallback
+    `${BASE_MODELS_PATH}/library.gltf.glb`
 ];
 
-// Helper to reliably pick a model based on string ID (so it stays consistent)
 const getElderModel = (id: string) => {
     let hash = 0;
     for (let i = 0; i < id.length; i++) {
@@ -32,24 +48,17 @@ const getElderModel = (id: string) => {
     return ELDER_MODELS[index];
 };
 
-// Helper to calculate positions in a spiral/ring for the village
 const getVillagePositions = (count: number, radius: number = 4) => {
     const pos = [];
-    // Captain/Leader in center
-    pos.push({ x: 0, z: 0, r: 0 });
-
-    // Inner ring (Co-Leaders/Elders)
+    pos.push({ x: 0, z: 0, r: 0 }); // Center
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
         pos.push({ x: Math.cos(angle) * (radius * 0.4), z: Math.sin(angle) * (radius * 0.4), r: -angle });
     }
-
-    // Outer rings (Members)
     for (let i = 0; i < 12; i++) {
         const angle = (i / 12) * Math.PI * 2;
         pos.push({ x: Math.cos(angle) * (radius * 0.8), z: Math.sin(angle) * (radius * 0.8), r: -angle });
     }
-
     return pos;
 };
 
@@ -63,33 +72,36 @@ interface MemberVillageProps {
     hoodName: string;
     members: Member[];
     onBack: () => void;
+    // New Props for Custom Models
+    leaderModel?: string;
+    coleaderModel?: string;
 }
 
-export default function MemberVillage({ hoodName, members, onBack }: MemberVillageProps) {
+export default function MemberVillage({ hoodName, members, onBack, leaderModel, coleaderModel }: MemberVillageProps) {
     const positions = useMemo(() => getVillagePositions(30), []);
     const [hoveredMember, setHoveredMember] = React.useState<string | null>(null);
 
-    // Fill slots with actual members, finding Leader for center
+    // Pre-calculate custom models if provided
+    const customLeaderUrl = resolveModelUrl(leaderModel);
+    const customCoLeaderUrl = resolveModelUrl(coleaderModel);
+
+    // ... arrangedMembers logic ...
     const arrangedMembers = useMemo(() => {
         const slots = Array(30).fill(null);
-
-        // Find Leader -> Slot 0
         const leader = members.find(m => m.role === 'Leader');
         if (leader) slots[0] = leader;
-
         let currentIndex = 1;
         members.filter(m => m.role !== 'Leader').forEach(m => {
             if (currentIndex < 30) slots[currentIndex++] = m;
         });
-
         return slots;
     }, [members]);
 
-    // Generate random trees/rocks for decoration
+    // ... decorations ...
     const decorations = useMemo(() => {
         return Array.from({ length: 20 }).map((_, i) => {
             const angle = Math.random() * Math.PI * 2;
-            const radius = 5 + Math.random() * 6; // Outer ring
+            const radius = 5 + Math.random() * 6;
             return {
                 x: Math.cos(angle) * radius,
                 z: Math.sin(angle) * radius,
@@ -100,11 +112,12 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
         });
     }, []);
 
+
     const getModelForMember = (m: Member) => {
-        if (m.role === 'Leader') return LEADER_MODEL;
-        if (m.role === 'CoLeader') return COLEADER_MODEL;
-        if (m.role === 'Elder') return getElderModel(m.id); // Auto-upgrade to random unique building
-        return MEMBER_MODEL; // Default House
+        if (m.role === 'Leader') return customLeaderUrl || LEADER_MODEL;
+        if (m.role === 'CoLeader') return customCoLeaderUrl || COLEADER_MODEL;
+        if (m.role === 'Elder') return getElderModel(m.id);
+        return MEMBER_MODEL;
     };
 
     return (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import House from './House';
 
@@ -214,9 +214,15 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                             modelUrl={getModelForMember(member)}
                         />
 
-                        {/* Name Tag - ONLY VISIBLE ON HOVER */}
+                        {/* Name Tag - ONLY VISIBLE ON HOVER - Faces Camera */}
                         {isHovered && (
-                            <group position={[0, isLeader ? 5.5 : 3.5, 0]}>
+                            <Billboard
+                                position={[0, isLeader ? 5.5 : 3.5, 0]}
+                                follow={true}
+                                lockX={false}
+                                lockY={false}
+                                lockZ={false}
+                            >
                                 <mesh position={[0, 0, -0.1]}>
                                     <planeGeometry args={[displayName.length * 0.3 + 1, 1.2]} />
                                     <meshBasicMaterial color="black" transparent opacity={0.7} />
@@ -241,7 +247,7 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                                 >
                                     {level ? `Lvl ${level}` : member.role.toUpperCase()}
                                 </Text>
-                            </group>
+                            </Billboard>
                         )}
                     </group>
                 );

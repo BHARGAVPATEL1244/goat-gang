@@ -18,12 +18,8 @@ interface HouseProps {
 export default function House({ tier, position, scale = 1, onClick, modelUrl }: HouseProps) {
     const mesh = useRef<THREE.Group>(null);
 
-    // Subtle Float Animation
-    useFrame((state) => {
-        if (mesh.current) {
-            mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime + position[0] * 0.5) * 0.05;
-        }
-    });
+    // Floating animation removed for stability
+
 
     return (
         <group ref={mesh} position={position} scale={scale} onClick={(e) => { e.stopPropagation(); onClick?.(); }}>

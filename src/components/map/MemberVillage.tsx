@@ -8,15 +8,28 @@ import House from './House';
 // CUSTOM GLTF MODELS
 const BASE_MODELS_PATH = '/models/KayKit Medieval Builder Pack 1.0/Models/objects/gltf';
 
-const HOUSE_MODELS: Record<string, string | null> = {
-    // Leader gets a Castle!
-    Leader: `${BASE_MODELS_PATH}/castle.gltf.glb`,
-    // Co-Leader gets the Market (managing the hood)
-    CoLeader: `${BASE_MODELS_PATH}/market.gltf.glb`,
-    // Elders get standard Houses
-    Elder: `${BASE_MODELS_PATH}/house.gltf.glb`,
-    // Members get Lumbermills (working hard!) - or swap for house if preferred
-    Member: `${BASE_MODELS_PATH}/lumbermill.gltf.glb`
+const LEADER_MODEL = `${BASE_MODELS_PATH}/castle.gltf.glb`;
+const COLEADER_MODEL = `${BASE_MODELS_PATH}/market.gltf.glb`;
+const MEMBER_MODEL = `${BASE_MODELS_PATH}/house.gltf.glb`; // Default simple house
+
+// Pool of "Upgraded" buildings for Elders
+const ELDER_MODELS = [
+    `${BASE_MODELS_PATH}/mill.gltf.glb`,
+    `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
+    `${BASE_MODELS_PATH}/barracks.gltf.glb`,
+    `${BASE_MODELS_PATH}/watermill.gltf.glb`,
+    `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
+    `${BASE_MODELS_PATH}/library.gltf.glb` // Assuming library exists or fallback
+];
+
+// Helper to reliably pick a model based on string ID (so it stays consistent)
+const getElderModel = (id: string) => {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % ELDER_MODELS.length;
+    return ELDER_MODELS[index];
 };
 
 // Helper to calculate positions in a spiral/ring for the village
@@ -54,6 +67,7 @@ interface MemberVillageProps {
 
 export default function MemberVillage({ hoodName, members, onBack }: MemberVillageProps) {
     const positions = useMemo(() => getVillagePositions(30), []);
+    const [hoveredMember, setHoveredMember] = React.useState<string | null>(null);
 
     // Fill slots with actual members, finding Leader for center
     const arrangedMembers = useMemo(() => {
@@ -85,6 +99,13 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
             };
         });
     }, []);
+
+    const getModelForMember = (m: Member) => {
+        if (m.role === 'Leader') return LEADER_MODEL;
+        if (m.role === 'CoLeader') return COLEADER_MODEL;
+        if (m.role === 'Elder') return getElderModel(m.id); // Auto-upgrade to random unique building
+        return MEMBER_MODEL; // Default House
+    };
 
     return (
         <group>
@@ -135,48 +156,57 @@ export default function MemberVillage({ hoodName, members, onBack }: MemberVilla
                 </group>
             ))}
 
-            {/* Houses (Existing Logic) */}
+            {/* Houses logic */}
             {arrangedMembers.map((member, i) => {
                 if (!member) return null;
                 const pos = positions[i];
                 const isLeader = member.role === 'Leader';
+                const isHovered = hoveredMember === member.id;
 
                 return (
-                    <group key={member.id || i} position={[pos.x, 0.5, pos.z]} rotation={[0, pos.r + Math.PI, 0]}>
+                    <group
+                        key={member.id || i}
+                        position={[pos.x, 0.5, pos.z]}
+                        rotation={[0, pos.r + Math.PI, 0]}
+                        onPointerOver={(e) => { e.stopPropagation(); setHoveredMember(member.id); document.body.style.cursor = 'pointer'; }}
+                        onPointerOut={(e) => { e.stopPropagation(); setHoveredMember(null); document.body.style.cursor = 'auto'; }}
+                    >
                         {/* Note: Rotated +Math.PI to face center */}
                         <House
                             tier={member.role}
                             scale={isLeader ? 1.5 : 1.0}
                             position={[0, 0, 0]}
-                            modelUrl={HOUSE_MODELS[member.role]}
+                            modelUrl={getModelForMember(member)}
                         />
 
-                        {/* Name Tag - Floating above */}
-                        <group position={[0, isLeader ? 4 : 2.5, 0]}>
-                            {/* Avatar/Icon Placeholder if URL exists (TODO) */}
-
-                            <Text
-                                fontSize={0.3}
-                                color="white"
-                                outlineWidth={0.04}
-                                outlineColor="black"
-                                anchorX="center"
-                                anchorY="middle"
-                            >
-                                {member.name}
-                            </Text>
-                            <Text
-                                position={[0, -0.4, 0]}
-                                fontSize={0.2}
-                                color="#fbbf24"
-                                outlineWidth={0.02}
-                                outlineColor="black"
-                                anchorX="center"
-                                anchorY="middle"
-                            >
-                                {member.role}
-                            </Text>
-                        </group>
+                        {/* Name Tag - ONLY VISIBLE ON HOVER */}
+                        {isHovered && (
+                            <group position={[0, isLeader ? 5.5 : 3.5, 0]}>
+                                <mesh position={[0, 0, -0.1]}>
+                                    <planeGeometry args={[member.name.length * 0.3 + 1, 0.8]} />
+                                    <meshBasicMaterial color="black" transparent opacity={0.6} />
+                                </mesh>
+                                <Text
+                                    fontSize={0.4}
+                                    color="white"
+                                    outlineWidth={0.02}
+                                    outlineColor="black"
+                                    anchorX="center"
+                                    anchorY="middle"
+                                >
+                                    {member.name}
+                                </Text>
+                                <Text
+                                    position={[0, -0.5, 0]}
+                                    fontSize={0.25}
+                                    color="#fbbf24"
+                                    anchorX="center"
+                                    anchorY="middle"
+                                >
+                                    {member.role.toUpperCase()}
+                                </Text>
+                            </group>
+                        )}
                     </group>
                 );
             })}

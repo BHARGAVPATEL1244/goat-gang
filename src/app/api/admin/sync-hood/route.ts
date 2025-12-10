@@ -17,11 +17,16 @@ export async function POST(req: Request) {
         // 2. Fetch Members from Discord Bot
         // NOTE: We use the server-to-bot internal URL if possible, or public
         const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:3000/api';
+        const BOT_API_KEY = process.env.BOT_API_KEY;
+
         // In production this might need to range, assuming user has configured it correctly
 
         const response = await fetch(`${BOT_API_URL}/members/list?roleId=${hood_id}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': BOT_API_KEY || ''
+            }
         });
 
         if (!response.ok) {

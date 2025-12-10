@@ -221,12 +221,14 @@ export default function MapManagerPage() {
                                 value={formData.leader_model}
                                 onChange={e => setFormData({ ...formData, leader_model: e.target.value })}
                             >
-                                <option value="castle">Castle (Default)</option>
-                                <option value="watchtower">Watchtower</option>
-                                <option value="barracks">Barracks</option>
-                                <option value="lumbermill">Lumbermill</option>
-                                <option value="mine">Mine</option>
-                                <option value="archeryrange">Archery Range</option>
+                                <option value="castle">Inn (New Leader)</option>
+                                <option value="inn">Inn</option>
+                                <option value="watchtower">Bell Tower</option>
+                                <option value="barracks">Blacksmith</option>
+                                <option value="lumbermill">Sawmill</option>
+                                <option value="library">Library House</option>
+                                <option value="mine">Mine Entrance</option>
+                                <option value="archeryrange">Stable</option>
                             </select>
                         </div>
                         <div>
@@ -236,14 +238,15 @@ export default function MapManagerPage() {
                                 value={formData.coleader_model}
                                 onChange={e => setFormData({ ...formData, coleader_model: e.target.value })}
                             >
-                                <option value="market">Market (Default)</option>
+                                <option value="market">Blacksmith (Default)</option>
                                 <option value="mill">Windmill</option>
                                 <option value="watermill">Watermill</option>
-                                <option value="barracks">Barracks</option>
-                                <option value="watchtower">Watchtower</option>
-                                <option value="lumbermill">Lumbermill</option>
-                                <option value="mine">Mine</option>
-                                <option value="archeryrange">Archery Range</option>
+                                <option value="barracks">Blacksmith</option>
+                                <option value="watchtower">Bell Tower</option>
+                                <option value="lumbermill">Sawmill</option>
+                                <option value="library">Library House</option>
+                                <option value="mine">Mine Entrance</option>
+                                <option value="archeryrange">Stable</option>
                                 <option value="house">Standard House</option>
                             </select>
                         </div>

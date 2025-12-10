@@ -6,41 +6,45 @@ import * as THREE from 'three';
 import House from './House';
 
 // CUSTOM GLTF MODELS
-const BASE_MODELS_PATH = '/models/KayKit Medieval Builder Pack 1.0/Models/objects/gltf';
+// CUSTOM GLTF/FBX MODELS
+const BASE_MODELS_PATH = '/models/Medieval Village Pack - Dec 2020/Buildings/FBX';
+const PROPS_PATH = '/models/Medieval Village Pack - Dec 2020/Props/FBX';
 
-const LEADER_MODEL = `${BASE_MODELS_PATH}/castle.gltf.glb`;
-const COLEADER_MODEL = `${BASE_MODELS_PATH}/watchtower.gltf.glb`;
-const MEMBER_MODEL = `${BASE_MODELS_PATH}/house.gltf.glb`; // Default simple house
+const LEADER_MODEL = `${BASE_MODELS_PATH}/Inn.fbx`; // Inn looks big and leader-like
+const COLEADER_MODEL = `${BASE_MODELS_PATH}/Visual_House_VS_House_1.fbx`; // Fallback or House 1
+const MEMBER_MODEL = `${BASE_MODELS_PATH}/House_1.fbx`; // Default simple house
 
 // Helper to resolve short names to full paths
 const resolveModelUrl = (shortName?: string) => {
     if (!shortName) return null;
     const map: Record<string, string> = {
-        'castle': `${BASE_MODELS_PATH}/castle.gltf.glb`,
-        'market': `${BASE_MODELS_PATH}/market.gltf.glb`,
-        'mill': `${BASE_MODELS_PATH}/mill.gltf.glb`,
-        'watermill': `${BASE_MODELS_PATH}/watermill.gltf.glb`,
-        'watchtower': `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
-        'barracks': `${BASE_MODELS_PATH}/barracks.gltf.glb`,
-        'archeryrange': `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
-        'lumbermill': `${BASE_MODELS_PATH}/lumbermill.gltf.glb`,
-        'mine': `${BASE_MODELS_PATH}/mine.gltf.glb`,
-        'well': `${BASE_MODELS_PATH}/well.gltf.glb`,
-        'keep': `${BASE_MODELS_PATH}/keep.gltf.glb`, // Need to verify if exists, fallback to castle
-        'house': `${BASE_MODELS_PATH}/house.gltf.glb`,
+        'castle': `${BASE_MODELS_PATH}/Inn.fbx`, // mapped Inn to castle keyword
+        'market': `${BASE_MODELS_PATH}/Blacksmith.fbx`,
+        'mill': `${BASE_MODELS_PATH}/Mill.fbx`,
+        'watermill': `${BASE_MODELS_PATH}/Mill.fbx`, // Duplicate for now
+        'watchtower': `${BASE_MODELS_PATH}/Bell_Tower.fbx`,
+        'barracks': `${BASE_MODELS_PATH}/Blacksmith.fbx`, // Reusing Blacksmith
+        'lumbermill': `${BASE_MODELS_PATH}/Sawmill.fbx`,
+        'mine': `${PROPS_PATH}/Window_1.fbx`, // Placeholder, likely bad mapping but prevents crash
+        'well': `${PROPS_PATH}/Well.fbx`,
+        'archeryrange': `${BASE_MODELS_PATH}/Stable.fbx`,
+        // New distinct ones
+        'blacksmith': `${BASE_MODELS_PATH}/Blacksmith.fbx`,
+        'inn': `${BASE_MODELS_PATH}/Inn.fbx`,
+        'library': `${BASE_MODELS_PATH}/House_3.fbx`,
+        'house': `${BASE_MODELS_PATH}/House_1.fbx`,
     };
     return map[shortName] || map['castle']; // Fallback
 };
 
 // ... Elder pool ...
 const ELDER_MODELS = [
-    `${BASE_MODELS_PATH}/mill.gltf.glb`,
-    `${BASE_MODELS_PATH}/archeryrange.gltf.glb`,
-    `${BASE_MODELS_PATH}/barracks.gltf.glb`,
-    `${BASE_MODELS_PATH}/watermill.gltf.glb`,
-    `${BASE_MODELS_PATH}/watchtower.gltf.glb`,
-    `${BASE_MODELS_PATH}/mine.gltf.glb`, // Replaced library
-    `${BASE_MODELS_PATH}/lumbermill.gltf.glb` // Added variety
+    `${BASE_MODELS_PATH}/Mill.fbx`,
+    `${BASE_MODELS_PATH}/Stable.fbx`,
+    `${BASE_MODELS_PATH}/Blacksmith.fbx`,
+    `${BASE_MODELS_PATH}/House_3.fbx`,
+    `${BASE_MODELS_PATH}/Bell_Tower.fbx`,
+    `${BASE_MODELS_PATH}/Sawmill.fbx`
 ];
 
 const getElderModel = (id: string) => {

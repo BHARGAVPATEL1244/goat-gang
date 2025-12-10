@@ -88,7 +88,17 @@ interface HexGridProps {
 export default function HexGrid({ districts, onHoodSelect }: HexGridProps) {
     const gridData = useMemo(() => {
         if (districts.length > 0) return districts;
-        return [];
+
+        // Default Demo Pattern (Central Cluster)
+        return [
+            { q: 0, r: 0, id: '1', name: 'Goat Gang Alpha', type: 'Capital' },
+            { q: 1, r: -1, id: '2', name: 'Goat Meadows', type: 'Capital' },
+            { q: -1, r: 1, id: '3', name: 'Goat Amity', type: 'Expansion' },
+            { q: 1, r: 0, id: '4', name: 'Goat Chill', type: 'Expansion' },
+            { q: 0, r: 1, id: '5', name: 'Goat Factory', type: 'Expansion' },
+            { q: -1, r: 0, id: '6', name: 'Goat Bunker', type: 'Expansion' },
+            { q: 0, r: -1, id: '7', name: 'Goat Outpost', type: 'Expansion' },
+        ];
     }, [districts]);
 
     return (

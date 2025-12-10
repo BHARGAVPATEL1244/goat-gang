@@ -192,12 +192,12 @@ export default function MapManagerPage() {
                                 <div>Coords: ({d.q}, {d.r})</div>
                             </div>
                         </div>
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => startEdit(d)} className="p-2 hover:bg-gray-800 rounded text-blue-400">
-                                <Edit className="w-4 h-4" />
+                        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-800">
+                            <button onClick={() => startEdit(d)} className="flex-1 bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 py-2 rounded flex items-center justify-center gap-2 transition-colors">
+                                <Edit className="w-4 h-4" /> Edit
                             </button>
-                            <button onClick={() => handleDelete(d.id)} className="p-2 hover:bg-gray-800 rounded text-red-400">
-                                <Trash className="w-4 h-4" />
+                            <button onClick={() => handleDelete(d.id)} className="flex-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 py-2 rounded flex items-center justify-center gap-2 transition-colors">
+                                <Trash className="w-4 h-4" /> Delete
                             </button>
                         </div>
                     </div>

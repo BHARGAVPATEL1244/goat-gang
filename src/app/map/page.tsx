@@ -16,7 +16,10 @@ export default function MapPage() {
     // 1. Load Districts (Hoods)
     useEffect(() => {
         async function loadData() {
-            const { data } = await supabase.from('map_districts').select('*').order('member_count', { ascending: false });
+            const { data, error } = await supabase.from('map_districts').select('*').order('name');
+            if (error) {
+                console.error('Error loading districts:', error);
+            }
             if (data) setDistricts(data);
         }
         loadData();

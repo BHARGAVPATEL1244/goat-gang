@@ -147,10 +147,11 @@ export default function MapPage() {
             {/* 3D SCENE (CANVAS) */}
             {/* 3D Scene - Hide or Unmount when in Wanted/Hideout/Farm Mode to save performance? */}
             {/* 3D Scene Container - Hidden when in DOM modes */}
-            <div className={`w-full h-full ${(['WANTED', 'HIDEOUT', 'FARM'].includes(villageStyle)) && viewMode === 'VILLAGE' ? 'hidden' : 'block'}`}>
+            {/* 3D Scene Container - Hidden when in DOM modes (FARM is 3D, so keep it visible) */}
+            <div className={`w-full h-full ${(['WANTED', 'HIDEOUT'].includes(villageStyle)) && viewMode === 'VILLAGE' ? 'hidden' : 'block'}`}>
 
                 {/* Canvas Overlay UI (Back Button for 3D modes) */}
-                {viewMode === 'VILLAGE' && !['WANTED', 'HIDEOUT', 'FARM'].includes(villageStyle) && (
+                {viewMode === 'VILLAGE' && !['WANTED', 'HIDEOUT'].includes(villageStyle) && (
                     <div className="absolute top-6 right-6 z-30 flex flex-col gap-4 items-end pointer-events-auto">
                         <button
                             onClick={exitVillage}

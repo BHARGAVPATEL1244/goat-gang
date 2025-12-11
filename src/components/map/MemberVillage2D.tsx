@@ -84,11 +84,14 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
                         {/* Label */}
                         <Billboard position={[0, 2.5, 0]}>
                             {hoveredMember === item.member.id || isLeader ? (
-                                <Text fontSize={0.7} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom">
-                                    {item.member.name}
-                                    {'\n'}
-                                    <tspan fontSize={0.4} fill="#ddd">[{item.member.role}]</tspan>
-                                </Text>
+                                <>
+                                    <Text fontSize={0.7} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom" position={[0, 0.2, 0]}>
+                                        {item.member.name}
+                                    </Text>
+                                    <Text fontSize={0.35} color="#ddd" outlineWidth={0.02} outlineColor="black" anchorY="top" position={[0, 0.1, 0]}>
+                                        [{item.member.role}]
+                                    </Text>
+                                </>
                             ) : (
                                 <Text fontSize={0.5} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom" fillOpacity={0.8}>
                                     {item.member.name}

@@ -101,14 +101,8 @@ function SuspenseModel({ url }: { url: string }) {
                 <meshStandardMaterial color="#e6d2b5" roughness={1} />
             </mesh>
 
-            <Billboard position={[0, 15, 0]}>
-                <Text fontSize={2} color="black" outlineWidth={0.1} outlineColor="white">
-                    SCALE 1.0 (CENTERED)
-                </Text>
-            </Billboard>
-
-            {/* City Model - Centered at 1.0 */}
-            <primitive object={scene} scale={1.0} position={[0, 0, 0]} />
+            {/* City Model - Scale 10 */}
+            <primitive object={scene} scale={10.0} position={[0, 0, 0]} />
 
         </group>
     );

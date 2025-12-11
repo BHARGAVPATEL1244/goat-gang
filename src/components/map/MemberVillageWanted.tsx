@@ -86,7 +86,7 @@ function WantedPoster({ member }: { member: Member }) {
                 >
                     <h3 className="text-2xl font-black uppercase tracking-widest leading-none mb-1"
                         style={{ color: borderColor, fontFamily: 'serif' }}>
-                        {member.name.split('[')[0].trim()}
+                        {member.name.replace(/\[.*?\]/g, '').trim()}
                     </h3>
 
                     {/* Portrait Placeholder */}

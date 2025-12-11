@@ -129,7 +129,7 @@ export default function MemberVillageHideout({ hoodName, members, onBack }: Memb
                                 <div className="w-10 h-10 bg-gray-300 rounded mb-1 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <User className="w-6 h-6 text-gray-600" />
                                 </div>
-                                <div className="text-black font-bold text-xs text-center truncate w-full">{m.name.split('[')[0].trim()}</div>
+                                <div className="text-black font-bold text-xs text-center truncate w-full">{m.name.replace(/\[.*?\]/g, '').trim()}</div>
                             </div>
                         ))}
                         {/* Empty Bunks */}

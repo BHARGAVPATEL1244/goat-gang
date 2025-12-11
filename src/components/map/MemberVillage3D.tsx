@@ -136,7 +136,7 @@ function SuspenseModel({ hoodName, members }: { hoodName: string, members: Membe
                             outlineColor="black"
                             anchorY="bottom"
                         >
-                            {item.member.name.split('[')[0].trim()}
+                            {item.member.name.replace(/\[.*?\]/g, '').trim()}
                         </Text>
                         <Text
                             fontSize={1}

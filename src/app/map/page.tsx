@@ -2,11 +2,12 @@
 
 import React, { useState, Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars, Environment, Sky } from '@react-three/drei';
+import { OrbitControls, Stars, Environment, Sky, Text } from '@react-three/drei';
 import HexGrid from '@/components/map/HexGrid';
 import MemberVillage from '@/components/map/MemberVillage';
 import MemberVillage3D from '@/components/map/MemberVillage3D';
 import MemberVillage2D from '@/components/map/MemberVillage2D';
+import { ThreeErrorBoundary } from '@/components/map/MapErrorBoundary';
 import { createClient } from '@/utils/supabase/client';
 import { ArrowLeft, Monitor, Image as ImageIcon, Grip } from 'lucide-react';
 
@@ -191,53 +192,61 @@ export default function MapPage() {
 
             {/* 3D Scene */}
             <Canvas camera={{ position: [10, 10, 10], fov: 45 }}>
-                <Suspense fallback={null}>
-                    <Sky sunPosition={[100, 20, 100]} />
-                    <ambientLight intensity={0.5} />
-                    <pointLight position={[10, 10, 10]} intensity={1} castShadow />
+                <ThreeErrorBoundary fallback={
+                    <group position={[0, 0, 0]}>
+                        <Text color="red" fontSize={1}>
+                            CRITICAL ERROR: CHECK CONSOLE
+                        </Text>
+                    </group>
+                }>
+                    <Suspense fallback={<Text position={[0, 0, 0]} color="white">Loading...</Text>}>
+                        <Sky sunPosition={[100, 20, 100]} />
+                        <ambientLight intensity={0.5} />
+                        <pointLight position={[10, 10, 10]} intensity={1} castShadow />
 
-                    {viewMode === 'MAP' ? (
-                        <HexGrid
-                            districts={districts}
-                            onHoodSelect={handleSelect}
+                        {viewMode === 'MAP' ? (
+                            <HexGrid
+                                districts={districts}
+                                onHoodSelect={handleSelect}
+                            />
+                        ) : (
+                            <>
+                                {/* Render based on Style Selection */}
+                                {villageStyle === '3D' && (
+                                    <MemberVillage3D
+                                        hoodName={selectedDistrict?.name}
+                                        members={villageMembers}
+                                        onBack={exitVillage}
+                                    />
+                                )}
+                                {villageStyle === '2D' && (
+                                    <MemberVillage2D
+                                        hoodName={selectedDistrict?.name}
+                                        members={villageMembers}
+                                        onBack={exitVillage}
+                                    />
+                                )}
+                                {villageStyle === 'GRID' && (
+                                    <MemberVillage
+                                        hoodName={selectedDistrict?.name}
+                                        members={villageMembers}
+                                        onBack={exitVillage}
+                                        leaderModel={selectedDistrict?.leader_model}
+                                        coleaderModel={selectedDistrict?.coleader_model}
+                                    />
+                                )}
+                            </>
+                        )}
+
+                        <OrbitControls
+                            enablePan={true}
+                            enableZoom={true}
+                            minDistance={5}
+                            maxDistance={50}
+                            maxPolarAngle={Math.PI / 2.5}
                         />
-                    ) : (
-                        <>
-                            {/* Render based on Style Selection */}
-                            {villageStyle === '3D' && (
-                                <MemberVillage3D
-                                    hoodName={selectedDistrict?.name}
-                                    members={villageMembers}
-                                    onBack={exitVillage}
-                                />
-                            )}
-                            {villageStyle === '2D' && (
-                                <MemberVillage2D
-                                    hoodName={selectedDistrict?.name}
-                                    members={villageMembers}
-                                    onBack={exitVillage}
-                                />
-                            )}
-                            {villageStyle === 'GRID' && (
-                                <MemberVillage
-                                    hoodName={selectedDistrict?.name}
-                                    members={villageMembers}
-                                    onBack={exitVillage}
-                                    leaderModel={selectedDistrict?.leader_model}
-                                    coleaderModel={selectedDistrict?.coleader_model}
-                                />
-                            )}
-                        </>
-                    )}
-
-                    <OrbitControls
-                        enablePan={true}
-                        enableZoom={true}
-                        minDistance={5}
-                        maxDistance={50}
-                        maxPolarAngle={Math.PI / 2.5}
-                    />
-                </Suspense>
+                    </Suspense>
+                </ThreeErrorBoundary>
             </Canvas>
         </div>
     );

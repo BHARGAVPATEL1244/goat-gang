@@ -160,7 +160,6 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
                             <Text
                                 fontSize={0.6}
                                 color="#ffeb3b"
-                                font="/fonts/Inter-Bold.ttf" // Fallback usually works or valid font
                                 anchorY="middle"
                                 outlineWidth={0.05}
                                 outlineColor="#3e2723"

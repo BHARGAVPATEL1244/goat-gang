@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Text, Billboard, Gltf } from '@react-three/drei';
+import { Text, Billboard, Gltf, Environment } from '@react-three/drei';
 import { ThreeErrorBoundary } from './MapErrorBoundary';
 
 // Placeholder for the "High Quality City" model
@@ -77,22 +77,29 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
     );
 }
 
+
+// ... imports
+
 function SuspenseModel({ url }: { url: string }) {
     return (
         <group>
-            {/* Fallback Ground Plane */}
+            {/* Environment for Global Lighting */}
+            <Environment preset="sunset" />
+
+            {/* Fallback Ground Plane & Grid */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
-                <planeGeometry args={[100, 100]} />
-                <meshStandardMaterial color="#2c3e50" />
+                <planeGeometry args={[200, 200]} />
+                <meshStandardMaterial color="#4a5568" />
             </mesh>
+            <gridHelper args={[200, 200, 0xffffff, 0x000000]} position={[0, 0, 0]} />
 
             {/* Actual Model with Error Boundary */}
             <ThreeErrorBoundary fallback={
                 <group position={[0, 2, 0]}>
-                    <Text color="red" fontSize={0.5} anchorX="center" anchorY="middle">
+                    <Text color="#ff0000" fontSize={0.8} anchorX="center" anchorY="middle" outlineWidth={0.05}>
                         City Model Missing
                     </Text>
-                    <Text position={[0, -0.6, 0]} color="white" fontSize={0.3} anchorX="center" anchorY="top">
+                    <Text position={[0, -0.8, 0]} color="white" fontSize={0.4} anchorX="center" anchorY="top" outlineWidth={0.02} outlineColor="black">
                         Upload to: public{url}
                     </Text>
                 </group>

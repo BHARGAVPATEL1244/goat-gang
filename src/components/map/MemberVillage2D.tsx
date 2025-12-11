@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Text, Billboard, Image } from '@react-three/drei';
-import * as THREE from 'three';
-
-// Placeholder for the "Painted Map"
-const MAP_IMAGE_URL = '/images/map_bg.jpg';
+import { Text, Billboard, Environment } from '@react-three/drei';
 
 interface Member {
     id: string;
@@ -22,15 +18,12 @@ interface MemberVillage2DProps {
 export default function MemberVillage2D({ hoodName, members, onBack }: MemberVillage2DProps) {
     const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
-    // In 2D mode, we just scatter pins on the flat plane
-    // Or we could have defined "Slots" on the image 
     const assignments = useMemo(() => {
         return members.map((member, i) => {
-            // Random scatter on the "Map"
             return {
                 member,
                 x: (Math.random() - 0.5) * 15,
-                y: 0.1, // Slightly above image
+                y: 0.1,
                 z: (Math.random() - 0.5) * 15
             };
         });
@@ -38,16 +31,23 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
 
     return (
         <group>
-            {/* The 2D Map Image treated as floor */}
-            {/* 20x20 units size */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-                <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial color="#ffffff" />
-                {/* Texture would go here: map={texture} */}
+            {/* Lighting for the map */}
+            <Environment preset="city" />
+
+            {/* Parchment/Map Background Plane */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
+                <planeGeometry args={[25, 25]} />
+                <meshStandardMaterial color="#f4e4bc" roughnes={1} /> {/* Parchment Color */}
             </mesh>
 
-            {/* For now, using Drei Image to show placeholder if texture not loaded manually */}
-            <Image url={MAP_IMAGE_URL} scale={[20, 20]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} opacity={0.5} transparent />
+            {/* Map Border/Table */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
+                <planeGeometry args={[27, 27]} />
+                <meshStandardMaterial color="#5d4037" /> {/* Wood dark brown */}
+            </mesh>
+
+            {/* Map Grid features */}
+            <gridHelper args={[20, 10, 0x8b4513, 0xd2b48c]} position={[0, 0, 0]} />
 
 
             {/* Pins/Houses on top of the map */}
@@ -57,9 +57,9 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
                         onPointerOver={() => { setHoveredMember(item.member.id); document.body.style.cursor = 'pointer'; }}
                         onPointerOut={() => { setHoveredMember(null); document.body.style.cursor = 'auto'; }}
                     >
-                        {/* Using a simple house shape as a "Game Piece" */}
-                        <boxGeometry args={[1, 1, 1]} />
-                        <meshStandardMaterial color={item.member.role === 'Leader' ? '#e74c3c' : '#bdc3c7'} />
+                        {/* Token / Pawn piece */}
+                        <cylinderGeometry args={[0.4, 0.6, 1, 16]} />
+                        <meshStandardMaterial color={item.member.role === 'Leader' ? '#e74c3c' : '#3498db'} metalness={0.3} roughness={0.4} />
                     </mesh>
 
                     {/* Label */}
@@ -72,9 +72,9 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
             ))}
 
             {/* Signpost */}
-            <group position={[0, 2, 10]} onClick={onBack}>
+            <group position={[0, 5, 12]} onClick={onBack}>
                 <Billboard>
-                    <Text fontSize={1} color="black" outlineWidth={0.1} outlineColor="white">
+                    <Text fontSize={1} color="white" outlineWidth={0.1} outlineColor="black">
                         EXIT 2D MAP
                     </Text>
                 </Billboard>

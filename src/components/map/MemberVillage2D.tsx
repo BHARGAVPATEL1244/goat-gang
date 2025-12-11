@@ -37,7 +37,7 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
             {/* Parchment/Map Background Plane */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
                 <planeGeometry args={[25, 25]} />
-                <meshStandardMaterial color="#f4e4bc" roughnes={1} /> {/* Parchment Color */}
+                <meshStandardMaterial color="#f4e4bc" roughness={1} /> {/* Parchment Color */}
             </mesh>
 
             {/* Map Border/Table */}

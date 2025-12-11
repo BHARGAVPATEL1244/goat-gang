@@ -9,13 +9,13 @@ type HouseTier = 'Leader' | 'CoLeader' | 'Elder' | 'Member';
 
 interface HouseProps {
     tier: HouseTier;
-    position: [number, number, number];
+    position?: [number, number, number];
     scale?: number;
     onClick?: () => void;
     modelUrl?: string | null; // Optional external model
 }
 
-export default function House({ tier, position, scale = 1, onClick, modelUrl }: HouseProps) {
+export default function House({ tier, position = [0, 0, 0], scale = 1, onClick, modelUrl }: HouseProps) {
     const mesh = useRef<THREE.Group>(null);
 
     // Floating animation removed for stability

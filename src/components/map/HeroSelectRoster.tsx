@@ -65,20 +65,25 @@ export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, memb
                 </button>
 
                 <div className="text-center mb-10">
-                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-full">
+                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-min mx-auto leading-tight">
                         {hoodName}
                     </h2>
                     <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />
                 </div>
 
                 {/* Big Avatar */}
-                <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group overflow-hidden">
-                    {hoodImage ? (
-                        <img src={hoodImage} alt={hoodName} className="w-full h-full object-cover" />
-                    ) : (
-                        <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
-                    )}
-                    <Crown size={48} className="absolute top-0 right-4 text-yellow-400 drop-shadow-md animate-bounce z-20" />
+                <div className="w-48 h-48 md:w-64 md:h-64 mb-8 relative group">
+                    {/* Image Container (Clipped) */}
+                    <div className="w-full h-full rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] overflow-hidden bg-gray-700 flex items-center justify-center">
+                        {hoodImage ? (
+                            <img src={hoodImage} alt={hoodName} className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
+                        )}
+                    </div>
+
+                    {/* Crown (Outside Clip) */}
+                    <Crown size={48} className="absolute -top-2 -right-2 text-yellow-400 drop-shadow-md animate-bounce z-20" />
                 </div>
 
                 <div className="text-center">

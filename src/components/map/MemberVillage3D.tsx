@@ -85,35 +85,32 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 // ... imports
 
-
 function SuspenseModel({ url }: { url: string }) {
-    // We ignore the `url` prop (which points to missing glb) and use existing FBX assets
-    const inn = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/Inn.fbx');
-    const tower = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/Bell_Tower.fbx');
-
-    // Clone for reuse
-    const innScene = useMemo(() => inn.clone(), [inn]);
-    const towerScene = useMemo(() => tower.clone(), [tower]);
+    // Load the user's Desert City model
+    // URL: /models/desert_city/scene.gltf
 
     return (
         <group>
-            <Environment preset="sunset" />
+            <Environment preset="park" />
 
-            {/* Ground */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
+            {/* Sand Ground */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
                 <planeGeometry args={[200, 200]} />
-                <meshStandardMaterial color="#556b2f" /> {/* Greenish for grass */}
+                <meshStandardMaterial color="#e6d2b5" roughness={1} /> {/* Sand Color */}
             </mesh>
-            {/* Faint Grid */}
-            <gridHelper args={[200, 20, 0xffffff, 0xffffff]} position={[0, 0.1, 0]} />
 
-            {/* Central Inn (Town Hall) */}
-            <primitive object={innScene} scale={0.05} position={[0, 0, 0]} />
+            {/* Actual Desert City Model */}
+            <ThreeErrorBoundary fallback={
+                <group position={[0, 2, 0]}>
+                    <Text color="red" fontSize={0.5} anchorX="center" anchorY="middle">
+                        Model Failed to Load
+                    </Text>
+                </group>
+            }>
+                {/* Scale might need adjustment depending on the model's native size */}
+                <Gltf src="/models/desert_city/scene.gltf" scale={1} position={[0, 0, 0]} />
+            </ThreeErrorBoundary>
 
-            {/* Decor Tower */}
-            <primitive object={towerScene} scale={0.05} position={[-15, 0, 10]} rotation={[0, 0.5, 0]} />
-
-            {/* We can add more decorations later, this proves the concept without downloading anything */}
         </group>
     );
 }

@@ -117,7 +117,7 @@ export default function MapPage() {
                             onClick={() => setVillageStyle('2D')}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === '2D' ? 'bg-purple-600' : 'hover:bg-white/10 text-gray-300'}`}
                         >
-                            <ImageImageIcon className="w-4 h-4" /> Option B (2D Map)
+                            <ImageIcon className="w-4 h-4" /> Option B (2D Map)
                         </button>
                         <button
                             onClick={() => setVillageStyle('GRID')}

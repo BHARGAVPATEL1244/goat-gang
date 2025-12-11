@@ -147,7 +147,8 @@ export default function MapPage() {
 
             {/* 3D SCENE (CANVAS) */}
             {/* 3D Scene - Hide or Unmount when in Wanted/Hideout/Farm Mode to save performance? */}
-            <Canvas camera={{ position: [10, 10, 10], fov: 45 }} className={`w-full h-full ${(['WANTED', 'HIDEOUT', 'FARM'].includes(villageStyle)) && viewMode === 'VILLAGE' ? 'hidden' : 'block'}`}>
+            {/* 3D Scene Container - Hidden when in DOM modes */}
+            <div className={`w-full h-full ${(['WANTED', 'HIDEOUT', 'FARM'].includes(villageStyle)) && viewMode === 'VILLAGE' ? 'hidden' : 'block'}`}>
 
                 {/* Canvas Overlay UI (Back Button for 3D modes) */}
                 {viewMode === 'VILLAGE' && !['WANTED', 'HIDEOUT', 'FARM'].includes(villageStyle) && (
@@ -229,61 +230,61 @@ export default function MapPage() {
                         </Suspense>
                     </ThreeErrorBoundary>
                 </Canvas>
-        </div>
-
-            {/* Selected Hood Detail Overlay (Only in MAP mode) */ }
-    {
-        selectedDistrict && viewMode === 'MAP' && (
-            <div className="absolute right-0 top-0 h-full w-96 bg-black/80 backdrop-blur-xl border-l border-white/10 z-20 p-6 animate-in slide-in-from-right duration-300 overflow-y-auto">
-                <button
-                    onClick={() => setSelectedDistrict(null)}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-white"
-                >
-                    ✕
-                </button>
-                <h2 className="text-2xl font-bold text-white mb-1">{selectedDistrict.name}</h2>
-                <p className="text-blue-400 text-sm font-medium mb-4">Leader: {selectedDistrict.leader_name || 'Unknown'}</p>
-
-                <div className="space-y-6">
-                    <div className="bg-white/5 p-4 rounded-lg border border-white/5">
-                        {/* ... existing details ... */}
-                        <h3 className="text-xs font-bold text-gray-400 uppercase mb-2">Details</h3>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                                <span className="text-gray-500 block text-xs">Tag</span>
-                                <span className="text-white font-mono">{selectedDistrict.tag}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-500 block text-xs">Status</span>
-                                <span className="text-green-400">Recruiting</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {selectedDistrict.hood_reqs_text && (
-                        <div>
-                            <h3 className="text-sm font-bold text-yellow-500 uppercase mb-2">Hood Requirements</h3>
-                            <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
-                                {selectedDistrict.hood_reqs_text}
-                            </p>
-                        </div>
-                    )}
-
-                    <div className="flex flex-col gap-3">
-                        <button
-                            onClick={enterVillage}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
-                        >
-                            🔍 VISIT VILLAGE
-                        </button>
-                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-green-900/20">
-                            JOIN HOOD
-                        </button>
-                    </div>
-                </div>
             </div>
-        )
-    }
+
+            {/* Selected Hood Detail Overlay (Only in MAP mode) */}
+            {
+                selectedDistrict && viewMode === 'MAP' && (
+                    <div className="absolute right-0 top-0 h-full w-96 bg-black/80 backdrop-blur-xl border-l border-white/10 z-20 p-6 animate-in slide-in-from-right duration-300 overflow-y-auto">
+                        <button
+                            onClick={() => setSelectedDistrict(null)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                        >
+                            ✕
+                        </button>
+                        <h2 className="text-2xl font-bold text-white mb-1">{selectedDistrict.name}</h2>
+                        <p className="text-blue-400 text-sm font-medium mb-4">Leader: {selectedDistrict.leader_name || 'Unknown'}</p>
+
+                        <div className="space-y-6">
+                            <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                                {/* ... existing details ... */}
+                                <h3 className="text-xs font-bold text-gray-400 uppercase mb-2">Details</h3>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                        <span className="text-gray-500 block text-xs">Tag</span>
+                                        <span className="text-white font-mono">{selectedDistrict.tag}</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-500 block text-xs">Status</span>
+                                        <span className="text-green-400">Recruiting</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {selectedDistrict.hood_reqs_text && (
+                                <div>
+                                    <h3 className="text-sm font-bold text-yellow-500 uppercase mb-2">Hood Requirements</h3>
+                                    <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
+                                        {selectedDistrict.hood_reqs_text}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={enterVillage}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
+                                >
+                                    🔍 VISIT VILLAGE
+                                </button>
+                                <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-green-900/20">
+                                    JOIN HOOD
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         </div >
     );
 }

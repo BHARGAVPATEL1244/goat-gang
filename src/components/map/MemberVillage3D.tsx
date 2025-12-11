@@ -32,42 +32,12 @@ const POI_SPOTS = [
 export default function MemberVillage3D({ hoodName, members, onBack }: MemberVillage3DProps) {
     const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
-    const assignments = useMemo(() => {
-        return members.map((member, i) => {
-            const spot = POI_SPOTS[i] || {
-                x: (Math.random() - 0.5) * 20,
-                y: 0,
-                z: (Math.random() - 0.5) * 20
-            };
-            return { member, ...spot };
-        });
-    }, [members]);
-
     return (
         <group>
-            <SuspenseModel url={CITY_ENV_URL} />
+            {/* Main City + Houses Model */}
+            <SuspenseModel hoodName={hoodName} members={members} />
 
-            {assignments.map((item) => (
-                <group key={item.member.id} position={[item.x, item.y + 2, item.z]}>
-                    <mesh
-                        onPointerOver={() => { setHoveredMember(item.member.id); document.body.style.cursor = 'pointer'; }}
-                        onPointerOut={() => { setHoveredMember(null); document.body.style.cursor = 'auto'; }}
-                    >
-                        <sphereGeometry args={[0.5]} />
-                        <meshStandardMaterial color={item.member.role === 'Leader' ? '#ffd700' : '#3498db'} />
-                    </mesh>
-
-                    <Billboard position={[0, 1, 0]}>
-                        <Text fontSize={0.5} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom">
-                            {item.member.name}
-                        </Text>
-                        <Text position={[0, -0.4, 0]} fontSize={0.3} color="#fbbf24" anchorY="top">
-                            {item.member.role}
-                        </Text>
-                    </Billboard>
-                </group>
-            ))}
-
+            {/* Exit Button */}
             <group position={[0, 5, 10]} onClick={onBack}>
                 <Billboard>
                     <Text fontSize={1} color="white" outlineWidth={0.1} outlineColor="red">

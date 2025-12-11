@@ -13,6 +13,7 @@ interface District {
     trophy_gold?: number;
     trophy_silver?: number;
     trophy_bronze?: number;
+    image_url?: string;
 }
 
 interface HeroSelectCarouselProps {
@@ -111,10 +112,20 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                             `}>
                                 {/* Image / Mascot Placeholder */}
                                 <div className="flex-1 bg-gradient-to-b from-gray-700 to-gray-900 flex items-center justify-center relative group">
-                                    {/* Simple Avatar/Icon generated from name initials */}
-                                    <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center text-6xl font-bold text-white/20">
-                                        {district.name.substring(0, 1)}
-                                    </div>
+                                    {/* Avatar/Image Logic */}
+                                    {district.image_url ? (
+                                        <div className="w-32 h-32 rounded-full border-4 border-white/10 overflow-hidden shadow-lg bg-black/50">
+                                            <img
+                                                src={district.image_url}
+                                                alt={district.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center text-6xl font-bold text-white/20 border-4 border-transparent">
+                                            {district.name.substring(0, 1)}
+                                        </div>
+                                    )}
 
                                     {/* "Select" Overlay */}
                                     {isActive && (

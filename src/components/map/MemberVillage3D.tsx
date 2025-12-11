@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Text, Billboard, Gltf } from '@react-three/drei';
-import { ThreeErrorBoundary } from '../ThreeErrorBoundary';
+import { ThreeErrorBoundary } from '@/components/ThreeErrorBoundary';
 
 // Placeholder for the "High Quality City" model
 const CITY_ENV_URL = '/models/city_env.glb';

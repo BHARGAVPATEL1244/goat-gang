@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Text, Billboard, Gltf, Environment } from '@react-three/drei';
+import { Text, Billboard, Gltf, Environment, useGLTF } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three-stdlib';
 import { ThreeErrorBoundary } from './MapErrorBoundary';
@@ -84,32 +84,31 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 
 // ... imports
+import { useGLTF } from '@react-three/drei';
 
 function SuspenseModel({ url }: { url: string }) {
-    // Load the user's Desert City model
-    // URL: /models/desert_city/scene.gltf
+    // Load model
+    const { scene } = useGLTF('/models/desert_city/scene.gltf');
 
     return (
         <group>
             <Environment preset="park" />
+            <ambientLight intensity={2} /> {/* Strong light */}
 
             {/* Sand Ground */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-                <planeGeometry args={[200, 200]} />
-                <meshStandardMaterial color="#e6d2b5" roughness={1} /> {/* Sand Color */}
+                <planeGeometry args={[500, 500]} />
+                <meshStandardMaterial color="#e6d2b5" roughness={1} />
             </mesh>
 
-            {/* Actual Desert City Model */}
-            <ThreeErrorBoundary fallback={
-                <group position={[0, 2, 0]}>
-                    <Text color="red" fontSize={0.5} anchorX="center" anchorY="middle">
-                        Model Failed to Load
-                    </Text>
-                </group>
-            }>
-                {/* Scale might need adjustment depending on the model's native size */}
-                <Gltf src="/models/desert_city/scene.gltf" scale={1} position={[0, 0, 0]} />
-            </ThreeErrorBoundary>
+            {/* DEBUG CUBE: Reference point at 0,0,0 */}
+            <mesh position={[0, 10, 0]}>
+                <boxGeometry args={[5, 5, 5]} />
+                <meshStandardMaterial color="red" />
+            </mesh>
+
+            {/* City Model - Try scaling down! often GLTFs are 100x size */}
+            <primitive object={scene} scale={0.01} position={[0, 0, 0]} />
 
         </group>
     );

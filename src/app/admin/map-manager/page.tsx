@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Plus, Edit, Trash, Save, Hexagon } from 'lucide-react';
-import NeighborhoodCard from '@/components/NeighborhoodCard'; // Added import
-
-import { useRouter } from 'next/navigation'; // Added import
+import { Plus, Edit, Trash, Save, Hexagon, Upload, Trophy, ArrowUp } from 'lucide-react';
+import NeighborhoodCard from '@/components/NeighborhoodCard';
+import { useRouter } from 'next/navigation';
 
 export default function MapManagerPage() {
     const supabase = createClient();
-    const router = useRouter(); // Hook must be here
+    const router = useRouter();
     const [districts, setDistricts] = useState<any[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -21,14 +21,14 @@ export default function MapManagerPage() {
         tag: '',
         derby_req: '',
         level_req: 0,
-        type: 'Expansion',
-        q: 0,
-        r: 0,
         hood_reqs_text: '',
         derby_reqs_text: '',
         leader_name: '',
-        leader_model: 'castle', // New Field
-        coleader_model: 'market' // New Field
+        image_url: '',
+        sort_order: 0,
+        trophy_gold: 0,
+        trophy_silver: 0,
+        trophy_bronze: 0
     });
 
     useEffect(() => {
@@ -37,7 +37,8 @@ export default function MapManagerPage() {
 
     const loadDistricts = async () => {
         setLoading(true);
-        const { data } = await supabase.from('map_districts').select('*').order('created_at');
+        // Sort by sort_order
+        const { data } = await supabase.from('map_districts').select('*').order('sort_order', { ascending: true });
         if (data) setDistricts(data);
         setLoading(false);
     };
@@ -50,14 +51,14 @@ export default function MapManagerPage() {
                 tag: formData.tag,
                 derby_req: formData.derby_req,
                 level_req: formData.level_req,
-                type: formData.type,
-                q: formData.q,
-                r: formData.r,
                 hood_reqs_text: formData.hood_reqs_text,
                 derby_reqs_text: formData.derby_reqs_text,
                 leader_name: formData.leader_name,
-                leader_model: formData.leader_model,
-                coleader_model: formData.coleader_model
+                image_url: formData.image_url,
+                sort_order: formData.sort_order,
+                trophy_gold: formData.trophy_gold,
+                trophy_silver: formData.trophy_silver,
+                trophy_bronze: formData.trophy_bronze
             };
 
             let error;
@@ -75,14 +76,19 @@ export default function MapManagerPage() {
             }
 
             setEditingId(null);
-            setFormData({
-                name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0,
-                hood_reqs_text: '', derby_reqs_text: '', leader_name: '', leader_model: 'castle', coleader_model: 'market'
-            });
+            resetForm();
             loadDistricts();
-        } catch (error) {
-            alert('Error saving district: ' + JSON.stringify(error));
+        } catch (error: any) {
+            alert('Error saving district: ' + (error.message || JSON.stringify(error)));
         }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            name: '', hood_id: '', tag: '', derby_req: '', level_req: 0,
+            hood_reqs_text: '', derby_reqs_text: '', leader_name: '',
+            image_url: '', sort_order: 0, trophy_gold: 0, trophy_silver: 0, trophy_bronze: 0
+        });
     };
 
     const handleDelete = async (hood: any) => {
@@ -93,15 +99,21 @@ export default function MapManagerPage() {
 
     const startEdit = (d: any) => {
         setEditingId(d.id);
-        const safeData = {
-            ...d,
+        setFormData({
+            name: d.name || '',
+            hood_id: d.hood_id || '',
+            tag: d.tag || '',
+            derby_req: d.derby_req || '',
+            level_req: d.level_req || 0,
             hood_reqs_text: d.hood_reqs_text || '',
             derby_reqs_text: d.derby_reqs_text || '',
             leader_name: d.leader_name || '',
-            leader_model: d.leader_model || 'castle',
-            coleader_model: d.coleader_model || 'market'
-        };
-        setFormData(safeData);
+            image_url: d.image_url || '',
+            sort_order: d.sort_order || 0,
+            trophy_gold: d.trophy_gold || 0,
+            trophy_silver: d.trophy_silver || 0,
+            trophy_bronze: d.trophy_bronze || 0
+        });
         // Scroll to form
         document.getElementById('editor-form')?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -126,19 +138,53 @@ export default function MapManagerPage() {
         }
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        try {
+            setUploading(true);
+            const file = e.target.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            // Trying 'images' bucket first, fall back to 'public' handled by error catch if needed
+            // But we'll assume user followed directions to create a bucket
+            const { error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+            setFormData(prev => ({ ...prev, image_url: data.publicUrl }));
+
+        } catch (error: any) {
+            alert('Error uploading image: ' + error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     // Helper to adapt District to NeighborhoodDB for Card
     const adaptToCard = (d: any) => ({
-        id: d.id.toString(), // Fix: Convert number ID to string
+        id: d.id.toString(),
         name: d.name || 'Unnamed',
-        image: '', // No image support in UI anymore
-        // Use leader_name for leader
+        image: d.image_url || '',
         leader: d.leader_name || 'None',
         tag: d.tag || '',
-        // text_color not in map_districts, use white or add col later
         text_color: '#ffffff',
-        // splitting raw text into arrays for card
         requirements: d.hood_reqs_text ? d.hood_reqs_text.split('\n') : [],
         derby_requirements: d.derby_reqs_text ? d.derby_reqs_text.split('\n') : [],
+        // Pass extra data for card if we modify card later, but mainly for admin visualization now
+        trophies: {
+            gold: d.trophy_gold || 0,
+            silver: d.trophy_silver || 0,
+            bronze: d.trophy_bronze || 0
+        },
+        order: d.sort_order
     });
 
     return (
@@ -153,51 +199,103 @@ export default function MapManagerPage() {
                     {editingId ? 'Edit District' : 'Add New District'}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <input
-                        type="text" placeholder="Hood Name"
-                        className="bg-gray-900 border border-gray-700 rounded p-2"
-                        value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    />
-                    <input
-                        type="text" placeholder="Leader Name"
-                        className="bg-gray-900 border border-gray-700 rounded p-2"
-                        value={formData.leader_name} onChange={e => setFormData({ ...formData, leader_name: e.target.value })}
-                    />
-                    <input
-                        type="text" placeholder="Tag (#XYZ)"
-                        className="bg-gray-900 border border-gray-700 rounded p-2"
-                        value={formData.tag} onChange={e => setFormData({ ...formData, tag: e.target.value })}
-                    />
-                    <select
-                        className="bg-gray-900 border border-gray-700 rounded p-2"
-                        value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}
-                    >
-                        <option value="Capital">Capital (Center)</option>
-                        <option value="Expansion">Expansion (Outer)</option>
-                    </select>
-
-                    {/* Hex Coordinates */}
-                    <div className="flex gap-2">
+                    <div className="lg:col-span-1">
+                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Sort Order</label>
                         <input
-                            type="number" placeholder="Q"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
-                            value={formData.q} onChange={e => setFormData({ ...formData, q: parseInt(e.target.value) })}
-                        />
-                        <input
-                            type="number" placeholder="R"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
-                            value={formData.r} onChange={e => setFormData({ ...formData, r: parseInt(e.target.value) })}
+                            type="number"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full text-center font-mono text-yellow-500 font-bold"
+                            value={formData.sort_order} onChange={e => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
                         />
                     </div>
 
-                    <input
-                        type="text" placeholder="Discord Role ID"
-                        className="bg-gray-900 border border-gray-700 rounded p-2 font-mono text-sm"
-                        value={formData.hood_id} onChange={e => setFormData({ ...formData, hood_id: e.target.value })}
-                    />
+                    <div className="lg:col-span-3">
+                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Hood Name</label>
+                        <input
+                            type="text" placeholder="Hood Name"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
+                            value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="lg:col-span-2">
+                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Leader Name</label>
+                        <input
+                            type="text" placeholder="Leader Name"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
+                            value={formData.leader_name} onChange={e => setFormData({ ...formData, leader_name: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="lg:col-span-1">
+                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Tag</label>
+                        <input
+                            type="text" placeholder="Tag (#XYZ)"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
+                            value={formData.tag} onChange={e => setFormData({ ...formData, tag: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="lg:col-span-1">
+                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Discord Role ID</label>
+                        <input
+                            type="text" placeholder="Role ID"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-sm"
+                            value={formData.hood_id} onChange={e => setFormData({ ...formData, hood_id: e.target.value })}
+                        />
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="mt-6 border-t border-gray-700 pt-4">
+                    <h3 className="text-sm font-bold text-yellow-500 uppercase mb-3 text-xs tracking-wider flex items-center gap-2">
+                        <Trophy size={14} /> Trophies & Image
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-yellow-900/20 p-2 rounded border border-yellow-700/30 text-center">
+                            <label className="text-xs text-yellow-500 block mb-1">GOLD</label>
+                            <input
+                                type="number"
+                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                value={formData.trophy_gold} onChange={e => setFormData({ ...formData, trophy_gold: parseInt(e.target.value) || 0 })}
+                            />
+                        </div>
+                        <div className="bg-gray-400/20 p-2 rounded border border-gray-500/30 text-center">
+                            <label className="text-xs text-gray-400 block mb-1">SILVER</label>
+                            <input
+                                type="number"
+                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                value={formData.trophy_silver} onChange={e => setFormData({ ...formData, trophy_silver: parseInt(e.target.value) || 0 })}
+                            />
+                        </div>
+                        <div className="bg-orange-900/20 p-2 rounded border border-orange-700/30 text-center">
+                            <label className="text-xs text-orange-500 block mb-1">BRONZE</label>
+                            <input
+                                type="number"
+                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                value={formData.trophy_bronze} onChange={e => setFormData({ ...formData, trophy_bronze: parseInt(e.target.value) || 0 })}
+                            />
+                        </div>
+
+                        <div className="relative">
+                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Hood Image</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    className="bg-gray-900 border border-gray-700 rounded p-2 w-full text-xs"
+                                    value={formData.image_url}
+                                    onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                                />
+                                <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded flex items-center justify-center">
+                                    <Upload size={16} />
+                                    <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
+                                </label>
+                            </div>
+                            {uploading && <div className="text-xs text-blue-400 mt-1">Uploading...</div>}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                     <textarea
                         rows={3} placeholder="Requirements (one per line)"
                         className="w-full bg-gray-900 border border-gray-700 rounded p-2"
@@ -210,55 +308,12 @@ export default function MapManagerPage() {
                     />
                 </div>
 
-                {/* VISUAL CUSTOMIZATION */}
-                <div className="mt-4 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
-                    <h3 className="text-sm font-bold text-gray-400 uppercase mb-3 text-xs tracking-wider">House Visuals</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-xs text-gray-500 mb-1 block">Leader House</label>
-                            <select
-                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm"
-                                value={formData.leader_model}
-                                onChange={e => setFormData({ ...formData, leader_model: e.target.value })}
-                            >
-                                <option value="castle">Inn (New Leader)</option>
-                                <option value="inn">Inn</option>
-                                <option value="watchtower">Bell Tower</option>
-                                <option value="barracks">Blacksmith</option>
-                                <option value="lumbermill">Sawmill</option>
-                                <option value="library">Library House</option>
-                                <option value="mine">Mine Entrance</option>
-                                <option value="archeryrange">Stable</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="text-xs text-gray-500 mb-1 block">Co-Leader House</label>
-                            <select
-                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm"
-                                value={formData.coleader_model}
-                                onChange={e => setFormData({ ...formData, coleader_model: e.target.value })}
-                            >
-                                <option value="market">Blacksmith (Default)</option>
-                                <option value="mill">Windmill</option>
-                                <option value="watermill">Watermill</option>
-                                <option value="barracks">Blacksmith</option>
-                                <option value="watchtower">Bell Tower</option>
-                                <option value="lumbermill">Sawmill</option>
-                                <option value="library">Library House</option>
-                                <option value="mine">Mine Entrance</option>
-                                <option value="archeryrange">Stable</option>
-                                <option value="house">Standard House</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm font-bold flex items-center gap-2">
-                        <Save className="w-4 h-4" /> Save
+                <div className="mt-6 flex gap-2">
+                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold flex items-center gap-2">
+                        <Save className="w-4 h-4" /> Save District
                     </button>
                     {editingId && (
-                        <button onClick={() => { setEditingId(null); setFormData({ name: '', hood_id: '', tag: '', derby_req: '', level_req: 0, type: 'Expansion', q: 0, r: 0, hood_reqs_text: '', derby_reqs_text: '', leader_name: '', leader_model: 'castle', coleader_model: 'market' }); }} className="bg-gray-700 px-4 py-2 rounded text-sm">
+                        <button onClick={() => { setEditingId(null); resetForm(); }} className="bg-gray-700 px-4 py-2 rounded">
                             Cancel
                         </button>
                     )}
@@ -268,8 +323,12 @@ export default function MapManagerPage() {
             {/* Render List using NeighborhoodCard */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {districts.map((d, index) => (
-                    // We must adapt 'd' (map district) to 'NeighborhoodDB' shape for the card
-                    <div key={d.id} className="h-full">
+                    <div key={d.id} className="h-full relative group">
+                        {/* Order Badge */}
+                        <div className="absolute -top-3 -left-3 z-30 w-8 h-8 bg-yellow-500 text-black font-black rounded-full flex items-center justify-center border-2 border-black">
+                            {d.sort_order}
+                        </div>
+
                         <NeighborhoodCard
                             neighborhood={adaptToCard(d)}
                             index={index}
@@ -278,9 +337,8 @@ export default function MapManagerPage() {
                             onDelete={() => handleDelete(d)}
                             onManageMembers={() => router.push(`/admin/hood-members?hood_id=${d.hood_id}&name=${encodeURIComponent(d.name)}`)}
                         />
-                        {/* Optional small text for debug info not in card */}
-                        <div className="text-center mt-2 text-xs text-mono text-gray-600">
-                            Coords: ({d.q}, {d.r}) | ID: {d.hood_id || 'NaN'}
+                        <div className="bg-gray-800 p-2 text-center text-xs text-gray-500 rounded-b-lg border-t border-gray-700">
+                            ID: {d.hood_id || 'NaN'} | Trophies: {d.trophy_gold || 0}G / {d.trophy_silver || 0}S / {d.trophy_bronze || 0}B
                         </div>
                     </div>
                 ))}
@@ -293,3 +351,4 @@ export default function MapManagerPage() {
         </div >
     );
 }
+

@@ -14,11 +14,12 @@ interface Member {
 interface HeroSelectRosterProps {
     hoodName: string;
     leaderName: string;
+    hoodImage?: string;
     members: Member[];
     onBack: () => void;
 }
 
-export default function HeroSelectRoster({ hoodName, leaderName, members, onBack }: HeroSelectRosterProps) {
+export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, members, onBack }: HeroSelectRosterProps) {
     // Determine Leader logic: Use passed leaderName if not found in list, but prefer list member for role consistency
     const leaderMember = members.find(m => m.role === 'Leader');
     const leaderRawName = leaderMember ? leaderMember.name : leaderName;
@@ -69,6 +70,13 @@ export default function HeroSelectRoster({ hoodName, leaderName, members, onBack
                     </h2>
                     <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />
                 </div>
+
+                {/* Hood Image Banner */}
+                {hoodImage && (
+                    <div className="w-full max-w-sm mb-6 rounded-lg overflow-hidden border-2 border-yellow-500/30 shadow-lg">
+                        <img src={hoodImage} alt={hoodName} className="w-full h-48 object-cover" />
+                    </div>
+                )}
 
                 {/* Big Avatar */}
                 <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group">

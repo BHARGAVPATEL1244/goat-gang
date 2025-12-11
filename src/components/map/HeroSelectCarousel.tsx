@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Users, Crown, ArrowRight } from 'lucide-react';
+import { Users, Crown, ArrowRight, Trophy } from 'lucide-react';
 
 interface District {
     id: string;
@@ -9,7 +9,10 @@ interface District {
     leader_name: string;
     member_count: number;
     description?: string;
-    color?: string; // Fallback or defined color
+    color?: string;
+    trophy_gold?: number;
+    trophy_silver?: number;
+    trophy_bronze?: number;
 }
 
 interface HeroSelectCarouselProps {
@@ -136,7 +139,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                     </h2>
                                     <div className="w-12 h-1 bg-yellow-500 mb-4" />
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <div className="flex items-center justify-between text-gray-300">
                                             <div className="flex items-center gap-2">
                                                 <Crown size={16} className="text-yellow-500" />
@@ -145,12 +148,22 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                             <span className="font-mono text-sm">{district.leader_name}</span>
                                         </div>
 
-                                        <div className="flex items-center justify-between text-gray-300">
-                                            <div className="flex items-center gap-2">
-                                                <Users size={16} className="text-blue-500" />
-                                                <span className="text-xs font-bold uppercase tracking-wider">Power Lvl</span>
+                                        {/* Trophies Display */}
+                                        <div className="flex items-center justify-between text-gray-300 pt-2 border-t border-white/5">
+                                            <div className="flex items-center gap-4 w-full justify-around">
+                                                <div className="flex flex-col items-center">
+                                                    <Trophy size={16} className="text-yellow-400 mb-1" />
+                                                    <span className="text-xs font-bold text-white">{district.trophy_gold || 0}</span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Trophy size={16} className="text-gray-300 mb-1" />
+                                                    <span className="text-xs font-bold text-white">{district.trophy_silver || 0}</span>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Trophy size={16} className="text-orange-400 mb-1" />
+                                                    <span className="text-xs font-bold text-white">{district.trophy_bronze || 0}</span>
+                                                </div>
                                             </div>
-                                            <span className="font-mono text-sm text-blue-400 font-bold">{district.member_count || 0}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -168,3 +181,4 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
         </div>
     );
 }
+

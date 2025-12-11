@@ -16,7 +16,7 @@ export default function NeighborhoodsPage() {
     // 1. Load Districts (Hoods)
     useEffect(() => {
         async function loadData() {
-            const { data, error } = await supabase.from('map_districts').select('*').order('name');
+            const { data, error } = await supabase.from('map_districts').select('*').order('sort_order', { ascending: true });
             if (error) {
                 console.error('Error loading districts:', error);
             }
@@ -88,6 +88,7 @@ export default function NeighborhoodsPage() {
                 <HeroSelectRoster
                     hoodName={selectedDistrict?.name || 'Unknown'}
                     leaderName={selectedDistrict?.leader_name || 'Unknown'}
+                    hoodImage={selectedDistrict?.image_url}
                     members={villageMembers}
                     onBack={handleBack}
                 />

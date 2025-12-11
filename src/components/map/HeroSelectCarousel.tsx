@@ -95,8 +95,9 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                             key={district.id}
                             onClick={() => scrollToItem(index)}
                             className={`
-                                relative flex-shrink-0 transition-all duration-500 ease-out cursor-pointer snap-center
-                                ${isActive ? 'w-[320px] h-[560px] scale-110 z-20 brightness-110' : 'w-[280px] h-[480px] scale-90 z-10 brightness-50 hover:brightness-75'}
+                                relative flex-shrink-0 transition-all duration-300 ease-out cursor-pointer snap-center
+                                w-[300px] h-[520px]
+                                ${isActive ? 'z-20 brightness-110 scale-105' : 'z-10 brightness-50 hover:brightness-75 scale-95'}
                             `}
                         >
                             {/* Card Frame */}

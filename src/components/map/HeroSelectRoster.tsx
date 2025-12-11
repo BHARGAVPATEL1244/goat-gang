@@ -3,6 +3,7 @@
 import React from 'react';
 import { ArrowLeft, Crown, Shield, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { parseUser } from '@/utils/nameParser';
 
 interface Member {
     id: string;
@@ -18,8 +19,21 @@ interface HeroSelectRosterProps {
 }
 
 export default function HeroSelectRoster({ hoodName, leaderName, members, onBack }: HeroSelectRosterProps) {
-    const leader = members.find(m => m.role === 'Leader') || { name: leaderName, role: 'Leader' };
-    const otherMembers = members.filter(m => m.role !== 'Leader');
+    // Determine Leader logic: Use passed leaderName if not found in list, but prefer list member for role consistency
+    const leaderMember = members.find(m => m.role === 'Leader');
+    const leaderRawName = leaderMember ? leaderMember.name : leaderName;
+    const { cleanName: leaderClean, level: leaderLevel } = parseUser(leaderRawName);
+
+    // Filter out leader from the list if already shown on the left
+    // Logic: If members list contains the leader, exclude them from the right side list
+    const otherMembers = members
+        .filter(m => m.role !== 'Leader')
+        .map(m => ({ ...m, ...parseUser(m.name) }))
+        .sort((a, b) => {
+            // Sort by Role Priority
+            const rolePriority: any = { 'CoLeader': 1, 'Elder': 2, 'Member': 3 };
+            return (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99);
+        });
 
     const getRoleColor = (role: string) => {
         switch (role) {
@@ -50,22 +64,28 @@ export default function HeroSelectRoster({ hoodName, leaderName, members, onBack
                 </button>
 
                 <div className="text-center mb-10">
-                    <h2 className="text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg">
+                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-full">
                         {hoodName}
                     </h2>
                     <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />
                 </div>
 
-                {/* Big Avatar / Model Placeholder */}
-                <div className="w-64 h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group">
-                    {/* Static Image or Initial for now */}
-                    <span className="text-8xl font-black text-white/10">{leader.name.substring(0, 1)}</span>
+                {/* Big Avatar */}
+                <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group">
+                    <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
                     <Crown size={48} className="absolute -top-4 -right-4 text-yellow-400 drop-shadow-md animate-bounce" />
                 </div>
 
                 <div className="text-center">
                     <h3 className="text-gray-400 uppercase tracking-[0.2em] text-sm mb-2">Guild Master</h3>
-                    <h1 className="text-4xl font-bold text-white">{leader.name}</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{leaderClean}</h1>
+
+                    {/* Leader Level Display */}
+                    {leaderLevel && (
+                        <div className="inline-block bg-yellow-500/20 text-yellow-300 px-4 py-1 rounded-full border border-yellow-500/50 font-mono font-bold text-sm tracking-widest">
+                            LVL {leaderLevel}
+                        </div>
+                    )}
                 </div>
             </motion.div>
 
@@ -74,39 +94,58 @@ export default function HeroSelectRoster({ hoodName, leaderName, members, onBack
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="w-full md:w-2/3 p-8 md:p-12 overflow-y-auto z-10"
+                className="w-full md:w-2/3 p-6 md:p-12 overflow-y-auto z-10"
             >
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between">
+                    <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between sticky top-0 bg-gray-900/95 backdrop-blur z-20">
                         <span>Active Roster</span>
                         <span className="text-base not-italic font-mono text-gray-500 bg-gray-800 px-3 py-1 rounded">{members.length} Members</span>
                     </h2>
 
-                    <div className="space-y-3">
+                    <div className="space-y-3 pb-20">
                         {/* Co-Leaders & Elders First */}
                         {otherMembers.map((member, i) => (
                             <motion.div
                                 key={member.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * i }}
+                                transition={{ delay: 0.05 * i }}
                                 className={`
                                     flex items-center justify-between p-4 rounded-lg border backdrop-blur-sm
-                                    hover:scale-[1.01] transition-transform cursor-default
+                                    hover:bg-white/5 transition-colors cursor-default group
                                     ${getRoleColor(member.role)}
                                 `}
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded bg-black/30 flex items-center justify-center">
+                                <div className="flex items-center gap-4 flex-1">
+                                    {/* Role Icon */}
+                                    <div className="w-10 h-10 rounded bg-black/30 flex items-center justify-center flex-shrink-0">
                                         {member.role === 'CoLeader' && <Shield size={20} />}
                                         {member.role === 'Elder' && <Shield size={16} />}
                                         {member.role === 'Member' && <User size={16} />}
                                     </div>
-                                    <span className="font-bold text-lg">{member.name.replace(/\[.*?\]/g, '').trim()}</span>
+
+                                    {/* Level Box (Before Name) */}
+                                    {member.level && (
+                                        <div className="w-14 h-8 flex items-center justify-center bg-black/40 border border-white/10 rounded text-xs font-mono font-bold text-gray-400">
+                                            {member.level}
+                                        </div>
+                                    )}
+
+                                    {/* Name */}
+                                    <span className="font-bold text-lg truncate">{member.cleanName}</span>
                                 </div>
-                                <span className="font-mono text-xs uppercase tracking-widest opacity-60">{member.role}</span>
+
+                                <span className="font-mono text-xs uppercase tracking-widest opacity-60 ml-4 hidden sm:block">
+                                    {member.role === 'CoLeader' ? 'Co-Leader' : member.role}
+                                </span>
                             </motion.div>
                         ))}
+
+                        {otherMembers.length === 0 && (
+                            <div className="text-center text-gray-500 py-10 font-mono">
+                                No other members found.
+                            </div>
+                        )}
                     </div>
                 </div>
             </motion.div>

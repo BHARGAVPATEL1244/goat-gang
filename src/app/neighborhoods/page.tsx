@@ -1,59 +1,97 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { NeighborhoodDB } from '@/lib/types';
-import NeighborhoodCard from '@/components/NeighborhoodCard';
-import { Loader2 } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client'; // Added proper import
+import React, { useState, useEffect } from 'react';
+import HeroSelectCarousel from '@/components/map/HeroSelectCarousel';
+import HeroSelectRoster from '@/components/map/HeroSelectRoster';
+import { createClient } from '@/utils/supabase/client';
+import { div } from 'framer-motion/client';
 
 export default function NeighborhoodsPage() {
-    const [neighborhoods, setNeighborhoods] = useState<NeighborhoodDB[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [selectedDistrict, setSelectedDistrict] = useState<any | null>(null);
+    const [viewMode, setViewMode] = useState<'CAROUSEL' | 'ROSTER'>('CAROUSEL');
+    const [villageMembers, setVillageMembers] = useState<any[]>([]);
+    const supabase = createClient();
 
+    // 1. Load Districts (Hoods)
     useEffect(() => {
         async function loadData() {
-            const supabase = createClient();
-            const { data } = await supabase.from('map_districts').select('*');
-
-            if (data) {
-                // Adapt to NeighborhoodDB shape expected by Card
-                const adapted = data.map((d: any) => ({
-                    id: d.id.toString(), // Fix: Convert number ID to string
-                    name: d.name || 'Unnamed',
-                    image: d.image || '',
-                    leader: d.leader_name || 'None',
-                    tag: d.tag || '',
-                    text_color: '#ffffff',
-                    requirements: d.hood_reqs_text ? d.hood_reqs_text.split('\n') : [],
-                    derby_requirements: d.derby_reqs_text ? d.derby_reqs_text.split('\n') : [],
-                }));
-                const sorted = adapted.sort((a: any, b: any) => a.name.localeCompare(b.name));
-                setNeighborhoods(sorted);
+            const { data, error } = await supabase.from('map_districts').select('*').order('name');
+            if (error) {
+                console.error('Error loading districts:', error);
             }
-            setLoading(false);
+            if (data) setDistricts(data);
         }
         loadData();
     }, []);
 
-    if (loading) return <div className="flex justify-center p-20"><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>;
+    // 2. Load Members when Roster is selected
+    useEffect(() => {
+        if (viewMode === 'ROSTER' && selectedDistrict) {
+            async function fetchMembers() {
+                if (selectedDistrict.hood_id) {
+                    const { data } = await supabase
+                        .from('hood_memberships')
+                        .select('*')
+                        .eq('hood_id', selectedDistrict.hood_id)
+                        // Use a simple sort by rank for now via JS if DB view doesn't handle it
+                        ;
+
+                    if (data && data.length > 0) {
+                        const realMembers = data.map(m => ({
+                            id: m.user_id,
+                            name: m.nickname || m.username || 'Member',
+                            role: m.rank
+                        }));
+
+                        // Sort by Role Priority
+                        const rolePriority: any = { 'Leader': 0, 'CoLeader': 1, 'Elder': 2, 'Member': 3 };
+                        realMembers.sort((a, b) => (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99));
+
+                        setVillageMembers(realMembers);
+                    } else {
+                        setVillageMembers([
+                            { id: 'leader', name: selectedDistrict.leader_name || 'Leader', role: 'Leader' }
+                        ]);
+                    }
+                } else {
+                    // Demo Mode
+                    setVillageMembers([
+                        { id: '1', name: selectedDistrict.leader_name || 'Leader', role: 'Leader' },
+                        { id: '2', name: 'Demo Member', role: 'Member' }
+                    ]);
+                }
+            }
+            fetchMembers();
+        }
+    }, [viewMode, selectedDistrict]);
+
+    // Handlers
+    const handleSelectHood = (district: any) => {
+        setSelectedDistrict(district);
+        setViewMode('ROSTER');
+    };
+
+    const handleBack = () => {
+        setViewMode('CAROUSEL');
+        setSelectedDistrict(null);
+    };
 
     return (
-        <div className="space-y-12">
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">Our Neighborhoods</h1>
-                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                    Choose your path. Whether you are a hardcore derby player or a casual farmer, we have a home for you.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                {neighborhoods.map((hood, index) => (
-                    <NeighborhoodCard key={hood.id} neighborhood={hood} index={index} />
-                ))}
-                {neighborhoods.length === 0 && (
-                    <div className="text-center text-gray-500">No neighborhoods found. Check back soon!</div>
-                )}
-            </div>
+        <div className="w-full h-screen bg-black overflow-hidden relative">
+            {viewMode === 'CAROUSEL' ? (
+                <HeroSelectCarousel
+                    districts={districts}
+                    onSelect={handleSelectHood}
+                />
+            ) : (
+                <HeroSelectRoster
+                    hoodName={selectedDistrict?.name || 'Unknown'}
+                    leaderName={selectedDistrict?.leader_name || 'Unknown'}
+                    members={villageMembers}
+                    onBack={handleBack}
+                />
+            )}
         </div>
     );
 }

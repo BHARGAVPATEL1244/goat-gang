@@ -84,7 +84,7 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 
 // ... imports
-import { useGLTF } from '@react-three/drei';
+// ... imports
 
 function SuspenseModel({ url }: { url: string }) {
     // Load model

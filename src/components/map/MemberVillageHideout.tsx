@@ -66,7 +66,7 @@ export default function MemberVillageHideout({ hoodName, members, onBack }: Memb
                                     <div className="absolute -bottom-2 -right-2 bg-black text-white text-xs font-bold px-2 py-1 rounded border border-yellow-500">BOSS</div>
                                 </div>
                                 <div className="text-center">
-                                    <h2 className="text-3xl font-black text-white drop-shadow-lg">{leader.name}</h2>
+                                    <h2 className="text-3xl font-black text-white drop-shadow-lg">{leader.name.split('[')[0].trim()}</h2>
                                     <p className="text-yellow-400 font-bold uppercase text-sm tracking-widest">The Leader</p>
                                 </div>
                             </div>
@@ -92,7 +92,7 @@ export default function MemberVillageHideout({ hoodName, members, onBack }: Memb
                                         <Shield className="w-8 h-8 text-gray-700" />
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-white font-bold text-lg leading-none">{cl.name}</div>
+                                        <div className="text-white font-bold text-lg leading-none">{cl.name.split('[')[0].trim()}</div>
                                         <div className="text-green-400 text-xs font-bold uppercase mt-1">Co-Leader</div>
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@ export default function MemberVillageHideout({ hoodName, members, onBack }: Memb
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow mb-2">
                                     <User className="w-6 h-6 text-gray-800" />
                                 </div>
-                                <div className="text-white font-bold text-sm text-center">{e.name}</div>
+                                <div className="text-white font-bold text-sm text-center">{e.name.split('[')[0].trim()}</div>
                                 <div className="text-gray-300 text-[10px] uppercase">Elder</div>
                                 {/* Bed */}
                                 <div className="absolute bottom-1 right-1 w-8 h-4 bg-blue-800 rounded-sm"></div>
@@ -129,7 +129,7 @@ export default function MemberVillageHideout({ hoodName, members, onBack }: Memb
                                 <div className="w-10 h-10 bg-gray-300 rounded mb-1 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <User className="w-6 h-6 text-gray-600" />
                                 </div>
-                                <div className="text-black font-bold text-xs text-center truncate w-full">{m.name}</div>
+                                <div className="text-black font-bold text-xs text-center truncate w-full">{m.name.split('[')[0].trim()}</div>
                             </div>
                         ))}
                         {/* Empty Bunks */}

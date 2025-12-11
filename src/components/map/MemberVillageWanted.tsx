@@ -84,8 +84,9 @@ function WantedPoster({ member }: { member: Member }) {
                 <div className="border-4 border-double p-4 text-center flex flex-col items-center gap-2"
                     style={{ borderColor: borderColor }}
                 >
-                    <h3 className="text-3xl font-black text-[#2d1b15] tracking-widest uppercase mb-1" style={{ fontFamily: 'serif' }}>
-                        WANTED
+                    <h3 className="text-2xl font-black uppercase tracking-widest leading-none mb-1"
+                        style={{ color: borderColor, fontFamily: 'serif' }}>
+                        {member.name.split('[')[0].trim()}
                     </h3>
 
                     {/* Portrait Placeholder */}

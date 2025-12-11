@@ -86,7 +86,7 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
                             {hoveredMember === item.member.id || isLeader ? (
                                 <>
                                     <Text fontSize={0.7} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom" position={[0, 0.2, 0]}>
-                                        {item.member.name}
+                                        {item.member.name.split('[')[0].trim()}
                                     </Text>
                                     <Text fontSize={0.35} color="#ddd" outlineWidth={0.02} outlineColor="black" anchorY="top" position={[0, 0.1, 0]}>
                                         [{item.member.role}]
@@ -94,7 +94,7 @@ export default function MemberVillage2D({ hoodName, members, onBack }: MemberVil
                                 </>
                             ) : (
                                 <Text fontSize={0.5} color="white" outlineWidth={0.05} outlineColor="black" anchorY="bottom" fillOpacity={0.8}>
-                                    {item.member.name}
+                                    {item.member.name.split('[')[0].trim()}
                                 </Text>
                             )}
                         </Billboard>

@@ -81,29 +81,76 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 
 // ... imports
-
-
-// ... imports
 // ... imports
 
-function SuspenseModel({ url }: { url: string }) {
-    // Load model
-    const { scene } = useGLTF('/models/desert_city/scene.gltf?v=2');
+function SuspenseModel({ hoodName, members }: { hoodName: string, members: Member[] }) {
+    // Load Desert City Environment
+    const { scene: cityScene } = useGLTF('/models/desert_city/scene.gltf?v=2');
+
+    // Load Individual House Models
+    const memberHouse = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/House_1.fbx');
+    const leaderHouse = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/Inn.fbx');
+
+    // Clone for usage
+    const getHouse = (role: string) => {
+        if (role === 'Leader') return leaderHouse.clone();
+        if (role === 'CoLeader') return leaderHouse.clone(); // Use big house for CoLeaders too? Or maybe scale it down
+        return memberHouse.clone();
+    };
+
+    // Procedural Layout Logic (Grid Clustering around Center)
+    const placements = useMemo(() => {
+        return members.map((member, i) => {
+            // Spiral or Grid layout
+            const angle = i * 1.5; // Spread out
+            const radius = 5 + (i * 2); // Expanding spiral
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            return { member, x, z };
+        });
+    }, [members]);
 
     return (
         <group>
             <Environment preset="park" />
-            <ambientLight intensity={2} />
+            <ambientLight intensity={1} />
+            <directionalLight position={[50, 50, 25]} intensity={2} castShadow />
 
-            {/* Sand Ground */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-                <planeGeometry args={[500, 500]} />
-                <meshStandardMaterial color="#e6d2b5" roughness={1} />
-            </mesh>
+            {/* Huge Desert City Background (Scaled up largely to act as 'Terrain') */}
+            <primitive object={cityScene} scale={10.0} position={[0, -1, 0]} />
 
-            {/* City Model - Scale 10 */}
-            <primitive object={scene} scale={10.0} position={[0, 0, 0]} />
+            {/* Individual Member Houses */}
+            {placements.map((item) => (
+                <group key={item.member.id} position={[item.x, 0, item.z]}>
+                    <primitive
+                        object={getHouse(item.member.role)}
+                        scale={item.member.role === 'Leader' ? 0.02 : 0.015}
+                    />
 
+                    {/* Floating Label */}
+                    <Billboard position={[0, 8, 0]}>
+                        <Text
+                            fontSize={2}
+                            color={item.member.role === 'Leader' ? "gold" : "white"}
+                            outlineWidth={0.1}
+                            outlineColor="black"
+                            anchorY="bottom"
+                        >
+                            {item.member.name.split('[')[0].trim()}
+                        </Text>
+                        <Text
+                            fontSize={1}
+                            color="#ddd"
+                            outlineWidth={0.05}
+                            outlineColor="black"
+                            anchorY="top"
+                            position={[0, -0.5, 0]}
+                        >
+                            {item.member.role}
+                        </Text>
+                    </Billboard>
+                </group>
+            ))}
         </group>
     );
 }

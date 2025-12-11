@@ -111,28 +111,32 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                 bg-gray-800 flex flex-col
                             `}>
                                 {/* Image / Mascot Placeholder */}
-                                <div className="flex-1 bg-gradient-to-b from-gray-700 to-gray-900 flex items-center justify-center relative group">
-                                    {/* Avatar/Image Logic */}
+                                <div className="flex-1 bg-gray-800 flex items-center justify-center relative group overflow-hidden">
+                                    {/* Full Image or Avatar Fallback */}
                                     {district.image_url ? (
-                                        <div className="w-32 h-32 rounded-full border-4 border-white/10 overflow-hidden shadow-lg bg-black/50">
+                                        <>
                                             <img
                                                 src={district.image_url}
                                                 alt={district.name}
-                                                className="w-full h-full object-cover"
+                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90"
                                             />
-                                        </div>
+                                            {/* Gradient for smooth transition to info section */}
+                                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-gray-900 to-transparent" />
+                                        </>
                                     ) : (
-                                        <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center text-6xl font-bold text-white/20 border-4 border-transparent">
-                                            {district.name.substring(0, 1)}
+                                        <div className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-900 flex items-center justify-center">
+                                            <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center text-6xl font-bold text-white/20 border-4 border-transparent">
+                                                {district.name.substring(0, 1)}
+                                            </div>
                                         </div>
                                     )}
 
                                     {/* "Select" Overlay */}
                                     {isActive && (
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm">
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm z-10">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onSelect(district); }}
-                                                className="bg-yellow-500 text-black font-bold uppercase px-6 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2"
+                                                className="bg-yellow-500 text-black font-bold uppercase px-6 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 shadow-lg shadow-yellow-500/20"
                                             >
                                                 Enter Roster <ArrowRight size={20} />
                                             </button>

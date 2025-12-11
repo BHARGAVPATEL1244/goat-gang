@@ -71,17 +71,14 @@ export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, memb
                     <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />
                 </div>
 
-                {/* Hood Image Banner */}
-                {hoodImage && (
-                    <div className="w-full max-w-sm mb-6 rounded-lg overflow-hidden border-2 border-yellow-500/30 shadow-lg">
-                        <img src={hoodImage} alt={hoodName} className="w-full h-48 object-cover" />
-                    </div>
-                )}
-
                 {/* Big Avatar */}
-                <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group">
-                    <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
-                    <Crown size={48} className="absolute -top-4 -right-4 text-yellow-400 drop-shadow-md animate-bounce" />
+                <div className="w-48 h-48 md:w-64 md:h-64 bg-gray-700 rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] flex items-center justify-center mb-8 relative group overflow-hidden">
+                    {hoodImage ? (
+                        <img src={hoodImage} alt={hoodName} className="w-full h-full object-cover" />
+                    ) : (
+                        <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
+                    )}
+                    <Crown size={48} className="absolute top-0 right-4 text-yellow-400 drop-shadow-md animate-bounce z-20" />
                 </div>
 
                 <div className="text-center">

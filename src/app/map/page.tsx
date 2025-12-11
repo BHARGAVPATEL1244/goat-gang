@@ -19,9 +19,8 @@ import { ArrowLeft, Monitor, Image as ImageIcon, Grip } from 'lucide-react';
 export default function MapPage() {
     const [districts, setDistricts] = useState<any[]>([]);
     const [selectedDistrict, setSelectedDistrict] = useState<any | null>(null);
-    const [viewMode, setViewMode] = useState<'MAP' | 'VILLAGE'>('MAP');
-    // Default to HIDEOUT as per latest feature
-    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D' | 'WANTED' | 'HIDEOUT'>('HIDEOUT');
+    const [viewMode, setViewMode] = useState<'CITY' | 'VILLAGE'>('CITY');
+    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D' | 'WANTED' | 'HIDEOUT' | 'FARM'>('FARM'); // Default to Farm for test
     const [villageMembers, setVillageMembers] = useState<any[]>([]);
     const supabase = createClient();
 

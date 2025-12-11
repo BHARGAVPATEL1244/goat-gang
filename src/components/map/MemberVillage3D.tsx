@@ -88,7 +88,7 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 function SuspenseModel({ url }: { url: string }) {
     // Load model
-    const { scene } = useGLTF('/models/desert_city/scene.gltf');
+    const { scene } = useGLTF('/models/desert_city/scene.gltf?v=2');
 
     return (
         <group>

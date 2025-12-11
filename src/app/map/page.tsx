@@ -182,7 +182,9 @@ export default function MapPage() {
                         </group>
                     }>
                         <Suspense fallback={<Text position={[0, 0, 0]} color="white" anchorX="center" anchorY="middle">Loading 3D Assets...</Text>}>
-                            <Sky sunPosition={[100, 20, 100]} />
+                            {/* Render Sky only for non-Farm modes (Farm has its own style) */}
+                            {villageStyle !== 'FARM' && <Sky sunPosition={[100, 20, 100]} />}
+
                             <ambientLight intensity={0.5} />
                             <pointLight position={[10, 10, 10]} intensity={1} castShadow />
 
@@ -217,16 +219,23 @@ export default function MapPage() {
                                             coleaderModel={selectedDistrict?.coleader_model}
                                         />
                                     )}
+
+                                    {villageStyle === 'FARM' && (
+                                        <MemberVillageFarm hoodName={selectedDistrict?.name || 'Unknown'} members={villageMembers} onBack={exitVillage} />
+                                    )}
                                 </>
                             )}
 
-                            <OrbitControls
-                                enablePan={true}
-                                enableZoom={true}
-                                minDistance={5}
-                                maxDistance={50}
-                                maxPolarAngle={Math.PI / 2.5}
-                            />
+                            {/* Global Controls - valid for everything EXCEPT Farm (which has custom controls) */}
+                            {villageStyle !== 'FARM' && (
+                                <OrbitControls
+                                    enablePan={true}
+                                    enableZoom={true}
+                                    minDistance={5}
+                                    maxDistance={50}
+                                    maxPolarAngle={Math.PI / 2.5}
+                                />
+                            )}
                         </Suspense>
                     </ThreeErrorBoundary>
                 </Canvas>

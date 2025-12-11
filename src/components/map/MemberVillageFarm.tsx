@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Text, Billboard, Environment, OrthographicCamera, useCursor } from '@react-three/drei';
+import { Text, Billboard, Environment, OrthographicCamera, useCursor, MapControls } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three-stdlib';
 import * as THREE from 'three';
@@ -78,7 +78,20 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
     return (
         <group>
             {/* 1. Camera Setup for 2D/Isometric Look */}
-            <OrthographicCamera makeDefault position={[20, 20, 20]} zoom={35} near={-50} far={200} />
+            {/* Using MapControls for better panning in isometric view */}
+            <MapControls
+                enableRotate={false} /* Lock rotation for strict 2D feel? Or allow slight? User said 'like this' which is iso */
+                enableZoom={true}
+                minZoom={10}
+                maxZoom={100}
+            />
+            <OrthographicCamera makeDefault position={[50, 50, 50]} zoom={20} near={-100} far={500} onUpdate={c => c.lookAt(0, 0, 0)} />
+
+            {/* DEBUG: Red Box at 0,0,0 to confirm render */}
+            <mesh position={[0, 5, 0]}>
+                <boxGeometry args={[2, 2, 2]} />
+                <meshStandardMaterial color="red" />
+            </mesh>
 
             {/* 2. Lighting (Bright, sunny, cartoonish) */}
             <Environment preset="park" />

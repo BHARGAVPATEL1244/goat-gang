@@ -43,10 +43,19 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
             // Tint Red for Barn look
             model.traverse((child: any) => {
                 if (child.isMesh) {
-                    // Clone material to avoid affecting other instances strictly
-                    child.material = child.material.clone();
-                    if (child.material.name.toLowerCase().includes('wood') || child.material.name.toLowerCase().includes('plank')) {
-                        child.material.color.setHex(0xa63c3c); // Reddish Barn Wood
+                    if (Array.isArray(child.material)) {
+                        child.material = child.material.map((m: any) => {
+                            const newMat = m.clone();
+                            if (newMat.name.toLowerCase().includes('wood') || newMat.name.toLowerCase().includes('plank')) {
+                                newMat.color.setHex(0xa63c3c);
+                            }
+                            return newMat;
+                        });
+                    } else if (child.material && child.material.clone) {
+                        child.material = child.material.clone();
+                        if (child.material.name.toLowerCase().includes('wood') || child.material.name.toLowerCase().includes('plank')) {
+                            child.material.color.setHex(0xa63c3c);
+                        }
                     }
                 }
             });

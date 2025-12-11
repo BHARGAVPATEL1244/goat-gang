@@ -79,7 +79,7 @@ export default function MapPage() {
     };
 
     const exitVillage = () => {
-        setViewMode('MAP');
+        setViewMode('CITY');
         setSelectedDistrict(null);
     };
 
@@ -185,7 +185,7 @@ export default function MapPage() {
                             <ambientLight intensity={0.5} />
                             <pointLight position={[10, 10, 10]} intensity={1} castShadow />
 
-                            {viewMode === 'MAP' ? (
+                            {viewMode === 'CITY' ? (
                                 <HexGrid
                                     districts={districts}
                                     onHoodSelect={handleSelect}

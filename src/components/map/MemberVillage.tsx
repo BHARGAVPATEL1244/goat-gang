@@ -273,12 +273,11 @@ export default function MemberVillage({ hoodName, members, onBack, leaderModel, 
                                 <meshBasicMaterial color="black" transparent opacity={0.7} />
                             </mesh>
                             <Text fontSize={0.4} color="white" anchorX="center" anchorY="middle">
-                                <Text fontSize={0.4} color="white" anchorX="center" anchorY="middle">
-                                    {item.member.name.replace(/\[.*?\]/g, '').trim()}
-                                </Text>
-                                <Text position={[0, -0.3, 0]} fontSize={0.25} color="#fbbf24" anchorX="center" anchorY="middle">
-                                    {item.member.role}
-                                </Text>
+                                {item.member.name.replace(/\[.*?\]/g, '').trim()}
+                            </Text>
+                            <Text position={[0, -0.3, 0]} fontSize={0.25} color="#fbbf24" anchorX="center" anchorY="middle">
+                                {item.member.role}
+                            </Text>
                         </Billboard>
                     )}
                 </group>

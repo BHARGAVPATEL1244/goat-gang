@@ -173,12 +173,12 @@ export default function MapPage() {
                 <Canvas camera={{ position: [10, 10, 10], fov: 45 }}>
                     <ThreeErrorBoundary fallback={
                         <group position={[0, 0, 0]}>
-                            <Text color="red" fontSize={1} anchorX="center" anchorY="center">
+                            <Text color="red" fontSize={1} anchorX="center" anchorY="middle">
                                 CRITICAL ERROR: CHECK CONSOLE
                             </Text>
                         </group>
                     }>
-                        <Suspense fallback={<Text position={[0, 0, 0]} color="white" anchorX="center" anchorY="center">Loading 3D Assets...</Text>}>
+                        <Suspense fallback={<Text position={[0, 0, 0]} color="white" anchorX="center" anchorY="middle">Loading 3D Assets...</Text>}>
                             <Sky sunPosition={[100, 20, 100]} />
                             <ambientLight intensity={0.5} />
                             <pointLight position={[10, 10, 10]} intensity={1} castShadow />

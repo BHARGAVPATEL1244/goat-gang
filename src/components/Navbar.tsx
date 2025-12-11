@@ -121,7 +121,6 @@ export default function Navbar() {
     const communityLinks = [
         { href: '/map', label: 'Neighborhoods' },
         { href: '/events', label: 'Events' },
-        { href: '/leaderboard', label: 'Leaderboard' },
         { href: '/contact', label: 'Contact' },
     ];
 

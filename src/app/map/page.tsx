@@ -5,13 +5,16 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, Environment, Sky } from '@react-three/drei';
 import HexGrid from '@/components/map/HexGrid';
 import MemberVillage from '@/components/map/MemberVillage';
+import MemberVillage3D from '@/components/map/MemberVillage3D';
+import MemberVillage2D from '@/components/map/MemberVillage2D';
 import { createClient } from '@/utils/supabase/client';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Monitor, Image as ImageIcon, Grip } from 'lucide-react';
 
 export default function MapPage() {
     const [districts, setDistricts] = useState<any[]>([]);
     const [selectedDistrict, setSelectedDistrict] = useState<any | null>(null);
     const [viewMode, setViewMode] = useState<'MAP' | 'VILLAGE'>('MAP');
+    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D'>('3D'); // Default to 3D as recommened
     const [villageMembers, setVillageMembers] = useState<any[]>([]);
     const supabase = createClient();
 
@@ -71,8 +74,6 @@ export default function MapPage() {
 
     const exitVillage = () => {
         setViewMode('MAP');
-        // Keep selectedDistrict so they don't lose context, or clear it? 
-        // Let's keep it but maybe close the selection to avoid clutter
         setSelectedDistrict(null);
     };
 
@@ -89,27 +90,43 @@ export default function MapPage() {
                             {viewMode === 'VILLAGE' ? 'Member Village' : 'Interactive Valley'}
                         </p>
                     </div>
-
-                    {/* Search Bar Placeholder */}
-                    {/* Removed search bar as per instruction, but keeping the div structure for context */}
-                    {/* <div className="pointer-events-auto">
-                        <input
-                            type="text"
-                            placeholder="Find a Hood..."
-                            className="bg-black/40 text-white border border-white/20 rounded-full px-4 py-2 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div> */}
                 </div>
             </div>
 
-            {/* Back Button for Village View */}
+            {/* Back Button & Style Switcher for Village View */}
             {viewMode === 'VILLAGE' && (
-                <button
-                    onClick={exitVillage}
-                    className="absolute top-6 right-6 z-30 bg-black/50 hover:bg-black/70 text-white px-6 py-3 rounded-full flex items-center gap-2 backdrop-blur border border-white/20 transition-all"
-                >
-                    <ArrowLeft className="w-5 h-5" /> Back to Map
-                </button>
+                <div className="absolute top-6 right-6 z-30 flex flex-col gap-4 items-end pointer-events-auto">
+                    <button
+                        onClick={exitVillage}
+                        className="bg-black/50 hover:bg-black/70 text-white px-6 py-3 rounded-full flex items-center gap-2 backdrop-blur border border-white/20 transition-all font-bold"
+                    >
+                        <ArrowLeft className="w-5 h-5" /> Back to Map
+                    </button>
+
+                    {/* Style Switcher (Temporary for User Choice) */}
+                    <div className="bg-black/60 p-2 rounded-xl border border-white/10 backdrop-blur-md flex flex-col gap-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase text-center">Map Style</span>
+
+                        <button
+                            onClick={() => setVillageStyle('3D')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === '3D' ? 'bg-blue-600' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            <Monitor className="w-4 h-4" /> Option A (3D Scene)
+                        </button>
+                        <button
+                            onClick={() => setVillageStyle('2D')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === '2D' ? 'bg-purple-600' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            <ImageImageIcon className="w-4 h-4" /> Option B (2D Map)
+                        </button>
+                        <button
+                            onClick={() => setVillageStyle('GRID')}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === 'GRID' ? 'bg-gray-600' : 'hover:bg-white/10 text-gray-300'}`}
+                        >
+                            <Grip className="w-4 h-4" /> Legacy (Grid)
+                        </button>
+                    </div>
+                </div>
             )}
 
             {/* Selected Hood Detail Overlay (Only in MAP mode) */}
@@ -185,13 +202,32 @@ export default function MapPage() {
                             onHoodSelect={handleSelect}
                         />
                     ) : (
-                        <MemberVillage
-                            hoodName={selectedDistrict?.name}
-                            members={villageMembers}
-                            onBack={exitVillage}
-                            leaderModel={selectedDistrict?.leader_model} // New Prop
-                            coleaderModel={selectedDistrict?.coleader_model} // New Prop
-                        />
+                        <>
+                            {/* Render based on Style Selection */}
+                            {villageStyle === '3D' && (
+                                <MemberVillage3D
+                                    hoodName={selectedDistrict?.name}
+                                    members={villageMembers}
+                                    onBack={exitVillage}
+                                />
+                            )}
+                            {villageStyle === '2D' && (
+                                <MemberVillage2D
+                                    hoodName={selectedDistrict?.name}
+                                    members={villageMembers}
+                                    onBack={exitVillage}
+                                />
+                            )}
+                            {villageStyle === 'GRID' && (
+                                <MemberVillage
+                                    hoodName={selectedDistrict?.name}
+                                    members={villageMembers}
+                                    onBack={exitVillage}
+                                    leaderModel={selectedDistrict?.leader_model}
+                                    coleaderModel={selectedDistrict?.coleader_model}
+                                />
+                            )}
+                        </>
                     )}
 
                     <OrbitControls

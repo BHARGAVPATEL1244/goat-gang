@@ -2,6 +2,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { Text, Billboard, Gltf, Environment } from '@react-three/drei';
+import { useLoader } from '@react-three/fiber';
+import { FBXLoader } from 'three-stdlib';
 import { ThreeErrorBoundary } from './MapErrorBoundary';
 
 // Placeholder for the "High Quality City" model
@@ -80,32 +82,38 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 // ... imports
 
+
+// ... imports
+
+
 function SuspenseModel({ url }: { url: string }) {
+    // We ignore the `url` prop (which points to missing glb) and use existing FBX assets
+    const inn = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/Inn.fbx');
+    const tower = useLoader(FBXLoader, '/models/Medieval Village Pack - Dec 2020/Buildings/FBX/Bell_Tower.fbx');
+
+    // Clone for reuse
+    const innScene = useMemo(() => inn.clone(), [inn]);
+    const towerScene = useMemo(() => tower.clone(), [tower]);
+
     return (
         <group>
-            {/* Environment for Global Lighting */}
             <Environment preset="sunset" />
 
-            {/* Fallback Ground Plane & Grid */}
+            {/* Ground */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
                 <planeGeometry args={[200, 200]} />
-                <meshStandardMaterial color="#4a5568" />
+                <meshStandardMaterial color="#556b2f" /> {/* Greenish for grass */}
             </mesh>
-            <gridHelper args={[200, 200, 0xffffff, 0x000000]} position={[0, 0, 0]} />
+            {/* Faint Grid */}
+            <gridHelper args={[200, 20, 0xffffff, 0xffffff]} position={[0, 0.1, 0]} />
 
-            {/* Actual Model with Error Boundary */}
-            <ThreeErrorBoundary fallback={
-                <group position={[0, 2, 0]}>
-                    <Text color="#ff0000" fontSize={0.8} anchorX="center" anchorY="middle" outlineWidth={0.05}>
-                        City Model Missing
-                    </Text>
-                    <Text position={[0, -0.8, 0]} color="white" fontSize={0.4} anchorX="center" anchorY="top" outlineWidth={0.02} outlineColor="black">
-                        Upload to: public{url}
-                    </Text>
-                </group>
-            }>
-                <Gltf src={url} />
-            </ThreeErrorBoundary>
+            {/* Central Inn (Town Hall) */}
+            <primitive object={innScene} scale={0.05} position={[0, 0, 0]} />
+
+            {/* Decor Tower */}
+            <primitive object={towerScene} scale={0.05} position={[-15, 0, 10]} rotation={[0, 0.5, 0]} />
+
+            {/* We can add more decorations later, this proves the concept without downloading anything */}
         </group>
     );
 }

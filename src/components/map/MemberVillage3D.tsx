@@ -88,11 +88,7 @@ export default function MemberVillage3D({ hoodName, members, onBack }: MemberVil
 
 function SuspenseModel({ url }: { url: string }) {
     // Load model
-    const result = useGLTF('/models/desert_city/scene.gltf?v=2');
-    // Clone scene for multiple usages
-    const scene1 = useMemo(() => result.scene.clone(), [result.scene]);
-    const scene2 = useMemo(() => result.scene.clone(), [result.scene]);
-    const scene3 = useMemo(() => result.scene.clone(), [result.scene]);
+    const { scene } = useGLTF('/models/desert_city/scene.gltf?v=2');
 
     return (
         <group>
@@ -105,38 +101,14 @@ function SuspenseModel({ url }: { url: string }) {
                 <meshStandardMaterial color="#e6d2b5" roughness={1} />
             </mesh>
 
-            {/* DEBUG CUBE (Center) */}
-            <mesh position={[0, 10, 0]}>
-                <boxGeometry args={[5, 5, 5]} />
-                <meshStandardMaterial color="red" />
-            </mesh>
-            <Billboard position={[0, 14, 0]}>
-                <Text fontSize={3} color="black" outlineWidth={0.1} outlineColor="white">CENTER RED CUBE</Text>
+            <Billboard position={[0, 15, 0]}>
+                <Text fontSize={2} color="black" outlineWidth={0.1} outlineColor="white">
+                    SCALE 1.0 (CENTERED)
+                </Text>
             </Billboard>
 
-            {/* TEST 1: Tiny Scale (0.01) */}
-            <group position={[-50, 0, 0]}>
-                <Billboard position={[0, 20, 0]}>
-                    <Text fontSize={5} color="blue" outlineWidth={0.2} outlineColor="white">SCALE 0.01</Text>
-                </Billboard>
-                <primitive object={scene1} scale={0.01} />
-            </group>
-
-            {/* TEST 2: Medium Scale (0.1) */}
-            <group position={[0, 0, 30]}>
-                <Billboard position={[0, 20, 0]}>
-                    <Text fontSize={5} color="green" outlineWidth={0.2} outlineColor="white">SCALE 0.1</Text>
-                </Billboard>
-                <primitive object={scene2} scale={0.1} />
-            </group>
-
-            {/* TEST 3: Full Scale (1.0) */}
-            <group position={[50, 0, 0]}>
-                <Billboard position={[0, 20, 0]}>
-                    <Text fontSize={5} color="purple" outlineWidth={0.2} outlineColor="white">SCALE 1.0</Text>
-                </Billboard>
-                <primitive object={scene3} scale={1.0} />
-            </group>
+            {/* City Model - Centered at 1.0 */}
+            <primitive object={scene} scale={1.0} position={[0, 0, 0]} />
 
         </group>
     );

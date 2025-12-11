@@ -179,25 +179,32 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
                 );
             })}
 
+    // Memoize tree placement so they don't jump around on re-renders (hover)
+    const randomTrees = useMemo(() => {
+        return [...Array(15)].map((_, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 15 + Math.random() * 15;
+            const x = Math.cos(angle) * r;
+            const z = Math.sin(angle) * r;
+            return { i, x, z };
+        });
+    }, []);
+
+    // ... (inside return statement)
+
             {/* 8. Random Trees (Low Poly Cones) */}
-            {[...Array(15)].map((_, i) => {
-                const angle = Math.random() * Math.PI * 2;
-                const r = 15 + Math.random() * 15;
-                const x = Math.cos(angle) * r;
-                const z = Math.sin(angle) * r;
-                return (
-                    <group key={i} position={[x, 0, z]}>
-                        <mesh position={[0, 1, 0]}>
-                            <cylinderGeometry args={[0.2, 0.4, 2, 8]} />
-                            <meshStandardMaterial color="#5d4037" />
-                        </mesh>
-                        <mesh position={[0, 3, 0]}>
-                            <coneGeometry args={[1.5, 4, 8]} />
-                            <meshStandardMaterial color="#2d5a27" />
-                        </mesh>
-                    </group>
-                )
-            })}
+            {randomTrees.map((tree) => (
+                <group key={tree.i} position={[tree.x, 0, tree.z]}>
+                    <mesh position={[0, 1, 0]}>
+                        <cylinderGeometry args={[0.2, 0.4, 2, 8]} />
+                        <meshStandardMaterial color="#5d4037" />
+                    </mesh>
+                    <mesh position={[0, 3, 0]}>
+                        <coneGeometry args={[1.5, 4, 8]} />
+                        <meshStandardMaterial color="#2d5a27" />
+                    </mesh>
+                </group>
+            ))}
 
             {/* Exit Sign */}
             <group position={[0, 5, 15]} onClick={onBack}>

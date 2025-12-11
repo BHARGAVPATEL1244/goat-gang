@@ -89,5 +89,6 @@ export default function MapPage() {
                     onBack={handleBack}
                 />
             )}
-
-
+        </div>
+    );
+}

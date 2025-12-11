@@ -84,6 +84,17 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
         });
     }, [members]);
 
+    // Memoize tree placement so they don't jump around on re-renders (hover)
+    const randomTrees = useMemo(() => {
+        return [...Array(15)].map((_, i) => {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 15 + Math.random() * 15;
+            const x = Math.cos(angle) * r;
+            const z = Math.sin(angle) * r;
+            return { i, x, z };
+        });
+    }, []);
+
     return (
         <group>
             {/* 1. Camera Setup for 2D/Isometric Look */}
@@ -178,20 +189,6 @@ export default function MemberVillageFarm({ hoodName, members, onBack }: MemberV
                     </group>
                 );
             })}
-
-    // Memoize tree placement so they don't jump around on re-renders (hover)
-    const randomTrees = useMemo(() => {
-        return [...Array(15)].map((_, i) => {
-            const angle = Math.random() * Math.PI * 2;
-            const r = 15 + Math.random() * 15;
-            const x = Math.cos(angle) * r;
-            const z = Math.sin(angle) * r;
-            return { i, x, z };
-        });
-    }, []);
-
-    // ... (inside return statement)
-
             {/* 8. Random Trees (Low Poly Cones) */}
             {randomTrees.map((tree) => (
                 <group key={tree.i} position={[tree.x, 0, tree.z]}>

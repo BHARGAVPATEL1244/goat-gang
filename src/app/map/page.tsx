@@ -231,9 +231,9 @@ export default function MapPage() {
                 </Canvas>
             </div>
 
-            {/* Selected Hood Detail Overlay (Only in MAP mode) */}
+            {/* Selected Hood Detail Overlay (Only in CITY mode) */}
             {
-                selectedDistrict && viewMode === 'MAP' && (
+                selectedDistrict && viewMode === 'CITY' && (
                     <div className="absolute right-0 top-0 h-full w-96 bg-black/80 backdrop-blur-xl border-l border-white/10 z-20 p-6 animate-in slide-in-from-right duration-300 overflow-y-auto">
                         <button
                             onClick={() => setSelectedDistrict(null)}

@@ -12,11 +12,89 @@ import { createClient } from '@/utils/supabase/client';
 import { ArrowLeft, Monitor, Image as ImageIcon, Grip } from 'lucide-react';
 
 export default function MapPage() {
-    const [districts, setDistricts] = useState<any[]>([]);
-    const [selectedDistrict, setSelectedDistrict] = useState<any | null>(null);
-    const [viewMode, setViewMode] = useState<'MAP' | 'VILLAGE'>('MAP');
-    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D'>('3D'); // Default to 3D as recommened
-    const [villageMembers, setVillageMembers] = useState<any[]>([]);
+    // ... component code
+    import MemberVillagewanted from '@/components/map/MemberVillageWanted';
+    // ... inside MapPage component
+    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D' | 'WANTED'>('WANTED'); // Default to Wanted
+
+    // ... inside render loop
+    {
+        villageStyle === '3D' && (
+            <MemberVillage3D
+                hoodName={selectedDistrict?.name}
+                members={villageMembers}
+                onBack={exitVillage}
+            />
+        )
+    }
+    {
+        villageStyle === '2D' && (
+            <MemberVillage2D
+                hoodName={selectedDistrict?.name}
+                members={villageMembers}
+                onBack={exitVillage}
+            />
+        )
+    }
+    {
+        villageStyle === 'WANTED' && (
+            /* Note: This component renders its own DOM UI, so we can't put it *inside* Canvas. 
+               We must render it conditionally OUTSIDE the Canvas or use Html from drei, 
+               but since it's a full page takeover, outside is better. */
+            null
+        )
+    }
+    {
+        villageStyle === 'GRID' && (
+            <MemberVillage
+                hoodName={selectedDistrict?.name}
+                members={villageMembers}
+                onBack={exitVillage}
+                leaderModel={selectedDistrict?.leader_model}
+                coleaderModel={selectedDistrict?.coleader_model}
+            />
+        )
+    }
+    // ...
+
+    return (
+        <div className="w-full h-screen bg-gray-900 relative">
+            {/* ... headers ... */}
+
+            {/* RENDER WANTED WALL OUTSIDE CANVAS IF SELECTED */}
+            {viewMode === 'VILLAGE' && villageStyle === 'WANTED' && (
+                <div className="absolute inset-0 z-40 bg-[#3e2723]"> {/* High Z-index to cover canvas */}
+                    <MemberVillagewanted
+                        hoodName={selectedDistrict?.name}
+                        members={villageMembers}
+                        onBack={exitVillage}
+                    />
+
+                    {/* Re-add the style switcher overlay here because the main one might be hidden or z-indexed under */}
+                    <div className="fixed top-6 right-6 z-50 flex flex-col gap-4 items-end pointer-events-auto">
+                        <button onClick={exitVillage} className="bg-black/50 text-white px-6 py-3 rounded-full flex items-center gap-2 border border-white/20 font-bold">
+                            <ArrowLeft className="w-5 h-5" /> Back to Map
+                        </button>
+                        <div className="bg-black/80 p-2 rounded-xl border border-white/10 backdrop-blur-md flex flex-col gap-2">
+                            <span className="text-xs font-bold text-gray-400 uppercase text-center">View Style</span>
+                            <button onClick={() => setVillageStyle('WANTED')} className="text-sm font-bold text-yellow-400 bg-white/10 px-3 py-2 rounded">🤠 Wanted Wall</button>
+                            <button onClick={() => setVillageStyle('3D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🧊 3D Scene</button>
+                            <button onClick={() => setVillageStyle('2D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🗺️ 2D Map</button>
+                            <button onClick={() => setVillageStyle('GRID')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🕸️ Grid</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 3D Scene - Hide or Unmount when in Wanted Mode to save performance? 
+                Actually just keeping it mounted is fine, providing we don't render heavy stuff.
+            */}
+            <Canvas camera={{ position: [10, 10, 10], fov: 45 }} className={villageStyle === 'WANTED' ? 'hidden' : ''}>
+                {/* ... existing canvas content ... */}
+            </Canvas>
+        </div>
+    );
+
     const supabase = createClient();
 
     useEffect(() => {
@@ -104,29 +182,66 @@ export default function MapPage() {
                         <ArrowLeft className="w-5 h-5" /> Back to Map
                     </button>
 
-                    {/* Style Switcher (Temporary for User Choice) */}
-                    <div className="bg-black/60 p-2 rounded-xl border border-white/10 backdrop-blur-md flex flex-col gap-2">
-                        <span className="text-xs font-bold text-gray-400 uppercase text-center">Map Style</span>
+// ... imports
+                    import MemberVillageHideout from '@/components/map/MemberVillageHideout';
 
-                        <button
-                            onClick={() => setVillageStyle('3D')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === '3D' ? 'bg-blue-600' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            <Monitor className="w-4 h-4" /> Option A (3D Scene)
-                        </button>
-                        <button
-                            onClick={() => setVillageStyle('2D')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === '2D' ? 'bg-purple-600' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            <ImageIcon className="w-4 h-4" /> Option B (2D Map)
-                        </button>
-                        <button
-                            onClick={() => setVillageStyle('GRID')}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${villageStyle === 'GRID' ? 'bg-gray-600' : 'hover:bg-white/10 text-gray-300'}`}
-                        >
-                            <Grip className="w-4 h-4" /> Legacy (Grid)
-                        </button>
+                    // ... switch style state
+                    const [villageStyle, setVillageStyle] = useState<'GRID' | '3D' | '2D' | 'WANTED' | 'HIDEOUT'>('HIDEOUT'); // Default to Hideout for new test
+
+                    // ... in UI
+                    <div className="bg-black/80 p-2 rounded-xl border border-white/10 backdrop-blur-md flex flex-col gap-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase text-center">View Style</span>
+                        <button onClick={() => setVillageStyle('HIDEOUT')} className="text-sm font-bold text-green-400 bg-white/10 px-3 py-2 rounded">🏢 The Hideout</button>
+                        <button onClick={() => setVillageStyle('WANTED')} className="text-sm text-yellow-400 hover:text-white px-3 py-2">🤠 Wanted Wall</button>
+                        <button onClick={() => setVillageStyle('3D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🧊 3D Scene</button>
+                        <button onClick={() => setVillageStyle('2D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🗺️ 2D Map</button>
+                        <button onClick={() => setVillageStyle('GRID')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🕸️ Grid</button>
                     </div>
+// ... in Rendering
+
+                    {/* RENDER WANTED OR HIDEOUT OUTSIDE CANVAS */}
+                    {viewMode === 'VILLAGE' && (
+                        <>
+                            {villageStyle === 'WANTED' && (
+                                <div className="absolute inset-0 z-40 bg-[#3e2723]">
+                                    <MemberVillagewanted
+                                        hoodName={selectedDistrict?.name}
+                                        members={villageMembers}
+                                        onBack={exitVillage}
+                                    />
+                                </div>
+                            )}
+                            {villageStyle === 'HIDEOUT' && (
+                                <div className="absolute inset-0 z-40 bg-gray-900">
+                                    <MemberVillageHideout
+                                        hoodName={selectedDistrict?.name}
+                                        members={villageMembers}
+                                        onBack={exitVillage}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Navigation Overlay for these modes */}
+                            {(villageStyle === 'WANTED' || villageStyle === 'HIDEOUT') && (
+                                <div className="fixed top-6 right-6 z-50 flex flex-col gap-4 items-end pointer-events-auto">
+                                    <button onClick={exitVillage} className="bg-black/50 text-white px-6 py-3 rounded-full flex items-center gap-2 border border-white/20 font-bold">
+                                        <ArrowLeft className="w-5 h-5" /> Back to Map
+                                    </button>
+                                    {/* Re-render switcher here for convenience */}
+                                    <div className="bg-black/80 p-2 rounded-xl border border-white/10 backdrop-blur-md flex flex-col gap-2">
+                                        <span className="text-xs font-bold text-gray-400 uppercase text-center">View Style</span>
+                                        <button onClick={() => setVillageStyle('HIDEOUT')} className={`text-sm px-3 py-2 rounded ${villageStyle === 'HIDEOUT' ? 'font-bold text-green-400 bg-white/10' : 'text-gray-400'}`}>🏢 The Hideout</button>
+                                        <button onClick={() => setVillageStyle('WANTED')} className={`text-sm px-3 py-2 rounded ${villageStyle === 'WANTED' ? 'font-bold text-yellow-400 bg-white/10' : 'text-gray-400'}`}>🤠 Wanted Wall</button>
+                                        <button onClick={() => setVillageStyle('3D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🧊 3D Scene</button>
+                                        <button onClick={() => setVillageStyle('2D')} className="text-sm text-gray-400 hover:text-white px-3 py-2">🗺️ 2D Map</button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* 3D Scene */}
+                    <Canvas camera={{ position: [10, 10, 10], fov: 45 }} className={(villageStyle === 'WANTED' || villageStyle === 'HIDEOUT') ? 'hidden' : ''}>
                 </div>
             )}
 

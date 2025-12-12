@@ -52,23 +52,37 @@ export default function NeighborhoodsPage() {
                             };
                         });
 
-                        // Primary "High Tier" Hoods - Use 1st Level
-                        const PRIMARY_HOODS = ['goat meadows', 'goat elysian', 'goat springs'];
+                        // Defined Hierarchy of "Hood Roles"
+                        // 1. Meadows -> Level Index 0
+                        // 2. Elysian -> Level Index 1
+                        // 3. Springs -> Level Index 2 (or 1 if only 2 provided)
+                        // Others -> Fallback logic
+                        const HOOD_HIERARCHY = ['goat meadows', 'goat elysian', 'goat springs', 'goat creek'];
                         const currentHoodName = selectedDistrict.name.toLowerCase();
-                        const isPrimaryHood = PRIMARY_HOODS.some(ph => currentHoodName.includes(ph));
 
-                        // Sort by Role Priority -> Level (Appropriate High/Low) -> Name
+                        // Find which "Slot" this hood corresponds to
+                        // If not found, defaults to -1 (will handle as fallback)
+                        const hierarchyIndex = HOOD_HIERARCHY.findIndex(h => currentHoodName.includes(h));
+
                         const rolePriority: any = { 'Leader': 0, 'CoLeader': 1, 'Elder': 2, 'Member': 3 };
 
                         const getRelevantLevel = (levels: number[]) => {
                             if (levels.length === 0) return 0;
-                            if (levels.length === 1) return levels[0];
 
-                            // If viewing a Primary Hood -> Use 1st Level
-                            if (isPrimaryHood) return levels[0];
+                            // If this hood is in our known list, try to grab that specific slot
+                            if (hierarchyIndex !== -1) {
+                                if (levels[hierarchyIndex] !== undefined) {
+                                    return levels[hierarchyIndex];
+                                }
+                            }
 
-                            // If viewing any other Hood -> Use 2nd Level
-                            return levels[1];
+                            // FALLBACKS:
+                            // If we looked for Slot 1 (Elysian) but user only has [Level] (1 item), use that 1 item.
+                            // If we are in a hood NOT in the list, use the last available level? Or first?
+                            // User said "2nd one to 2nd hood role".
+                            // Let's default to the *last* defined level if specific slot is missing?
+                            // Or default to Main (0) if specific is missing.
+                            return levels[0];
                         };
 
                         realMembers.sort((a, b) => {
@@ -80,7 +94,7 @@ export default function NeighborhoodsPage() {
                             const levelA = getRelevantLevel(a.levels);
                             const levelB = getRelevantLevel(b.levels);
 
-                            if (levelB !== levelA) return levelB - levelA; // Descending Sort (Higher Level first)
+                            if (levelB !== levelA) return levelB - levelA; // Descending Sort
 
                             // 3. Name Alphabetical
                             return a.name.localeCompare(b.name);

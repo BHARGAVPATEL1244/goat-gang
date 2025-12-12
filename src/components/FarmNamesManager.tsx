@@ -243,50 +243,77 @@ export default function FarmNamesManager() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-700">
-                                    {members.map(member => (
-                                        <tr key={member.id} className="hover:bg-gray-700/50 transition-colors">
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center gap-3">
-                                                    <img
-                                                        src={member.avatar || '/logo.png'}
-                                                        alt={member.username}
-                                                        className="w-10 h-10 rounded-full border border-gray-600"
-                                                    />
-                                                    <div>
-                                                        <div className="font-semibold text-white text-lg">{member.displayName}</div>
-                                                        <div className="text-xs text-gray-500">@{member.username}</div>
+                                    {(() => {
+                                        // --- SORTING LOGIC START ---
+                                        const HOOD_HIERARCHY = ['goat meadows', 'goat elysian', 'goat springs', 'goat creek'];
+                                        const currentHoodName = selectedRoleName.toLowerCase();
+                                        const hierarchyIndex = HOOD_HIERARCHY.findIndex(h => currentHoodName.includes(h));
+
+                                        const getRelevantLevel = (nickname: string | null) => {
+                                            if (!nickname) return 0;
+                                            const matches = nickname.match(/\[(\d+)\]/g);
+                                            const levels = matches ? matches.map((lvl: string) => parseInt(lvl.replace('[', '').replace(']', ''))) : [];
+
+                                            if (levels.length === 0) return 0;
+                                            if (hierarchyIndex !== -1 && levels[hierarchyIndex] !== undefined) {
+                                                return levels[hierarchyIndex];
+                                            }
+                                            return levels[0];
+                                        };
+
+                                        // computed sorted list
+                                        const sortedMembers = [...members].sort((a, b) => {
+                                            const levelA = getRelevantLevel(a.nickname);
+                                            const levelB = getRelevantLevel(b.nickname);
+                                            return levelB - levelA; // Descending
+                                        });
+                                        // --- SORTING LOGIC END ---
+
+                                        return sortedMembers.map(member => (
+                                            <tr key={member.id} className="hover:bg-gray-700/50 transition-colors">
+                                                <td className="py-3 px-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <img
+                                                            src={member.avatar || '/logo.png'}
+                                                            alt={member.username}
+                                                            className="w-10 h-10 rounded-full border border-gray-600"
+                                                        />
+                                                        <div>
+                                                            <div className="font-semibold text-white text-lg">{member.displayName}</div>
+                                                            <div className="text-xs text-gray-500">@{member.username}</div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <input
-                                                    type="text"
-                                                    maxLength={32}
-                                                    value={nicknames[member.id] || ''}
-                                                    onChange={(e) => handleNicknameChange(member.id, e.target.value)}
-                                                    className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white w-full focus:border-yellow-500 focus:outline-none placeholder-gray-600"
-                                                    placeholder={member.nickname ? "Edit Farm Name" : "Set Farm Name"}
-                                                />
-                                            </td>
-                                            <td className="py-3 px-4 text-right">
-                                                <button
-                                                    onClick={() => handleUpdate(member)}
-                                                    disabled={
-                                                        updating === member.id ||
-                                                        (nicknames[member.id] === (member.nickname || ''))
-                                                    }
-                                                    className={`px-4 py-2 rounded font-bold text-sm transition-all ${updating === member.id
-                                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                        : (nicknames[member.id] === (member.nickname || ''))
-                                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50'
-                                                            : 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-lg shadow-yellow-900/20'
-                                                        }`}
-                                                >
-                                                    {updating === member.id ? 'Saving...' : 'Update'}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    <input
+                                                        type="text"
+                                                        maxLength={32}
+                                                        value={nicknames[member.id] || ''}
+                                                        onChange={(e) => handleNicknameChange(member.id, e.target.value)}
+                                                        className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white w-full focus:border-yellow-500 focus:outline-none placeholder-gray-600"
+                                                        placeholder={member.nickname ? "Edit Farm Name" : "Set Farm Name"}
+                                                    />
+                                                </td>
+                                                <td className="py-3 px-4 text-right">
+                                                    <button
+                                                        onClick={() => handleUpdate(member)}
+                                                        disabled={
+                                                            updating === member.id ||
+                                                            (nicknames[member.id] === (member.nickname || ''))
+                                                        }
+                                                        className={`px-4 py-2 rounded font-bold text-sm transition-all ${updating === member.id
+                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                            : (nicknames[member.id] === (member.nickname || ''))
+                                                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50'
+                                                                : 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-lg shadow-yellow-900/20'
+                                                            }`}
+                                                    >
+                                                        {updating === member.id ? 'Saving...' : 'Update'}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    })()}
                                 </tbody>
                             </table>
                         </div>

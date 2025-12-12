@@ -52,12 +52,21 @@ export default function NeighborhoodsPage() {
                             };
                         });
 
-                        // Determine Hood "Tier" (Is it a Primary Hood?)
-                        // Assumption: Top 3 districts by member count/sort_order are "Higher Hoods"
-                        const isHighTierHood = districts.findIndex(d => d.id === selectedDistrict.id) < 3;
-
-                        // Sort by Role Priority -> Level (Appropriate High/Low) -> Name
+                        // Sort by Role Priority -> Level (Based on Role Logic) -> Name
                         const rolePriority: any = { 'Leader': 0, 'CoLeader': 1, 'Elder': 2, 'Member': 3 };
+
+                        // Heuristic: High Roles (Leader/Co/Elder) use Primary Level. Member uses Secondary Level.
+                        // This assumes "Main Hood" = High Rank, "Mini Hood" = Member Rank.
+                        const getLevelForRole = (levels: number[], role: string) => {
+                            if (levels.length === 0) return 0;
+                            if (levels.length === 1) return levels[0];
+
+                            // If Leader/CoLeader -> Always 1st Level
+                            // If Elder -> 1st Level (Usually active main)
+                            // If Member -> 2nd Level (Likely a mini)
+                            if (['Leader', 'CoLeader', 'Elder'].includes(role)) return levels[0];
+                            return levels[1];
+                        };
 
                         realMembers.sort((a, b) => {
                             // 1. Role Priority
@@ -65,17 +74,14 @@ export default function NeighborhoodsPage() {
                             if (roleDiff !== 0) return roleDiff;
 
                             // 2. Level Priority
-                            // If High Tier Hood, use 1st level (index 0)
-                            // If Low Tier Hood, use 2nd level (index 1), fallback to 1st
-                            const levelA = isHighTierHood ? (a.levels[0] || 0) : (a.levels[1] || a.levels[0] || 0);
-                            const levelB = isHighTierHood ? (b.levels[0] || 0) : (b.levels[1] || b.levels[0] || 0);
+                            const levelA = getLevelForRole(a.levels, a.role);
+                            const levelB = getLevelForRole(b.levels, b.role);
 
-                            if (levelB !== levelA) return levelB - levelA; // Descending Sort (Higher Level first)
+                            if (levelB !== levelA) return levelB - levelA; // Descending
 
                             // 3. Name Alphabetical
                             return a.name.localeCompare(b.name);
                         });
-
                         setVillageMembers(realMembers);
                     } else {
                         setVillageMembers([

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { createClient } from '@/utils/supabase/client';
 
 interface Role {
     id: string;

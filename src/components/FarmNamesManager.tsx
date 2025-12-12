@@ -26,6 +26,23 @@ export default function FarmNamesManager() {
     const [loadingMembers, setLoadingMembers] = useState(false);
     const [updating, setUpdating] = useState<string | null>(null); // Member ID being updated
     const [nicknames, setNicknames] = useState<{ [key: string]: string }>({}); // Local state for inputs
+    const [hoodHierarchy, setHoodHierarchy] = useState<{ [key: string]: number }>({});
+
+    // Fetch Hood Hierarchy (Rank/SortOrder)
+    useEffect(() => {
+        const fetchHierarchy = async () => {
+            const supabase = createClient();
+            const { data } = await supabase.from('map_districts').select('name, sort_order');
+            if (data) {
+                const hierarchy: { [key: string]: number } = {};
+                data.forEach((d: any) => {
+                    hierarchy[d.name.toLowerCase()] = d.sort_order;
+                });
+                setHoodHierarchy(hierarchy);
+            }
+        };
+        fetchHierarchy();
+    }, []);
 
     const [roleSearch, setRoleSearch] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -245,9 +262,16 @@ export default function FarmNamesManager() {
                                 <tbody className="divide-y divide-gray-700">
                                     {(() => {
                                         // --- SORTING LOGIC START ---
-                                        const HOOD_HIERARCHY = ['goat meadows', 'goat elysian', 'goat springs', 'goat creek'];
                                         const currentHoodName = selectedRoleName.toLowerCase();
-                                        const hierarchyIndex = HOOD_HIERARCHY.findIndex(h => currentHoodName.includes(h));
+                                        // Get Rank of current hood from DB hierarchy
+                                        // Default to 999 if not found (lowest priority)
+                                        const currentRank = hoodHierarchy[currentHoodName] || 999;
+
+                                        // Threshold for "Top Tier" hoods that take the FIRST level (Index 0)
+                                        // Usually top 3 (Meadows, Elysian, Springs).
+                                        // If rank is 1, 2, 3 -> Use Level 0.
+                                        // If rank > 3 -> Use Level 1.
+                                        const IS_TOP_TIER = currentRank <= 3;
 
                                         const getRelevantLevel = (nickname: string | null) => {
                                             if (!nickname) return 0;
@@ -255,10 +279,15 @@ export default function FarmNamesManager() {
                                             const levels = matches ? matches.map((lvl: string) => parseInt(lvl.replace('[', '').replace(']', ''))) : [];
 
                                             if (levels.length === 0) return 0;
-                                            if (hierarchyIndex !== -1 && levels[hierarchyIndex] !== undefined) {
-                                                return levels[hierarchyIndex];
-                                            }
-                                            return levels[0];
+
+                                            // If strict hierarchy matching was requested (1st level to 1st hood, 2nd to 2nd):
+                                            // But user really means: "If I am in a TOP hood, show my Main Level. If I am in a BOTTOM hood, show my Mini Level."
+                                            // Amity (Rank ~4) is "Bottom". Meadows (Rank 1) is "Top".
+
+                                            if (IS_TOP_TIER) return levels[0];
+
+                                            // Use 2nd level if available, otherwise fallback to 1st
+                                            return levels[1] !== undefined ? levels[1] : levels[0];
                                         };
 
                                         // computed sorted list

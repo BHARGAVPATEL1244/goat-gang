@@ -46,60 +46,69 @@ export default function WelcomeManagerPage() {
     // For this implementation, we'll fetch channels for a hardcoded guild ID or first available one.
     // TODO: Ideally context provides this. For now let's fetch guilds first.
     const [guildId, setGuildId] = useState<string | null>(null);
+    const [guilds, setGuilds] = useState<{ id: string, name: string }[]>([]);
 
-    // 1. Fetch Guild & Channels
+    // 1. Fetch Guilds
     useEffect(() => {
-        const initData = async () => {
+        const fetchGuilds = async () => {
             try {
-                // Get Guilds (assuming bot is in at least one)
                 const gRes = await fetch('/api/bot/guilds');
                 const gData = await gRes.json();
 
                 if (gData && gData.length > 0) {
-                    const activeGuild = gData[0]; // Just grab the first one for now
-                    setGuildId(activeGuild.id);
-
-                    // Get Channels
-                    const cRes = await fetch(`/api/bot/guilds/${activeGuild.id}/channels`);
-                    const cData = await cRes.json();
-                    if (cData && cData.data) {
-                        setChannels(cData.data);
-                    }
+                    setGuilds(gData);
+                    setGuildId(gData[0].id); // Default to first
                 } else {
-                    // No guilds found - stop loading
                     toast.error("Bot is not in any guilds");
                     setLoading(false);
                 }
             } catch (e) {
-                console.error("Error init:", e);
-                toast.error("Failed to load bot data");
+                console.error("Error fetching guilds:", e);
+                toast.error("Failed to load servers");
                 setLoading(false);
             }
         };
-        initData();
+        fetchGuilds();
     }, []);
 
-    // 2. Fetch Config from Supabase
+    // 2. Fetch Channels & Config when Guild Changes
     useEffect(() => {
         if (!guildId) return;
+        setLoading(true);
 
-        const fetchConfig = async () => {
-            const supabase = createClient();
-            const { data, error } = await supabase
-                .from('welcome_configs')
-                .select('*')
-                .eq('guild_id', guildId) // or use 'default' if we want global
-                .single();
+        const fetchData = async () => {
+            try {
+                // Fetch Channels
+                const cRes = await fetch(`/api/bot/guilds/${guildId}/channels`);
+                const cData = await cRes.json();
+                if (cData && cData.data) {
+                    setChannels(cData.data);
+                } else {
+                    setChannels([]);
+                }
 
-            if (data) {
-                setConfig(data);
-            } else if (!error && !data) {
-                // No config yet, keep default but set guild_id
-                setConfig(prev => ({ ...prev, guild_id: guildId }));
+                // Fetch Config
+                const supabase = createClient();
+                const { data, error } = await supabase
+                    .from('welcome_configs')
+                    .select('*')
+                    .eq('guild_id', guildId)
+                    .single();
+
+                if (data) {
+                    setConfig(data);
+                } else {
+                    // Reset to default if no config found for this guild
+                    // Preserve guild_id
+                    setConfig({ ...DEFAULT_CONFIG, guild_id: guildId });
+                }
+            } catch (error) {
+                console.error("Error loading guild data", error);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
-        fetchConfig();
+        fetchData();
     }, [guildId]);
 
     const handleSave = async () => {

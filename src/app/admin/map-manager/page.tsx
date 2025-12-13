@@ -65,7 +65,7 @@ export default function MapManagerPage() {
                 // Ensure q and r are present to satisfy NOT NULL constraint
                 q: existing ? existing.q : 0,
                 r: existing ? existing.r : 0,
-                type: 'neighborhood' // Default type
+                type: 'District' // Default type (matches DB constraint 'Capital'/'District')
             };
 
             let error;

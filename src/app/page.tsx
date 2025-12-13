@@ -11,7 +11,7 @@ import { triggerCoinExplosion, triggerGoatExplosion } from '@/lib/confetti';
 import MagneticButton from '@/components/MagneticButton';
 
 // Dynamically import Scene3D to avoid SSR issues with R3F
-const Scene3D = dynamic(() => import('@/components/Scene3D'), { ssr: false });
+// const Scene3D = dynamic(() => import('@/components/Scene3D'), { ssr: false });
 
 export default function HomePage() {
     return (

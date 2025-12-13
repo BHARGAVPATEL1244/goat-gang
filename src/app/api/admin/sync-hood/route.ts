@@ -42,33 +42,63 @@ export async function POST(req: Request) {
         }
 
         // 3. Sync to Supabase
-        // We want to upsert them into hood_memberships
-        // Default Rank = 'Member'
 
-        const upsertData = members.map((m: any) => ({
-            user_id: m.id,
-            hood_id: hood_id, // This links to map_districts.hood_id (Discord Role ID)
-            rank: 'Member',   // Default rank, will be overriden if exists
-            nickname: m.nickname || m.displayName, // Use nickname if available, else display name
-            username: m.username,
-            avatar_url: m.avatar
-            // plot_index: managed automatically or null
-        }));
+        // 3a. Fetch Hood Configuration (Role IDs)
+        const { data: hoodConfig } = await supabase
+            .from('map_districts')
+            .select('role_id_coleader, role_id_elder')
+            .eq('id', hood_db_id)
+            .single();
 
-        // We use "ignoreDuplicates: true" to avoid overwriting Custom Ranks (Leader/Elder)
-        // Actually, we SHOULD overwrite if they exist to update plots, but we don't want to demote Leaders
-        // Strategy: Only insert if not exists? Or upsert but keep rank?
-        // Supabase upsert with "onConflict" can basically Update everything except...
+        const roleIdCoLeader = hoodConfig?.role_id_coleader;
+        const roleIdElder = hoodConfig?.role_id_elder;
 
-        // Simpler approach:
-        // 1. Get existing members for this hood
+        console.log(`[SYNC] Config for Hood ${hood_db_id}: CoLeader=${roleIdCoLeader}, Elder=${roleIdElder}`);
+
+        // 3b. Prepare Data
+        const upsertData = members.map((m: any) => {
+            // Determine Rank from Discord Roles
+            let rank = 'Member';
+            if (roleIdCoLeader && m.roles.includes(roleIdCoLeader)) {
+                rank = 'CoLeader';
+            } else if (roleIdElder && m.roles.includes(roleIdElder)) {
+                rank = 'Elder';
+            }
+
+            return {
+                user_id: m.id,
+                hood_id: hood_id, // Discord Role ID linking
+                rank: rank,
+                nickname: m.nickname || m.displayName,
+                username: m.username,
+                avatar_url: m.avatar
+            };
+        });
+
+        // 3c. Merge with Existing (Preserve Manual Promotions ONLY if Discord doesn't enforce rank)
+        // DECISION: If we have specific Role IDs configured, we Enforce them.
+        // If not configured, we default to Member but respect existing DB rank (for manual edits).
+
         const { data: existing } = await supabase.from('hood_memberships').select('user_id, rank').eq('hood_id', hood_id);
         const existingMap = new Map(existing?.map(e => [e.user_id, e.rank]));
 
-        const finalData = upsertData.map((m: any) => ({
-            ...m,
-            rank: existingMap.get(m.user_id) || 'Member' // Preserve existing rank
-        }));
+        const finalData = upsertData.map((m: any) => {
+            // If Discord Role dictated a specific rank (CoLeader/Elder), use it.
+            if (m.rank !== 'Member') {
+                return m;
+            }
+
+            // If Discord says 'Member', checking if we should keep existing rank?
+            // If user lost the role in Discord, they should be demoted.
+            // But if we haven't configured Role IDs at all, we must rely on Manual or Existing.
+            if (!roleIdCoLeader && !roleIdElder) {
+                return { ...m, rank: existingMap.get(m.user_id) || 'Member' };
+            }
+
+            // If Role IDs are configured, and user has neither, they are Member.
+            // Demotion Logic: Discord State is Truth.
+            return m;
+        });
 
         const { error } = await supabase.from('hood_memberships').upsert(finalData, {
             onConflict: 'user_id,hood_id'

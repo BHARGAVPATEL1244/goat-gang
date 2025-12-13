@@ -28,7 +28,9 @@ export default function MapManagerPage() {
         sort_order: 0,
         trophy_gold: 0,
         trophy_silver: 0,
-        trophy_bronze: 0
+        trophy_bronze: 0,
+        role_id_coleader: '',
+        role_id_elder: ''
     });
 
     useEffect(() => {
@@ -62,6 +64,8 @@ export default function MapManagerPage() {
                 trophy_gold: formData.trophy_gold,
                 trophy_silver: formData.trophy_silver,
                 trophy_bronze: formData.trophy_bronze,
+                role_id_coleader: formData.role_id_coleader,
+                role_id_elder: formData.role_id_elder,
                 type: 'District' // Default type (matches DB constraint 'Capital'/'District')
             };
 
@@ -91,7 +95,8 @@ export default function MapManagerPage() {
         setFormData({
             name: '', hood_id: '', tag: '', derby_req: '', level_req: 0,
             hood_reqs_text: '', derby_reqs_text: '', leader_name: '',
-            image_url: '', sort_order: 0, trophy_gold: 0, trophy_silver: 0, trophy_bronze: 0
+            image_url: '', sort_order: 0, trophy_gold: 0, trophy_silver: 0, trophy_bronze: 0,
+            role_id_coleader: '', role_id_elder: ''
         });
     };
 
@@ -116,7 +121,9 @@ export default function MapManagerPage() {
             sort_order: d.sort_order || 0,
             trophy_gold: d.trophy_gold || 0,
             trophy_silver: d.trophy_silver || 0,
-            trophy_bronze: d.trophy_bronze || 0
+            trophy_bronze: d.trophy_bronze || 0,
+            role_id_coleader: d.role_id_coleader || '',
+            role_id_elder: d.role_id_elder || ''
         });
         // Scroll to form
         document.getElementById('editor-form')?.scrollIntoView({ behavior: 'smooth' });

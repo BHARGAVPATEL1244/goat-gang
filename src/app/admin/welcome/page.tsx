@@ -148,10 +148,11 @@ export default function WelcomeManagerPage() {
         }
         setTesting(true);
         try {
-            await fetch('/api/bot/messages/send', {
+            const res = await fetch('/api/bot/messages/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    guildId: guildId,
                     channelId: config.channel_id,
                     content: config.message_content.replace('{user}', '@TestUser'),
                     embeds: [{
@@ -164,9 +165,16 @@ export default function WelcomeManagerPage() {
                     }]
                 })
             });
+
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Failed to send');
+            }
+
             toast.success("Test message sent!");
-        } catch (e) {
-            toast.error("Failed to send test");
+        } catch (e: any) {
+            console.error(e);
+            toast.error("Failed to send test: " + e.message);
         }
         setTesting(false);
     };

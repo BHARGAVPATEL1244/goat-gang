@@ -55,9 +55,12 @@ export default function WelcomeManagerPage() {
                 const gRes = await fetch('/api/bot/guilds');
                 const gData = await gRes.json();
 
-                if (Array.isArray(gData) && gData.length > 0) {
-                    setGuilds(gData);
-                    setGuildId(gData[0].id); // Default to first
+                // Unpack API response (supports {success: true, data: []} or raw [])
+                const guildsList = Array.isArray(gData) ? gData : (gData.success && Array.isArray(gData.data) ? gData.data : null);
+
+                if (guildsList && guildsList.length > 0) {
+                    setGuilds(guildsList);
+                    setGuildId(guildsList[0].id); // Default to first
                 } else {
                     console.warn("Invalid guilds data:", gData);
                     setGuilds([]);
@@ -82,10 +85,15 @@ export default function WelcomeManagerPage() {
         const fetchData = async () => {
             try {
                 // Fetch Channels
+                // Fetch Channels
                 const cRes = await fetch(`/api/bot/guilds/${guildId}/channels`);
                 const cData = await cRes.json();
-                if (cData && cData.data) {
-                    setChannels(cData.data);
+
+                // Unpack (supports {success: true, data: []} or raw [])
+                const channelsList = Array.isArray(cData) ? cData : (cData.success && Array.isArray(cData.data) ? cData.data : []);
+
+                if (channelsList.length > 0) {
+                    setChannels(channelsList);
                 } else {
                     setChannels([]);
                 }

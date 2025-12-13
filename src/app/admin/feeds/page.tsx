@@ -49,9 +49,12 @@ export default function FeedManagerPage() {
             const gRes = await fetch('/api/bot/guilds');
             const gData = await gRes.json();
 
-            if (Array.isArray(gData)) {
-                setGuilds(gData);
-                if (gData.length > 0) setSelectedGuild(gData[0].id);
+            // Unpack (supports {success: true, data: []} or raw [])
+            const guildsList = Array.isArray(gData) ? gData : (gData.success && Array.isArray(gData.data) ? gData.data : null);
+
+            if (guildsList && guildsList.length > 0) {
+                setGuilds(guildsList);
+                if (guildsList.length > 0) setSelectedGuild(guildsList[0].id);
             } else {
                 console.warn("Invalid guilds data:", gData);
                 setGuilds([]);
@@ -74,8 +77,11 @@ export default function FeedManagerPage() {
             const res = await fetch(`/api/bot/guilds/${guildId}/channels`);
             const data = await res.json();
 
-            if (data && Array.isArray(data.data)) {
-                setChannels(data.data);
+            // Unpack (supports {success: true, data: []} or raw [])
+            const channelsList = Array.isArray(data) ? data : (data.success && Array.isArray(data.data) ? data.data : null);
+
+            if (channelsList) {
+                setChannels(channelsList);
             } else {
                 console.warn("Invalid channels data:", data);
                 setChannels([]);

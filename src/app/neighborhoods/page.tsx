@@ -38,6 +38,20 @@ export default function NeighborhoodsPage() {
                         ;
 
                     if (data && data.length > 0) {
+                        console.log('[ROSTER] Raw DB Members:', data);
+
+                        // Helper to normalize DB roles to UI expectations
+                        const normalizeRole = (rawRole: string): 'Leader' | 'CoLeader' | 'Elder' | 'Member' => {
+                            if (!rawRole) return 'Member';
+                            const lower = rawRole.toLowerCase().trim();
+
+                            if (lower.includes('co') && lower.includes('leader')) return 'CoLeader'; // Matches co-leader, co_leader, coleader
+                            if (lower.includes('leader')) return 'Leader';
+                            if (lower.includes('elder')) return 'Elder';
+
+                            return 'Member';
+                        };
+
                         const realMembers = data.map(m => {
                             // Logic to parse levels: "[50][30] Name" -> [50, 30]
                             const name = m.nickname || m.username || 'Member';
@@ -47,7 +61,7 @@ export default function NeighborhoodsPage() {
                             return {
                                 id: m.user_id,
                                 name: name,
-                                role: m.rank,
+                                role: normalizeRole(m.rank),
                                 levels: levels
                             };
                         });

@@ -81,47 +81,47 @@ export default function NeighborhoodCard({ neighborhood, index, onEdit, onSync, 
             )}
 
             {/* Top Pattern / Decoration since image is gone */}
-            <div className="h-14 bg-gradient-to-b from-blue-500/10 to-transparent relative overflow-hidden">
+            <div className="h-10 bg-gradient-to-b from-blue-500/10 to-transparent relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
 
                 {/* Hash Tag */}
-                <div className="absolute top-3 left-3 z-20">
+                <div className="absolute top-2 left-2 z-20">
                     <button
                         onClick={handleCopyTag}
-                        className="px-2 py-0.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 text-[10px] font-mono border border-white/5 flex items-center gap-1 transition-all"
+                        className="px-2 py-0.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 text-[9px] font-mono border border-white/5 flex items-center gap-1 transition-all"
                     >
-                        <Hash className="w-3 h-3 text-blue-400" />
+                        <Hash className="w-2 h-2 text-blue-400" />
                         {copied ? 'Copied!' : neighborhood.tag}
                     </button>
                 </div>
             </div>
 
             {/* Content Section */}
-            <div className="p-5 flex flex-col flex-1 gap-3 relative z-20 -mt-8">
-                <div className="space-y-1">
+            <div className="p-2 flex flex-col flex-1 gap-1 relative z-20 -mt-6">
+                <div className="space-y-0.5 pl-1">
                     <h2
-                        className="text-2xl font-black tracking-tight text-white drop-shadow-lg"
+                        className="text-xl font-black tracking-tight text-white drop-shadow-lg"
                         style={{ color: neighborhood.text_color || '#ffffff' }}
                     >
                         {neighborhood.name}
                     </h2>
-                    <div className="flex items-center gap-2 text-gray-400 text-xs font-medium">
-                        <Users className="w-3 h-3 text-yellow-500" />
+                    <div className="flex items-center gap-1.5 text-gray-400 text-[10px] font-medium">
+                        <Users className="w-2.5 h-2.5 text-yellow-500" />
                         <span>Leader: <span className="text-white">{neighborhood.leader}</span></span>
                     </div>
                 </div>
 
-                <div className="space-y-2 flex-1">
+                <div className="space-y-1 flex-1">
                     {/* Requirements Card */}
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5 hover:bg-white/10 transition-colors group/card">
-                        <h3 className="text-xs font-bold mb-2 flex items-center gap-2 text-gray-200 uppercase tracking-wider">
-                            <AlertCircle className="w-3 h-3 text-blue-400" /> Requirements
+                    <div className="bg-white/5 rounded-lg p-2 border border-white/5 hover:bg-white/10 transition-colors group/card">
+                        <h3 className="text-[10px] font-bold mb-1 flex items-center gap-1 text-gray-200 uppercase tracking-wider">
+                            <AlertCircle className="w-2.5 h-2.5 text-blue-400" /> Requirements
                         </h3>
                         {/* Handle string[] or parsing logic if accidentally string */}
-                        <ul className="space-y-1">
+                        <ul className="space-y-0.5">
                             {(Array.isArray(neighborhood.requirements) ? neighborhood.requirements : [neighborhood.requirements]).map((req, idx) => (
-                                <li key={idx} className="text-xs text-gray-400 flex items-start gap-2 leading-tight">
-                                    <span className="w-1 h-1 rounded-full bg-blue-500/50 mt-1.5 shrink-0" />
+                                <li key={idx} className="text-[10px] text-gray-400 flex items-start gap-1 leading-tight">
+                                    <span className="w-0.5 h-0.5 rounded-full bg-blue-500/50 mt-1 shrink-0" />
                                     {req || 'None'}
                                 </li>
                             ))}
@@ -130,14 +130,14 @@ export default function NeighborhoodCard({ neighborhood, index, onEdit, onSync, 
 
                     {/* Derby Card */}
                     {neighborhood.derby_requirements && (
-                        <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-3 border border-purple-500/20 hover:border-purple-500/40 transition-colors">
-                            <h3 className="text-xs font-bold mb-2 flex items-center gap-2 text-white uppercase tracking-wider">
-                                <Trophy className="w-3 h-3 text-purple-400" /> Derby Rules
+                        <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg p-2 border border-purple-500/20 hover:border-purple-500/40 transition-colors">
+                            <h3 className="text-[10px] font-bold mb-1 flex items-center gap-1 text-white uppercase tracking-wider">
+                                <Trophy className="w-2.5 h-2.5 text-purple-400" /> Derby Rules
                             </h3>
-                            <ul className="space-y-1">
+                            <ul className="space-y-0.5">
                                 {(Array.isArray(neighborhood.derby_requirements) ? neighborhood.derby_requirements : [neighborhood.derby_requirements]).map((req, idx) => (
-                                    <li key={idx} className="text-xs text-gray-300 flex items-start gap-2 leading-tight">
-                                        <span className="w-1 h-1 rounded-full bg-purple-500 mt-1.5 shrink-0" />
+                                    <li key={idx} className="text-[10px] text-gray-300 flex items-start gap-1 leading-tight">
+                                        <span className="w-0.5 h-0.5 rounded-full bg-purple-500 mt-1 shrink-0" />
                                         {typeof req === 'string' ? req : 'Derby Focus'}
                                     </li>
                                 ))}

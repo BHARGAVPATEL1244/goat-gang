@@ -325,7 +325,7 @@ export default function MapManagerPage() {
             </div>
 
             {/* Render List using NeighborhoodCard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {districts.map((d, index) => (
                     <div key={d.id} className="h-full relative group">
                         {/* Order Badge */}

@@ -45,6 +45,9 @@ export default function MapManagerPage() {
 
     const handleSave = async () => {
         try {
+            // Find existing district to preserve invisible fields like q, r, created_at
+            const existing = editingId ? districts.find(d => d.id === editingId) : null;
+
             const payload = {
                 name: formData.name,
                 hood_id: formData.hood_id,
@@ -58,7 +61,10 @@ export default function MapManagerPage() {
                 sort_order: formData.sort_order,
                 trophy_gold: formData.trophy_gold,
                 trophy_silver: formData.trophy_silver,
-                trophy_bronze: formData.trophy_bronze
+                trophy_bronze: formData.trophy_bronze,
+                // Ensure q and r are present to satisfy NOT NULL constraint
+                q: existing ? existing.q : 0,
+                r: existing ? existing.r : 0
             };
 
             let error;

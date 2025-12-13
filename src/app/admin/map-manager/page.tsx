@@ -256,6 +256,25 @@ export default function MapManagerPage() {
                     </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 bg-gray-900/50 p-4 rounded border border-gray-700/50">
+                    <div className="lg:col-span-1">
+                        <label className="text-xs text-orange-400 uppercase font-bold mb-1 block">Co-Leader Role ID (Optional)</label>
+                        <input
+                            type="text" placeholder="123456789..."
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            value={formData.role_id_coleader} onChange={e => setFormData({ ...formData, role_id_coleader: e.target.value })}
+                        />
+                    </div>
+                    <div className="lg:col-span-1">
+                        <label className="text-xs text-purple-400 uppercase font-bold mb-1 block">Elder Role ID (Optional)</label>
+                        <input
+                            type="text" placeholder="123456789..."
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            value={formData.role_id_elder} onChange={e => setFormData({ ...formData, role_id_elder: e.target.value })}
+                        />
+                    </div>
+                </div>
+
                 <div className="mt-6 border-t border-gray-700 pt-4">
                     <h3 className="text-sm font-bold text-yellow-500 uppercase mb-3 text-xs tracking-wider flex items-center gap-2">
                         <Trophy size={14} /> Trophies & Image

@@ -61,7 +61,8 @@ export default function WelcomeManagerPage() {
                 } else {
                     console.warn("Invalid guilds data:", gData);
                     setGuilds([]);
-                    toast.error("Bot is not in any guilds or API error");
+                    const errMsg = gData?.error || "Bot is not in any guilds or API error";
+                    toast.error(errMsg);
                     setLoading(false);
                 }
             } catch (e) {

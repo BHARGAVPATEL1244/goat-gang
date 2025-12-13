@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
 import { Rss, Youtube, MessageSquare, Trash, Save, Play, Plus, ChevronRight, ChevronDown } from 'lucide-react';
+import SearchableSelect from '@/components/admin/SearchableSelect';
 
 interface FeedConfig {
     id?: string;
@@ -161,14 +162,13 @@ export default function FeedManagerPage() {
 
             {/* Server Selector */}
             <div className="mb-8 max-w-md">
-                <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Selected Server</label>
-                <select
+                <SearchableSelect
+                    label="Selected Server"
+                    options={guilds}
                     value={selectedGuild}
-                    onChange={e => setSelectedGuild(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white"
-                >
-                    {guilds.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-                </select>
+                    onChange={setSelectedGuild}
+                    placeholder="Select a Server"
+                />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -236,15 +236,14 @@ export default function FeedManagerPage() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-400 uppercase font-bold mb-1 block">Target Channel</label>
-                                    <select
+                                    <SearchableSelect
+                                        label="Target Channel"
+                                        options={channels}
                                         value={editingFeed.channel_id}
-                                        onChange={e => setEditingFeed({ ...editingFeed, channel_id: e.target.value })}
-                                        className="w-full bg-gray-900 border border-gray-600 rounded p-2"
-                                    >
-                                        <option value="">Select Channel...</option>
-                                        {channels.map(c => <option key={c.id} value={c.id}>#{c.name}</option>)}
-                                    </select>
+                                        onChange={(val) => setEditingFeed({ ...editingFeed, channel_id: val })}
+                                        placeholder="Select Channel"
+                                        disabled={!selectedGuild}
+                                    />
                                 </div>
                             </div>
 

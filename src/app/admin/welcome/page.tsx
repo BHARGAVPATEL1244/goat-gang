@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
+import SearchableSelect from '@/components/admin/SearchableSelect';
 
 interface Channel {
     id: string;
@@ -188,33 +189,25 @@ export default function WelcomeManagerPage() {
                     <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-6">
 
                         {/* Server Selection */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Select Server</label>
-                            <select
-                                value={guildId || ''}
-                                onChange={e => setGuildId(e.target.value)}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                            >
-                                {guilds.map(g => (
-                                    <option key={g.id} value={g.id}>{g.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                        <SearchableSelect
+                            label="Select Server"
+                            options={guilds}
+                            value={guildId || ''}
+                            onChange={(val) => setGuildId(val)}
+                            placeholder="Select a Server"
+                            className="mb-6"
+                        />
 
                         {/* Channel Selection */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Welcome Channel</label>
-                            <select
-                                value={config.channel_id}
-                                onChange={e => setConfig({ ...config, channel_id: e.target.value })}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                            >
-                                <option value="">-- Select Channel --</option>
-                                {channels.map(c => (
-                                    <option key={c.id} value={c.id}>#{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                        <SearchableSelect
+                            label="Welcome Channel"
+                            options={channels}
+                            value={config.channel_id}
+                            onChange={(val) => setConfig({ ...config, channel_id: val })}
+                            placeholder="Select Channel"
+                            className="mb-6"
+                            disabled={!guildId}
+                        />
 
                         {/* Top Message */}
                         <div>

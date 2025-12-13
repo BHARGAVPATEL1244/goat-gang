@@ -162,12 +162,12 @@ export default function WelcomeManagerPage() {
     if (loading) return <div className="p-12 text-center text-gray-500">Loading...</div>;
 
     return (
-        <div className="p-6 md:p-12 min-h-screen bg-gray-950 text-white">
+        <div className="p-6 md:p-12 min-h-screen bg-gray-900 text-white">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
 
                 {/* --- Left Column: Configuration Form --- */}
                 <div>
-                    <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
+                    <h1 className="text-3xl font-bold mb-2 text-white">
                         Welcome Embed Manager
                     </h1>
                     <p className="text-gray-400 mb-8">

@@ -28,7 +28,7 @@ export default function NeighborhoodCard({ neighborhood, index, variant = 'card'
 
     if (variant === 'row') {
         return (
-            <div className="group flex items-center justify-between bg-gray-900/40 border border-white/5 hover:border-white/20 hover:bg-white/5 rounded-lg p-3 transition-all">
+            <div className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded p-2 hover:bg-gray-700/80 transition-colors">
                 {/* Left: Info */}
                 <div className="flex items-center gap-4">
                     {/* Tag Badge */}

@@ -100,7 +100,7 @@ function MemberManagerContent() {
             ) : (
                 <div className="grid grid-cols-1 gap-4">
                     {members.map((member) => (
-                        <div key={member.user_id} className="bg-gray-800/50 border border-gray-700 p-4 rounded-xl flex items-center justify-between hover:bg-gray-800 transition-colors">
+                        <div key={member.user_id} className="bg-gray-800 border border-gray-700 p-4 rounded-xl flex items-center justify-between hover:bg-gray-750 transition-colors">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gray-700 rounded-full overflow-hidden flex items-center justify-center">
                                     {member.avatar_url ? (
@@ -123,7 +123,7 @@ function MemberManagerContent() {
                                 <select
                                     value={member.rank}
                                     onChange={(e) => handleRoleChange(member.user_id, e.target.value)}
-                                    className="bg-black/40 border border-gray-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                                     <option value="Leader">Leader (Castle)</option>
                                     <option value="CoLeader">Co-Leader (Market)</option>

@@ -254,7 +254,7 @@ export default function MapManagerPage() {
                         <Trophy size={14} /> Trophies & Image
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-yellow-900/20 p-2 rounded border border-yellow-700/30 text-center">
+                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
                             <label className="text-xs text-yellow-500 block mb-1">GOLD</label>
                             <input
                                 type="number"
@@ -262,7 +262,7 @@ export default function MapManagerPage() {
                                 value={formData.trophy_gold} onChange={e => setFormData({ ...formData, trophy_gold: parseInt(e.target.value) || 0 })}
                             />
                         </div>
-                        <div className="bg-gray-400/20 p-2 rounded border border-gray-500/30 text-center">
+                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
                             <label className="text-xs text-gray-400 block mb-1">SILVER</label>
                             <input
                                 type="number"
@@ -270,7 +270,7 @@ export default function MapManagerPage() {
                                 value={formData.trophy_silver} onChange={e => setFormData({ ...formData, trophy_silver: parseInt(e.target.value) || 0 })}
                             />
                         </div>
-                        <div className="bg-orange-900/20 p-2 rounded border border-orange-700/30 text-center">
+                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
                             <label className="text-xs text-orange-500 block mb-1">BRONZE</label>
                             <input
                                 type="number"

@@ -9,16 +9,15 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const checkHoods = async () => {
-    console.log("Checking Hoods for Types...");
+    console.log("Checking Hood IDs...");
     const { data, error } = await supabase
         .from('map_districts')
-        .select('name, type');
+        .select('name, hood_id');
 
     if (error) {
         console.error("Error:", error);
     } else {
-        const types = new Set(data?.map(d => d.type));
-        console.log("Existing Types in DB:", Array.from(types));
+        console.log("Existing Hoods:", data);
     }
 };
 

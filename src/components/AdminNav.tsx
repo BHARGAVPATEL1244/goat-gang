@@ -107,7 +107,7 @@ function AdminNavContent() {
     const isPageActive = (path: string) => pathname === path;
 
     return (
-        <div className="bg-gray-800 border-b border-gray-700 sticky top-16 z-30 shadow-md">
+        <div className="bg-gray-900 border-b border-gray-800 sticky top-16 z-30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
                 <div className="flex flex-wrap gap-2 items-center">
 
@@ -139,9 +139,9 @@ function AdminNavContent() {
                     {showNeighborhoods && (
                         <Link
                             href="/admin/map-manager"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isPageActive('/admin/map-manager')
-                                ? 'bg-gray-700 text-white shadow-sm'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors border ${isPageActive('/admin/map-manager')
+                                ? 'bg-gray-800 text-white border-gray-700'
+                                : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800'
                                 }`}
                         >
                             Map Manager

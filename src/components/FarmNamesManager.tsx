@@ -154,7 +154,7 @@ export default function FarmNamesManager() {
 
     return (
         <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 min-h-[400px]">
-            <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
+            <h2 className="text-2xl font-bold mb-6 text-white">
                 Farm Name Manager
             </h2>
 

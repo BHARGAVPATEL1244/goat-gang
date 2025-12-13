@@ -240,7 +240,7 @@ export default function AdminPanel() {
 
             {/* Delete Confirmation Modal */}
             {deleteConfirmation && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700 p-6">
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Confirm Deletion</h3>
                         <p className="text-gray-600 dark:text-gray-300 mb-6">
@@ -265,7 +265,7 @@ export default function AdminPanel() {
             )}
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 m-4 sm:m-0">
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">

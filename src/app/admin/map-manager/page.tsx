@@ -64,7 +64,8 @@ export default function MapManagerPage() {
                 trophy_bronze: formData.trophy_bronze,
                 // Ensure q and r are present to satisfy NOT NULL constraint
                 q: existing ? existing.q : 0,
-                r: existing ? existing.r : 0
+                r: existing ? existing.r : 0,
+                type: 'neighborhood' // Default type
             };
 
             let error;

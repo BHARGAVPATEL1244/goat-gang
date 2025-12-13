@@ -91,7 +91,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
             <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className="w-full flex items-center gap-8 px-[50vw] overflow-x-auto scrollbar-hide snap-x snap-mandatory py-20 z-10"
+                className="w-full flex items-center gap-8 px-[calc(50vw-150px)] overflow-x-auto scrollbar-hide snap-x snap-mandatory py-20 z-10"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {/* Fallback if empty */}

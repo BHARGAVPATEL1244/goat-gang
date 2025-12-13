@@ -57,11 +57,33 @@ export async function POST(req: Request) {
 
         console.log(`[SYNC] Config (Global): CoLeader=${roleIdCoLeader}, Elder=${roleIdElder}`);
 
-        // 3b. Prepare Data
+        // 3b. Fetch Local Hood Config (Fixed IDs)
+        const { data: hoodConfig } = await supabase
+            .from('map_districts')
+            .select('leader_discord_id, coleader_discord_ids')
+            .eq('id', hood_db_id)
+            .single();
+
+        const fixedLeaderId = hoodConfig?.leader_discord_id;
+        const fixedCoLeaderIds = hoodConfig?.coleader_discord_ids || [];
+
+        console.log(`[SYNC] Hood ${hood_db_id}: Leader=${fixedLeaderId}, CoLeaders=${fixedCoLeaderIds.length}`);
+
+        // 3c. Prepare Data
         const upsertData = members.map((m: any) => {
-            // Determine Rank from Discord Roles
+            // Determine Rank
             let rank = 'Member';
-            if (roleIdCoLeader && m.roles.includes(roleIdCoLeader)) {
+
+            // Priority 1: Fixed Leader
+            if (fixedLeaderId && m.id === fixedLeaderId) {
+                rank = 'Leader';
+            }
+            // Priority 2: Fixed Co-Leaders
+            else if (fixedCoLeaderIds.includes(m.id)) {
+                rank = 'CoLeader';
+            }
+            // Priority 3: Global Discord Roles
+            else if (roleIdCoLeader && m.roles.includes(roleIdCoLeader)) {
                 rank = 'CoLeader';
             } else if (roleIdElder && m.roles.includes(roleIdElder)) {
                 rank = 'Elder';
@@ -77,7 +99,7 @@ export async function POST(req: Request) {
             };
         });
 
-        // 3c. Merge with Existing (Preserve Manual Promotions ONLY if Discord doesn't enforce rank)
+        // 3d. Merge with Existing (Preserve Manual Promotions ONLY if Discord doesn't enforce rank)
         // DECISION: If we have specific Role IDs configured, we Enforce them.
         // If not configured, we default to Member but respect existing DB rank (for manual edits).
 
@@ -85,20 +107,19 @@ export async function POST(req: Request) {
         const existingMap = new Map(existing?.map(e => [e.user_id, e.rank]));
 
         const finalData = upsertData.map((m: any) => {
-            // If Discord Role dictated a specific rank (CoLeader/Elder), use it.
+            // If Logic dictated a specific rank, use it.
             if (m.rank !== 'Member') {
                 return m;
             }
 
-            // If Discord says 'Member', checking if we should keep existing rank?
-            // If user lost the role in Discord, they should be demoted.
-            // But if we haven't configured Role IDs at all, we must rely on Manual or Existing.
+            // If logic says 'Member', but user was previously promoted manually AND no global/fixed rules force otherwise...
+            // Actually, we want Dynamic Sync. If they lost the role, they lose the rank.
+            // BUT for simple "Member" vs "Elder" where Elder isn't configured, we might want to keep it?
+            // "if no global role configured, keep existing"
             if (!roleIdCoLeader && !roleIdElder) {
                 return { ...m, rank: existingMap.get(m.user_id) || 'Member' };
             }
 
-            // If Role IDs are configured, and user has neither, they are Member.
-            // Demotion Logic: Discord State is Truth.
             return m;
         });
 

@@ -325,25 +325,19 @@ export default function MapManagerPage() {
             </div>
 
             {/* Render List using NeighborhoodCard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {/* Render List using NeighborhoodCard */}
+            <div className="flex flex-col gap-1">
                 {districts.map((d, index) => (
-                    <div key={d.id} className="h-full relative group">
-                        {/* Order Badge */}
-                        <div className="absolute -top-3 -left-3 z-30 w-8 h-8 bg-yellow-500 text-black font-black rounded-full flex items-center justify-center border-2 border-black">
-                            {d.sort_order}
-                        </div>
-
+                    <div key={d.id} className="relative group">
                         <NeighborhoodCard
                             neighborhood={adaptToCard(d)}
                             index={index}
+                            variant="row"
                             onEdit={() => startEdit(d)}
                             onSync={() => handleSync(d)}
                             onDelete={() => handleDelete(d)}
                             onManageMembers={() => router.push(`/admin/hood-members?hood_id=${d.hood_id}&name=${encodeURIComponent(d.name)}`)}
                         />
-                        <div className="bg-gray-800 p-2 text-center text-xs text-gray-500 rounded-b-lg border-t border-gray-700">
-                            ID: {d.hood_id || 'NaN'} | Trophies: {d.trophy_gold || 0}G / {d.trophy_silver || 0}S / {d.trophy_bronze || 0}B
-                        </div>
                     </div>
                 ))}
                 {districts.length === 0 && (

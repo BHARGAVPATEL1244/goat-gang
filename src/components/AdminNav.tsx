@@ -213,15 +213,20 @@ function AdminNavContent() {
 
                     {/* Welcome Manager */}
                     {showEmbeds && (
-                        <Link
-                            href="/admin/welcome"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname === '/admin/welcome'
-                                ? 'bg-gray-700 text-white shadow-sm'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                }`}
-                        >
-                            Welcome Manager
-                        </Link>
+                        <>
+                            <Link
+                                href="/admin/welcome"
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors border ${pathname === '/admin/welcome' ? 'bg-gray-800 text-yellow-500 border-gray-700' : 'text-gray-400 hover:bg-gray-800 hover:text-white border-transparent'}`}
+                            >
+                                Welcome Manager
+                            </Link>
+                            <Link
+                                href="/admin/feeds"
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors border ${pathname === '/admin/feeds' ? 'bg-gray-800 text-yellow-500 border-gray-700' : 'text-gray-400 hover:bg-gray-800 hover:text-white border-transparent'}`}
+                            >
+                                Feed Manager
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>

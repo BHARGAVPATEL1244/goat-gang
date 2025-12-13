@@ -17,7 +17,7 @@ export function parseUser(name: string): ParsedUser {
         .trim();
 
     // 3. Remove leading/trailing symbols often used in gamer tags
-    clean = clean.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, '');
+
 
     return {
         cleanName: clean || name, // Fallback to original if everything removed

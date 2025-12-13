@@ -176,6 +176,20 @@ export default function WelcomeManagerPage() {
 
                     <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-6">
 
+                        {/* Server Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Select Server</label>
+                            <select
+                                value={guildId || ''}
+                                onChange={e => setGuildId(e.target.value)}
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
+                            >
+                                {guilds.map(g => (
+                                    <option key={g.id} value={g.id}>{g.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
                         {/* Channel Selection */}
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Welcome Channel</label>

@@ -210,6 +210,19 @@ function AdminNavContent() {
                             Giveaways
                         </Link>
                     )}
+
+                    {/* Welcome Manager */}
+                    {showEmbeds && (
+                        <Link
+                            href="/admin/welcome"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${pathname === '/admin/welcome'
+                                ? 'bg-gray-700 text-white shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            Welcome Manager
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

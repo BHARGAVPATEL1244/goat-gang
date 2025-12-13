@@ -3,23 +3,30 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
-import { Rss, Youtube, MessageSquare, Trash, Save, Play, Plus, ChevronRight, ChevronDown } from 'lucide-react';
+import { Rss, Youtube, MessageSquare, Trash, Save, Plus, ChevronRight, ChevronDown, Clock, Filter } from 'lucide-react';
 import SearchableSelect from '@/components/admin/SearchableSelect';
 
 interface FeedConfig {
     id?: string;
     guild_id: string;
     channel_id: string;
-    platform: 'youtube' | 'reddit' | 'rss';
+    platform: 'youtube' | 'reddit' | 'rss' | 'reddit_comments';
     source: string;
     message_template: string;
     is_enabled: boolean;
+    check_interval_minutes: number;
+    meta?: {
+        min_length?: number;
+        keywords?: string; // Comma separated
+        ignore_automod?: boolean;
+    };
 }
 
 const DEFAULT_TEMPLATE = {
     'youtube': "**New Video!** 🎥\n{title}\n{url}",
     'reddit': "**New Post in r/{subreddit}** 🔴\n{title}\n{url}",
-    'rss': "**New Article** 📰\n{title}\n{url}"
+    'rss': "**New Article** 📰\n{title}\n{url}",
+    'reddit_comments': "**New Comment!** 💬\nOn: {title}\nBy: u/{author}\n\n{body}\n\n{url}"
 };
 
 export default function FeedManagerPage() {
@@ -50,7 +57,7 @@ export default function FeedManagerPage() {
             const gRes = await fetch('/api/bot/guilds');
             const gData = await gRes.json();
 
-            // Unpack (supports {success: true, data: []} or raw [])
+            // Unpack
             const guildsList = Array.isArray(gData) ? gData : (gData.success && Array.isArray(gData.data) ? gData.data : null);
 
             if (guildsList && guildsList.length > 0) {
@@ -78,7 +85,7 @@ export default function FeedManagerPage() {
             const res = await fetch(`/api/bot/guilds/${guildId}/channels`);
             const data = await res.json();
 
-            // Unpack (supports {success: true, data: []} or raw [])
+            // Unpack
             const channelsList = Array.isArray(data) ? data : (data.success && Array.isArray(data.data) ? data.data : null);
 
             if (channelsList) {
@@ -140,13 +147,16 @@ export default function FeedManagerPage() {
             platform: 'youtube',
             source: '',
             message_template: DEFAULT_TEMPLATE['youtube'],
-            is_enabled: true
+            is_enabled: true,
+            check_interval_minutes: 15,
+            meta: {}
         });
     };
 
     const getPlatformIcon = (vals: string) => {
         if (vals === 'youtube') return <Youtube className="text-red-500" />;
         if (vals === 'reddit') return <MessageSquare className="text-orange-500" />;
+        if (vals === 'reddit_comments') return <MessageSquare className="text-orange-400" />;
         return <Rss className="text-blue-500" />;
     };
 
@@ -198,9 +208,13 @@ export default function FeedManagerPage() {
                             <div className="flex items-center gap-3">
                                 {getPlatformIcon(feed.platform)}
                                 <div>
-                                    <div className="font-bold text-sm truncate w-40">{feed.source}</div>
-                                    <div className="text-xs text-gray-500">
-                                        #{channels.find(c => c.id === feed.channel_id)?.name || feed.channel_id}
+                                    <div className="font-bold text-sm truncate w-40">
+                                        {feed.platform === 'reddit_comments' ? 'Comments: ' : ''}
+                                        {feed.source}
+                                    </div>
+                                    <div className="text-xs text-gray-500 flex gap-2">
+                                        <span>#{channels.find(c => c.id === feed.channel_id)?.name || feed.channel_id}</span>
+                                        <span>• {feed.check_interval_minutes}m</span>
                                     </div>
                                 </div>
                             </div>
@@ -227,11 +241,19 @@ export default function FeedManagerPage() {
                                     <label className="text-xs text-gray-400 uppercase font-bold mb-1 block">Platform</label>
                                     <select
                                         value={editingFeed.platform}
-                                        onChange={e => setEditingFeed({ ...editingFeed, platform: e.target.value as any, message_template: DEFAULT_TEMPLATE[e.target.value as 'youtube'] })}
-                                        className="w-full bg-gray-900 border border-gray-600 rounded p-2"
+                                        onChange={e => {
+                                            const plat = e.target.value as any;
+                                            setEditingFeed({
+                                                ...editingFeed,
+                                                platform: plat,
+                                                message_template: DEFAULT_TEMPLATE[plat as 'youtube'] || DEFAULT_TEMPLATE['youtube']
+                                            });
+                                        }}
+                                        className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white"
                                     >
                                         <option value="youtube">YouTube</option>
-                                        <option value="reddit">Reddit</option>
+                                        <option value="reddit">Reddit Posts</option>
+                                        <option value="reddit_comments">Reddit Comments</option>
                                         <option value="rss">RSS Feed</option>
                                     </select>
                                 </div>
@@ -249,16 +271,64 @@ export default function FeedManagerPage() {
 
                             <div className="mb-4">
                                 <label className="text-xs text-gray-400 uppercase font-bold mb-1 block">
-                                    {editingFeed.platform === 'youtube' ? 'Channel ID or User' : editingFeed.platform === 'reddit' ? 'Subreddit Name' : 'RSS URL'}
+                                    {editingFeed.platform === 'youtube' ? 'Channel ID or User' :
+                                        editingFeed.platform.startsWith('reddit') ? (editingFeed.platform === 'reddit_comments' ? 'Reddit Post URL' : 'Subreddit Name') :
+                                            'RSS URL'}
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder={editingFeed.platform === 'youtube' ? 'UC12345...' : editingFeed.platform === 'reddit' ? 'webdev' : 'https://...'}
+                                    placeholder={
+                                        editingFeed.platform === 'youtube' ? 'UC12345...' :
+                                            editingFeed.platform === 'reddit' ? 'webdev' :
+                                                editingFeed.platform === 'reddit_comments' ? 'https://reddit.com/r/...' : 'https://...'
+                                    }
                                     value={editingFeed.source}
                                     onChange={e => setEditingFeed({ ...editingFeed, source: e.target.value })}
-                                    className="w-full bg-gray-900 border border-gray-600 rounded p-2 font-mono"
+                                    className="w-full bg-gray-900 border border-gray-600 rounded p-2 font-mono text-white"
                                 />
                             </div>
+
+                            {/* Advanced Filters for Reddit Comments */}
+                            {editingFeed.platform === 'reddit_comments' && (
+                                <div className="mb-6 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                                    <h3 className="text-sm font-bold text-gray-300 mb-3 flex items-center gap-2">
+                                        <Filter size={14} /> Comment Filters
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Min Character Length</label>
+                                            <input
+                                                type="number"
+                                                value={editingFeed.meta?.min_length || 0}
+                                                onChange={e => setEditingFeed({ ...editingFeed, meta: { ...editingFeed.meta, min_length: parseInt(e.target.value) || 0 } })}
+                                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Ignore AutoMod</label>
+                                            <div className="flex items-center h-10">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={editingFeed.meta?.ignore_automod !== false} // Default to true if undefined
+                                                    onChange={e => setEditingFeed({ ...editingFeed, meta: { ...editingFeed.meta, ignore_automod: e.target.checked } })}
+                                                    className="w-5 h-5 rounded border-gray-600 text-yellow-500 focus:ring-yellow-500 bg-gray-700"
+                                                />
+                                                <span className="ml-2 text-sm text-gray-400">Yes, ignore bots</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Keywords (Optional, Comma Separated)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. giveaway, help, urgent"
+                                                value={editingFeed.meta?.keywords || ''}
+                                                onChange={e => setEditingFeed({ ...editingFeed, meta: { ...editingFeed.meta, keywords: e.target.value } })}
+                                                className="w-full bg-gray-900 border border-gray-600 rounded p-2 font-mono text-sm text-white"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="mb-6">
                                 <label className="text-xs text-gray-400 uppercase font-bold mb-1 block">Message Template</label>
@@ -266,18 +336,33 @@ export default function FeedManagerPage() {
                                     value={editingFeed.message_template}
                                     onChange={e => setEditingFeed({ ...editingFeed, message_template: e.target.value })}
                                     rows={4}
-                                    className="w-full bg-gray-900 border border-gray-600 rounded p-2 font-mono text-sm"
+                                    className="w-full bg-gray-900 border border-gray-600 rounded p-2 font-mono text-sm text-white"
                                 />
                                 <div className="text-xs text-gray-500 mt-1">
-                                    Variables: <code>{'{title}'}, {'{url}'}, {'{author}'}</code>
+                                    Variables: <code>{'{title}'}, {'{url}'}, {'{author}'}, {'{body}'}</code>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-4 pt-4 border-t border-gray-700">
-                                <button onClick={handleSave} className="flex-1 bg-green-600 hover:bg-green-500 py-2 rounded font-bold flex justify-center items-center gap-2">
+                                <button onClick={handleSave} className="flex-1 bg-green-600 hover:bg-green-500 py-2 rounded font-bold flex justify-center items-center gap-2 text-white">
                                     <Save size={18} /> Save Feed
                                 </button>
-                                <label className="flex items-center gap-2 cursor-pointer bg-gray-900 px-4 py-2 rounded border border-gray-600">
+
+                                {/* Interval Setting */}
+                                <div className="flex items-center gap-2 bg-gray-900 px-3 py-1.5 rounded border border-gray-600">
+                                    <Clock size={16} className="text-gray-400" />
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={editingFeed.check_interval_minutes || 15}
+                                        onChange={e => setEditingFeed({ ...editingFeed, check_interval_minutes: parseInt(e.target.value) || 15 })}
+                                        className="w-12 bg-transparent text-center focus:outline-none text-white font-mono"
+                                        title="Check interval in minutes"
+                                    />
+                                    <span className="text-xs text-gray-500">min</span>
+                                </div>
+
+                                <label className="flex items-center gap-2 cursor-pointer bg-gray-900 px-4 py-2 rounded border border-gray-600 text-white">
                                     <input
                                         type="checkbox"
                                         checked={editingFeed.is_enabled}

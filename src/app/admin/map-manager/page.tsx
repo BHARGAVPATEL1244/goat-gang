@@ -414,28 +414,27 @@ export default function MapManagerPage() {
                     </button>
                 )}
             </div>
-        </div>
 
-            {/* Render List using NeighborhoodCard */ }
-    <div className="flex flex-col gap-1">
-        {districts.map((d, index) => (
-            <div key={d.id} className="relative group">
-                <NeighborhoodCard
-                    neighborhood={adaptToCard(d)}
-                    index={index}
-                    variant="row"
-                    onEdit={() => startEdit(d)}
-                    onSync={() => handleSync(d)}
-                    onDelete={() => handleDelete(d)}
-                />
+            {/* Render List using NeighborhoodCard */}
+            <div className="flex flex-col gap-1">
+                {districts.map((d, index) => (
+                    <div key={d.id} className="relative group">
+                        <NeighborhoodCard
+                            neighborhood={adaptToCard(d)}
+                            index={index}
+                            variant="row"
+                            onEdit={() => startEdit(d)}
+                            onSync={() => handleSync(d)}
+                            onDelete={() => handleDelete(d)}
+                        />
+                    </div>
+                ))}
+                {districts.length === 0 && (
+                    <div className="col-span-3 text-center text-gray-500 py-10">
+                        No districts found. Add one above!
+                    </div>
+                )}
             </div>
-        ))}
-        {districts.length === 0 && (
-            <div className="col-span-3 text-center text-gray-500 py-10">
-                No districts found. Add one above!
-            </div>
-        )}
-    </div>
         </div >
     );
 }

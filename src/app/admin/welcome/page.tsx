@@ -65,10 +65,15 @@ export default function WelcomeManagerPage() {
                     if (cData && cData.data) {
                         setChannels(cData.data);
                     }
+                } else {
+                    // No guilds found - stop loading
+                    toast.error("Bot is not in any guilds");
+                    setLoading(false);
                 }
             } catch (e) {
                 console.error("Error init:", e);
                 toast.error("Failed to load bot data");
+                setLoading(false);
             }
         };
         initData();

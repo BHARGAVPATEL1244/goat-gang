@@ -107,7 +107,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, memb
                 className="w-full md:w-2/3 p-6 md:p-12 overflow-y-auto z-10"
             >
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between sticky top-0 bg-gray-900/95 backdrop-blur z-20">
+                    <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between">
                         <span>Active Roster</span>
                         <span className="text-base not-italic font-mono text-gray-500 bg-gray-800 px-3 py-1 rounded">{members.length} Members</span>
                     </h2>

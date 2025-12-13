@@ -25,20 +25,23 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
     const [activeIndex, setActiveIndex] = useState(0);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Auto-select center item on scroll
+    // Auto-select center item on scroll using Viewport Coordinates
     const handleScroll = () => {
         if (!scrollRef.current) return;
 
         const container = scrollRef.current;
-        const centerX = container.scrollLeft + container.clientWidth / 2;
+        const containerRect = container.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
 
         const cards = Array.from(container.children) as HTMLElement[];
         let closestIndex = 0;
         let closestDistance = Infinity;
 
         cards.forEach((card, index) => {
-            const cardCenterX = card.offsetLeft + card.offsetWidth / 2;
-            const distance = Math.abs(centerX - cardCenterX);
+            const rect = card.getBoundingClientRect();
+            const cardCenter = rect.left + rect.width / 2;
+            const distance = Math.abs(containerCenter - cardCenter);
+
             if (distance < closestDistance) {
                 closestDistance = distance;
                 closestIndex = index;
@@ -50,7 +53,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
         }
     };
 
-    // Scroll active item into view smoothly on click
+    // Scroll active item into view smoothly using relative delta
     const scrollToItem = (index: number) => {
         if (!scrollRef.current) return;
         const container = scrollRef.current;
@@ -58,8 +61,15 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
         const card = cards[index];
 
         if (card) {
-            const scrollLeft = card.offsetLeft - (container.clientWidth / 2) + (card.offsetWidth / 2);
-            container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            const containerRect = container.getBoundingClientRect();
+            const containerCenter = containerRect.left + containerRect.width / 2;
+
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.left + cardRect.width / 2;
+
+            const delta = cardCenter - containerCenter;
+
+            container.scrollBy({ left: delta, behavior: 'smooth' });
         }
     };
 

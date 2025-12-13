@@ -62,9 +62,6 @@ export default function MapManagerPage() {
                 trophy_gold: formData.trophy_gold,
                 trophy_silver: formData.trophy_silver,
                 trophy_bronze: formData.trophy_bronze,
-                // Ensure q and r are present to satisfy NOT NULL constraint
-                q: existing ? existing.q : 0,
-                r: existing ? existing.r : 0,
                 type: 'District' // Default type (matches DB constraint 'Capital'/'District')
             };
 

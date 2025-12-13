@@ -370,49 +370,50 @@ export default function MapManagerPage() {
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-900/50 p-4 rounded border border-gray-700/50">
-                <div>
-                    <label className="text-xs text-yellow-500 uppercase font-bold mb-1 block">Fixed Leader Discord ID (Optional)</label>
-                    <input
-                        type="text" placeholder="User ID (Overrides dynamic detection)"
-                        className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
-                        value={formData.leader_discord_id} onChange={e => setFormData({ ...formData, leader_discord_id: e.target.value })}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-900/50 p-4 rounded border border-gray-700/50">
+                    <div>
+                        <label className="text-xs text-yellow-500 uppercase font-bold mb-1 block">Fixed Leader Discord ID (Optional)</label>
+                        <input
+                            type="text" placeholder="User ID (Overrides dynamic detection)"
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            value={formData.leader_discord_id} onChange={e => setFormData({ ...formData, leader_discord_id: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs text-orange-500 uppercase font-bold mb-1 block">Fixed Co-Leader IDs (Comma Separated)</label>
+                        <input
+                            type="text" placeholder="ID1, ID2, ID3..."
+                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            value={formData.coleader_discord_ids} onChange={e => setFormData({ ...formData, coleader_discord_ids: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <textarea
+                        rows={3} placeholder="Requirements (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        value={formData.hood_reqs_text} onChange={e => setFormData({ ...formData, hood_reqs_text: e.target.value })}
+                    />
+                    <textarea
+                        rows={3} placeholder="Derby Rules (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        value={formData.derby_reqs_text} onChange={e => setFormData({ ...formData, derby_reqs_text: e.target.value })}
                     />
                 </div>
-                <div>
-                    <label className="text-xs text-orange-500 uppercase font-bold mb-1 block">Fixed Co-Leader IDs (Comma Separated)</label>
-                    <input
-                        type="text" placeholder="ID1, ID2, ID3..."
-                        className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
-                        value={formData.coleader_discord_ids} onChange={e => setFormData({ ...formData, coleader_discord_ids: e.target.value })}
-                    />
-                </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <textarea
-                    rows={3} placeholder="Requirements (one per line)"
-                    className="w-full bg-gray-900 border border-gray-700 rounded p-2"
-                    value={formData.hood_reqs_text} onChange={e => setFormData({ ...formData, hood_reqs_text: e.target.value })}
-                />
-                <textarea
-                    rows={3} placeholder="Derby Rules (one per line)"
-                    className="w-full bg-gray-900 border border-gray-700 rounded p-2"
-                    value={formData.derby_reqs_text} onChange={e => setFormData({ ...formData, derby_reqs_text: e.target.value })}
-                />
-            </div>
-
-            <div className="mt-6 flex gap-2">
-                <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold flex items-center gap-2">
-                    <Save className="w-4 h-4" /> Save District
-                </button>
-                {editingId && (
-                    <button onClick={() => { setEditingId(null); resetForm(); }} className="bg-gray-700 px-4 py-2 rounded">
-                        Cancel
+                <div className="mt-6 flex gap-2">
+                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold flex items-center gap-2">
+                        <Save className="w-4 h-4" /> Save District
                     </button>
-                )}
+                    {editingId && (
+                        <button onClick={() => { setEditingId(null); resetForm(); }} className="bg-gray-700 px-4 py-2 rounded">
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Render List using NeighborhoodCard */}

@@ -48,15 +48,22 @@ export default function FeedManagerPage() {
             // Fetch Guilds from Bot API
             const gRes = await fetch('/api/bot/guilds');
             const gData = await gRes.json();
-            setGuilds(gData || []);
-            if (gData?.length > 0) setSelectedGuild(gData[0].id);
+
+            if (Array.isArray(gData)) {
+                setGuilds(gData);
+                if (gData.length > 0) setSelectedGuild(gData[0].id);
+            } else {
+                console.warn("Invalid guilds data:", gData);
+                setGuilds([]);
+                toast.error(gData?.error || "Failed to load servers");
+            }
 
             // Fetch Feeds from DB
             const { data } = await supabase.from('feed_configs').select('*');
             if (data) setFeeds(data);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            toast.error("Failed to load data");
+            toast.error("Failed to load data: " + e.message);
         } finally {
             setLoading(false);
         }
@@ -66,9 +73,17 @@ export default function FeedManagerPage() {
         try {
             const res = await fetch(`/api/bot/guilds/${guildId}/channels`);
             const data = await res.json();
-            setChannels(data.data || []);
+
+            if (data && Array.isArray(data.data)) {
+                setChannels(data.data);
+            } else {
+                console.warn("Invalid channels data:", data);
+                setChannels([]);
+                toast.error(data?.error || "Failed to load channels");
+            }
         } catch (e) {
             console.error(e);
+            toast.error("Error loading channels");
         }
     };
 

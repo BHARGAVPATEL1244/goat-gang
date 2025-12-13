@@ -19,6 +19,7 @@ interface WelcomeConfig {
     embed_title: string;
     embed_description: string;
     embed_footer: string;
+    embed_color: string;
     embed_image_url: string;
     show_user_pfp: boolean;
     is_enabled: boolean;
@@ -31,6 +32,7 @@ const DEFAULT_CONFIG: WelcomeConfig = {
     embed_title: 'Welcome, {user}!',
     embed_description: 'We are glad to have you here. Please familiarize yourself with the rules and enjoy your stay!',
     embed_footer: 'Goat Gang Management',
+    embed_color: '#FACC15',
     embed_image_url: '',
     show_user_pfp: true,
     is_enabled: true
@@ -44,8 +46,6 @@ export default function WelcomeManagerPage() {
     const [testing, setTesting] = useState(false);
 
     // We assume a single "Main" guild for now, or fetch active guild ID context.
-    // For this implementation, we'll fetch channels for a hardcoded guild ID or first available one.
-    // TODO: Ideally context provides this. For now let's fetch guilds first.
     const [guildId, setGuildId] = useState<string | null>(null);
     const [guilds, setGuilds] = useState<{ id: string, name: string }[]>([]);
 
@@ -86,7 +86,6 @@ export default function WelcomeManagerPage() {
         const fetchData = async () => {
             try {
                 // Fetch Channels
-                // Fetch Channels
                 const cRes = await fetch(`/api/bot/guilds/${guildId}/channels`);
                 const cData = await cRes.json();
 
@@ -108,10 +107,10 @@ export default function WelcomeManagerPage() {
                     .single();
 
                 if (data) {
-                    setConfig(data);
+                    // Merge with default to ensure new fields like embed_color exist if DB record is old
+                    setConfig({ ...DEFAULT_CONFIG, ...data });
                 } else {
                     // Reset to default if no config found for this guild
-                    // Preserve guild_id
                     setConfig({ ...DEFAULT_CONFIG, guild_id: guildId });
                 }
             } catch (error) {
@@ -161,7 +160,7 @@ export default function WelcomeManagerPage() {
                         footer: { text: config.embed_footer },
                         image: config.embed_image_url ? { url: config.embed_image_url } : undefined,
                         thumbnail: config.show_user_pfp ? { url: 'https://cdn.discordapp.com/embed/avatars/0.png' } : undefined,
-                        color: 0xFACC15 // Yellow-400 equivalent
+                        color: parseInt(config.embed_color.replace('#', ''), 16) || 0xFACC15
                     }]
                 })
             });
@@ -255,6 +254,25 @@ export default function WelcomeManagerPage() {
                             </div>
                         </div>
 
+                        {/* Embed Color Picker */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Embed Color</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="color"
+                                    value={config.embed_color || '#FACC15'}
+                                    onChange={e => setConfig({ ...config, embed_color: e.target.value })}
+                                    className="h-10 w-20 bg-transparent border-0 rounded cursor-pointer"
+                                />
+                                <input
+                                    type="text"
+                                    value={config.embed_color || '#FACC15'}
+                                    onChange={e => setConfig({ ...config, embed_color: e.target.value })}
+                                    className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm font-mono w-32 uppercase"
+                                />
+                            </div>
+                        </div>
+
                         {/* Embed Description */}
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Small Text (Description)</label>
@@ -331,7 +349,10 @@ export default function WelcomeManagerPage() {
                         </div>
 
                         {/* Embed */}
-                        <div className="ml-[52px] bg-[#2B2D31] rounded border-l-4 border-yellow-400 p-4 max-w-full overflow-hidden">
+                        <div
+                            className="ml-[52px] bg-[#2B2D31] rounded border-l-4 p-4 max-w-full overflow-hidden"
+                            style={{ borderLeftColor: config.embed_color || '#FACC15' }}
+                        >
                             <div className="grid gap-2">
                                 {/* Author/Title & Thumbnail */}
                                 <div className="flex justify-between items-start gap-4">
@@ -351,16 +372,13 @@ export default function WelcomeManagerPage() {
                                 </div>
 
                                 {/* Main Image */}
-                                {config.embed_image_url && (
-                                    <div className="mt-2 rounded-lg overflow-hidden max-h-60">
-                                        <img
-                                            src={config.embed_image_url}
-                                            alt="Embed Media"
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => (e.currentTarget.style.display = 'none')}
-                                        />
-                                    </div>
-                                )}
+                                <img
+                                    src={config.embed_image_url}
+                                    alt="Embed Media"
+                                    className="mt-2 rounded-lg overflow-hidden max-h-60 w-full object-cover"
+                                    style={{ display: config.embed_image_url ? 'block' : 'none' }}
+                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                />
 
                                 {/* Footer */}
                                 {config.embed_footer && (

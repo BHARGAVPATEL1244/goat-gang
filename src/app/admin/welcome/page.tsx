@@ -55,11 +55,13 @@ export default function WelcomeManagerPage() {
                 const gRes = await fetch('/api/bot/guilds');
                 const gData = await gRes.json();
 
-                if (gData && gData.length > 0) {
+                if (Array.isArray(gData) && gData.length > 0) {
                     setGuilds(gData);
                     setGuildId(gData[0].id); // Default to first
                 } else {
-                    toast.error("Bot is not in any guilds");
+                    console.warn("Invalid guilds data:", gData);
+                    setGuilds([]);
+                    toast.error("Bot is not in any guilds or API error");
                     setLoading(false);
                 }
             } catch (e) {

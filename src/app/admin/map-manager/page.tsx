@@ -336,7 +336,6 @@ export default function MapManagerPage() {
                             onEdit={() => startEdit(d)}
                             onSync={() => handleSync(d)}
                             onDelete={() => handleDelete(d)}
-                            onManageMembers={() => router.push(`/admin/hood-members?hood_id=${d.hood_id}&name=${encodeURIComponent(d.name)}`)}
                         />
                     </div>
                 ))}

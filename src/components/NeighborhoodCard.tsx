@@ -12,10 +12,9 @@ interface NeighborhoodCardProps {
     onEdit?: (hood: NeighborhoodDB) => void;
     onSync?: (hood: NeighborhoodDB) => void;
     onDelete?: (hood: NeighborhoodDB) => void;
-    onManageMembers?: (neighborhood: any) => void;
 }
 
-export default function NeighborhoodCard({ neighborhood, index, variant = 'card', onEdit, onSync, onDelete, onManageMembers }: NeighborhoodCardProps) {
+export default function NeighborhoodCard({ neighborhood, index, variant = 'card', onEdit, onSync, onDelete }: NeighborhoodCardProps) {
     const [copied, setCopied] = React.useState(false);
     const divRef = React.useRef<HTMLDivElement>(null);
 
@@ -62,11 +61,7 @@ export default function NeighborhoodCard({ neighborhood, index, variant = 'card'
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                    {onManageMembers && (
-                        <button onClick={(e) => { e.stopPropagation(); onManageMembers(neighborhood); }} className="p-1.5 hover:bg-green-500/20 text-green-500 rounded transition-colors" title="Manage Members">
-                            <Users className="w-4 h-4" />
-                        </button>
-                    )}
+
                     {onEdit && (
                         <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 hover:bg-blue-500/20 text-blue-500 rounded transition-colors" title="Edit">
                             <Edit className="w-4 h-4" />
@@ -162,13 +157,9 @@ export default function NeighborhoodCard({ neighborhood, index, variant = 'card'
                 </div>
             </div>
             {/* Admin Controls Overlay for Card View */}
-            {(onEdit || onSync || onDelete || onManageMembers) && (
+            {(onEdit || onSync || onDelete) && (
                 <div className="absolute top-2 right-2 z-30 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    {onManageMembers && (
-                        <button onClick={(e) => { e.stopPropagation(); onManageMembers(neighborhood); }} className="p-1.5 bg-green-600/80 hover:bg-green-500 text-white rounded-full backdrop-blur shadow-lg" title="Manage Members">
-                            <Users className="w-3 h-3" />
-                        </button>
-                    )}
+
                     {onEdit && (
                         <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 bg-blue-600/80 hover:bg-blue-500 text-white rounded-full backdrop-blur shadow-lg" title="Edit">
                             <Edit className="w-3 h-3" />

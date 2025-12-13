@@ -43,17 +43,19 @@ export async function POST(req: Request) {
 
         // 3. Sync to Supabase
 
-        // 3a. Fetch Hood Configuration (Role IDs)
-        const { data: hoodConfig } = await supabase
-            .from('map_districts')
-            .select('role_id_coleader, role_id_elder')
-            .eq('id', hood_db_id)
-            .single();
+        // 3. Sync to Supabase
 
-        const roleIdCoLeader = hoodConfig?.role_id_coleader;
-        const roleIdElder = hoodConfig?.role_id_elder;
+        // 3a. Fetch Global Config (Role IDs)
+        const { data: configRows } = await supabase
+            .from('app_config')
+            .select('key, value')
+            .in('key', ['role_id_coleader', 'role_id_elder']);
 
-        console.log(`[SYNC] Config for Hood ${hood_db_id}: CoLeader=${roleIdCoLeader}, Elder=${roleIdElder}`);
+        const config = new Map(configRows?.map(r => [r.key, r.value]));
+        const roleIdCoLeader = config.get('role_id_coleader');
+        const roleIdElder = config.get('role_id_elder');
+
+        console.log(`[SYNC] Config (Global): CoLeader=${roleIdCoLeader}, Elder=${roleIdElder}`);
 
         // 3b. Prepare Data
         const upsertData = members.map((m: any) => {

@@ -3,10 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 import { syncNeighborhoodMembers } from '@/lib/sync';
 
 // Use Service Role to fetch the list of hoods (bypass RLS)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Helper to get admin client at runtime
+const getSupabaseAdmin = () => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    return createClient(url, key);
+};
 
 export async function GET(req: Request) {
     try {
@@ -14,6 +17,12 @@ export async function GET(req: Request) {
         const authHeader = req.headers.get('authorization');
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}` && process.env.NODE_ENV !== 'development') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const supabaseAdmin = getSupabaseAdmin();
+        if (!supabaseAdmin) {
+            console.error('Cron Sync Failed: Missing Service Role Key');
+            return NextResponse.json({ error: 'Configuration Error: Missing Service Key' }, { status: 500 });
         }
 
         // 2. Fetch all Hoods with Discord Role IDs

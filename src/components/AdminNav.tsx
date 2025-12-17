@@ -84,6 +84,9 @@ function AdminNavContent() {
     const showEmbeds = PERMISSIONS.canManageEmbeds(userRoles, dbPermissions);
     const showGiveaways = PERMISSIONS.canManageGiveaways(userRoles, dbPermissions);
 
+    const showWiki = PERMISSIONS.canManageWiki(userRoles, dbPermissions);
+    const showAudit = PERMISSIONS.canViewAudit(userRoles, dbPermissions);
+
     console.log('AdminNav Debug:', {
         providerId,
         userRoles,
@@ -91,6 +94,8 @@ function AdminNavContent() {
         showNeighborhoods,
         showEmbeds,
         showGiveaways,
+        showWiki,
+        showAudit,
         adminUserIds: (process.env.NEXT_PUBLIC_ADMIN_USER_IDS || '').split(','),
         adminRole: PERMISSIONS.ROLES.ADMIN[0],
         isAdmin: PERMISSIONS.isAdmin(userRoles),
@@ -187,6 +192,20 @@ function AdminNavContent() {
                         </Link>
                     )}
 
+                    {/* Audit Logs (Security) */}
+                    {showAudit && (
+                        <Link
+                            href="/admin/audit"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${isPageActive('/admin/audit')
+                                ? 'bg-purple-900/50 text-purple-200 border border-purple-700 shadow-sm'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                        >
+                            Audit Logs
+                        </Link>
+                    )}
+
+
                     {showEmbeds && (
                         <Link
                             href="/admin/embed-builder"
@@ -227,6 +246,16 @@ function AdminNavContent() {
                                 Feed Manager
                             </Link>
                         </>
+                    )}
+
+                    {/* Wiki / Guides */}
+                    {showWiki && (
+                        <Link
+                            href="/admin/wiki"
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors border ${pathname.startsWith('/admin/wiki') ? 'bg-blue-900/50 text-blue-200 border-blue-700' : 'text-gray-400 hover:bg-gray-800 hover:text-white border-transparent'}`}
+                        >
+                            Wiki / Guides
+                        </Link>
                     )}
                 </div>
             </div>

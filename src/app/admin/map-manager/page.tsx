@@ -179,6 +179,42 @@ export default function MapManagerPage() {
         }
     };
 
+    const handleSyncAll = async () => {
+        const validDistricts = districts.filter(d => d.hood_id);
+        if (validDistricts.length === 0) return alert('No districts have Discord Role IDs set.');
+
+        if (!confirm(`Are you sure you want to auto-sync ALL ${validDistricts.length} neighborhoods? This might take a moment.`)) return;
+
+        setLoading(true); // Re-use loading state or create a specific one
+        let successCount = 0;
+        let failCount = 0;
+        let errors: string[] = [];
+
+        // Sequential execution to be safe with rate limits
+        for (const [index, d] of validDistricts.entries()) {
+            try {
+                // Optional: You could update a progress state here if you added one
+                console.log(`Syncing ${index + 1}/${validDistricts.length}: ${d.name}`);
+
+                const res = await fetch('/api/admin/sync-hood', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ hood_id: d.hood_id, hood_db_id: d.id })
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                successCount++;
+            } catch (err: any) {
+                console.error(`Failed to sync ${d.name}:`, err);
+                failCount++;
+                errors.push(`${d.name}: ${err.message}`);
+            }
+        }
+
+        setLoading(false);
+        alert(`Auto-Sync Complete!\n\nSuccess: ${successCount}\nFailed: ${failCount}\n${errors.length > 0 ? '\nErrors:\n' + errors.join('\n') : ''}`);
+    };
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
 
@@ -259,8 +295,11 @@ export default function MapManagerPage() {
                         />
                     </div>
                     <div>
-                        <button onClick={saveGlobalConfig} className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold text-sm w-full">
+                        <button onClick={saveGlobalConfig} className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold text-sm w-full mb-2">
                             Save Global Settings
+                        </button>
+                        <button onClick={handleSyncAll} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold text-sm w-full flex items-center justify-center gap-2">
+                            Global Auto-Sync 🔄
                         </button>
                     </div>
                 </div>

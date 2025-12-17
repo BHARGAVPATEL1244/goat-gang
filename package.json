@@ -11,6 +11,9 @@
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.84.0",
+    "@vercel/analytics": "^1.6.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.554.0",
@@ -22,6 +25,7 @@
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "swr": "^2.3.6",
+    "tailwind-merge": "^3.4.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

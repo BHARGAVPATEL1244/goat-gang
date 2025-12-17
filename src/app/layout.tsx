@@ -41,6 +41,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/components/Navbar";
 import { Toaster } from 'sonner';
 import LazyMotionProvider from "@/components/LazyMotionProvider";
@@ -59,6 +60,7 @@ export default function RootLayout({
             <Navbar />
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
+              <Analytics />
             </main>
           </LazyMotionProvider>
         </ThemeProvider>

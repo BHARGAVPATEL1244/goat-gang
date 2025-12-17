@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -11,6 +11,7 @@ import { LoginButton } from './LoginButton';
 import { User } from '@supabase/supabase-js';
 import JoinGuildModal from './JoinGuildModal';
 import { PERMISSIONS } from '@/utils/permissions';
+import { CommandMenu } from './CommandMenu';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,10 @@ export default function Navbar() {
 
     const pathname = usePathname();
     const supabase = createClient();
+
+    const openCommand = () => {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+    };
 
     // Mapping for admin check (now handled via PERMISSIONS.hasAdminAccess with user ID)
     // const ADMIN_ROLE_IDS = process.env.NEXT_PUBLIC_DISCORD_ADMIN_ROLE_IDS?.split(',') || [];
@@ -201,6 +206,16 @@ export default function Navbar() {
                             Bar Vault
                         </Link>
 
+                        {/* Search Trigger (Desktop) */}
+                        <button
+                            onClick={openCommand}
+                            className="p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 group"
+                            aria-label="Search"
+                        >
+                            <Search className="w-5 h-5" />
+                            <span className="text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 hidden lg:block group-hover:border-gray-400 transition-colors">⌘K</span>
+                        </button>
+
                         {user ? (
                             <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-600">
                                 <span className="text-sm font-bold text-white max-w-[150px] truncate">
@@ -232,6 +247,13 @@ export default function Navbar() {
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-2">
+                        {/* Search Trigger (Mobile) */}
+                        <button
+                            onClick={openCommand}
+                            className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+                        >
+                            <Search className="w-5 h-5" />
+                        </button>
                         <ThemeToggle />
                         <button
                             onClick={() => setIsOpen(!isOpen)}
@@ -304,6 +326,7 @@ export default function Navbar() {
             )}
 
             <JoinGuildModal isOpen={showJoinModal} />
+            <CommandMenu />
         </nav>
     );
 }

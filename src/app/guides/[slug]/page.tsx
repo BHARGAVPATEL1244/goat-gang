@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 interface Props {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 }
 
 async function getGuide(slug: string) {
@@ -22,7 +22,8 @@ async function getGuide(slug: string) {
 
 // SEO: Generate dynamic metadata for each guide
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const guide = await getGuide(params.slug);
+    const { slug } = await params;
+    const guide = await getGuide(slug);
     if (!guide) return {};
 
     return {
@@ -50,7 +51,8 @@ export async function generateStaticParams() {
 }
 
 export default async function GuidePage({ params }: Props) {
-    const guide = await getGuide(params.slug);
+    const { slug } = await params;
+    const guide = await getGuide(slug);
 
     if (!guide) {
         notFound();

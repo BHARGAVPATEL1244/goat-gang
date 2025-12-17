@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Entry, BarCounts } from '@/lib/types';
 import { Plus, Trash2, Edit2, Download, X } from 'lucide-react';
-import * as XLSX from 'xlsx';
+
 
 export default function AdminPanel() {
     const [entries, setEntries] = useState<Entry[]>([]);
@@ -105,7 +105,8 @@ export default function AdminPanel() {
         }));
     };
 
-    const handleExport = () => {
+    const handleExport = async () => {
+        const XLSX = await import('xlsx');
         const data = entries.map(e => ({
             Date: new Date(e.timestamp).toLocaleDateString('en-US'),
             Type: e.type,

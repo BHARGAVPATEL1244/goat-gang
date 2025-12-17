@@ -1,17 +1,36 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Use Service Role for Cron/Backend operations to bypass RLS
-const supabaseAdmin = createClient<any>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const getSupabaseAdmin = () => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export async function syncNeighborhoodMembers(hood_discord_role_id: string, hood_db_id: string) {
-    const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:3000/api';
+    if (!url || !key) {
+        console.warn('Missing Supabase Service Role credentials. Sync operations will fail.');
+        return null;
+    }
+
+    return createClient<any>(url, key);
+};
+
+interface Member {
+    user: {
+        id: string;
+        username: string;
+        roles: string[];
+    };
+    roles: string[];
+}
+
+export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) throw new Error('Service Role Key missing');
+
+    const BOT_API_URL = process.env.BOT_API_URL;
     const BOT_API_KEY = process.env.BOT_API_KEY;
 
     // 1. Fetch Members from Discord Bot
-    const response = await fetch(`${BOT_API_URL}/members/list?roleId=${hood_discord_role_id}`, {
+    const response = await fetch(`${BOT_API_URL}/members/list?roleId=${roleId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

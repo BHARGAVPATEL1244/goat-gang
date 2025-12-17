@@ -6,6 +6,11 @@ import { toast } from 'sonner';
 import { Trash2, Edit, Plus, Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 interface WikiPage {
     id: string;
@@ -83,11 +88,16 @@ export default function AdminWikiPage() {
         }
 
         if (error) {
+            console.error(error);
             toast.error('Failed to save guide: ' + error.message);
         } else {
             toast.success(editingId ? 'Guide updated!' : 'Guide created!');
+            if (!editingId) {
+                // Keep form open if editing, close/reset if new? Actually reset is better
+                setFormData({ slug: '', title: '', excerpt: '', content: '', image_url: '', is_published: true });
+            }
+            // If we were editing, maybe keep it open or close? Let's close for now as per previous logic
             setEditingId(null);
-            setFormData({ slug: '', title: '', excerpt: '', content: '', image_url: '', is_published: true });
             fetchPages();
         }
     };
@@ -183,13 +193,24 @@ export default function AdminWikiPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Content (HTML Supported)</label>
-                                <textarea
-                                    value={formData.content}
-                                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                    className="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all h-64 font-mono text-sm"
-                                    placeholder="Write your article content here. Use <h2>, <p>, <ul> tags..."
-                                />
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-gray-900 dark:text-white">
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={formData.content}
+                                        onChange={(value) => setFormData({ ...formData, content: value })}
+                                        className="h-64 mb-12"
+                                        modules={{
+                                            toolbar: [
+                                                [{ 'header': [1, 2, 3, false] }],
+                                                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['link', 'image'],
+                                                ['clean']
+                                            ],
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-2">

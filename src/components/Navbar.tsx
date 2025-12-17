@@ -119,10 +119,11 @@ export default function Navbar() {
     const isAdmin = hasAdminAccess;
 
     // --- Menu Structure ---
-    const communityLinks = [
-        { href: '/neighborhoods', label: 'Neighborhoods' },
+    const links = [
+        { href: '/neighborhoods', label: 'Hoods' },
         { href: '/events', label: 'Events' },
-        { href: '/contact', label: 'Contact' },
+        { href: '/guides', label: 'Wiki' },
+        { href: '/contact', label: 'Join' },
     ];
 
     // Admin links moved to Dashboard page directly
@@ -184,7 +185,7 @@ export default function Navbar() {
                             Home
                         </Link>
 
-                        <NavDropdown title="Community" links={communityLinks} />
+                        <NavDropdown title="Community" links={links} />
 
                         {hasAdminAccess && (
                             <Link href="/admin" className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/admin')
@@ -254,16 +255,7 @@ export default function Navbar() {
 
                         {/* Community Links Mobile */}
                         <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Community</div>
-                        {communityLinks.map(link => (
-                            <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(link.href)
-                                ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                                } pl-6 border-l-2 border-transparent hover:border-blue-500`}>{link.label}</Link>
-                        ))}
-
-                        {/* Community Links Mobile */}
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Community</div>
-                        {communityLinks.map(link => (
+                        {links.map(link => (
                             <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(link.href)
                                 ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                                 : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'

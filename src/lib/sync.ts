@@ -92,7 +92,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     });
 
     // 6. Upsert
-    const { error } = await supabaseAdmin.from('hood_memberships').upsert(finalData, {
+    const { error } = await supabaseAdmin.from('hood_memberships').upsert(processedMembers, {
         onConflict: 'user_id,hood_id'
     });
 

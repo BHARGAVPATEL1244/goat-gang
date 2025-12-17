@@ -206,9 +206,11 @@ export default function Navbar() {
                                     {user.user_metadata?.full_name || user.email}
                                 </span>
                                 {user.user_metadata?.avatar_url && (
-                                    <img
+                                    <NextImage
                                         src={user.user_metadata.avatar_url}
                                         alt="Avatar"
+                                        width={32}
+                                        height={32}
                                         className="w-8 h-8 rounded-full border border-gray-600"
                                     />
                                 )}
@@ -287,9 +289,11 @@ export default function Navbar() {
                                 <div className="space-y-2 px-3">
                                     <div className="flex items-center gap-2">
                                         {user.user_metadata?.avatar_url && (
-                                            <img
+                                            <NextImage
                                                 src={user.user_metadata.avatar_url}
                                                 alt="Avatar"
+                                                width={32}
+                                                height={32}
                                                 className="w-8 h-8 rounded-full border border-gray-600"
                                             />
                                         )}

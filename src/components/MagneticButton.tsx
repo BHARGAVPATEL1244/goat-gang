@@ -1,11 +1,19 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useRef } from 'react';
 
 export default function MagneticButton({ children, className = "" }: { children: React.ReactNode, className?: string }) {
     const ref = useRef<HTMLDivElement>(null);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    // Use MotionValues instead of React State to prevent re-renders on every mouse move
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    // Smooth spring animation for the values
+    const springConfig = { type: "spring", stiffness: 150, damping: 15, mass: 0.1 };
+    const springX = useSpring(x, springConfig);
+    const springY = useSpring(y, springConfig);
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const { clientX, clientY } = e;
@@ -13,25 +21,25 @@ export default function MagneticButton({ children, className = "" }: { children:
         const center = { x: left + width / 2, y: top + height / 2 };
 
         // Calculate distance from center
-        const x = clientX - center.x;
-        const y = clientY - center.y;
+        const distanceX = clientX - center.x;
+        const distanceY = clientY - center.y;
 
-        setPosition({ x: x * 0.3, y: y * 0.3 }); // Adjust strength of pull here
+        // Update motion values directly (no React render)
+        x.set(distanceX * 0.3);
+        y.set(distanceY * 0.3);
     };
 
     const handleMouseLeave = () => {
-        setPosition({ x: 0, y: 0 });
+        x.set(0);
+        y.set(0);
     };
-
-    const { x, y } = position;
 
     return (
         <motion.div
             ref={ref}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            animate={{ x, y }}
-            transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+            style={{ x: springX, y: springY }}
             className={className}
         >
             {children}

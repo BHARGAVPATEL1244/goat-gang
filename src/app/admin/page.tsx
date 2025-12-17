@@ -205,6 +205,28 @@ function AdminDashboardContent() {
                     </p>
                 </Link>
 
+                <Link
+                    href="/admin/audit"
+                    className="group block p-6 bg-gray-800 rounded-xl border border-gray-700 hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/10"
+                >
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-purple-500/10 text-purple-500 rounded-lg group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                            <svg
+                                className="w-6 h-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">Audit Logs</h3>
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                        View security logs and track admin actions.
+                    </p>
+                </Link>
+
                 {/* Content Area */}
                 <div>
                     {activeView === 'management' && showData && <AdminPanel />}

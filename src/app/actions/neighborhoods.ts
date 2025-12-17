@@ -3,6 +3,7 @@
 import { supabase } from '@/lib/supabase';
 import { NeighborhoodDB } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
+import { logAdminAction } from './audit';
 
 export async function getNeighborhoods() {
     const { data, error } = await supabase
@@ -29,6 +30,9 @@ export async function createNeighborhood(neighborhood: Partial<NeighborhoodDB>) 
         return { success: false, error: error.message };
     }
 
+    // Log Action
+    await logAdminAction('CREATE_HOOD', { name: neighborhood.name });
+
     revalidatePath('/neighborhoods');
     revalidatePath('/admin');
     return { success: true, data };
@@ -46,6 +50,9 @@ export async function updateNeighborhood(id: string, neighborhood: Partial<Neigh
         return { success: false, error: error.message };
     }
 
+    // Log Action
+    await logAdminAction('UPDATE_HOOD', { id, updates: Object.keys(neighborhood) });
+
     revalidatePath('/neighborhoods');
     revalidatePath('/admin');
     return { success: true, data };
@@ -61,6 +68,9 @@ export async function deleteNeighborhood(id: string) {
         console.error('Error deleting neighborhood:', error);
         return { success: false, error: error.message };
     }
+
+    // Log Action
+    await logAdminAction('DELETE_HOOD', { id });
 
     revalidatePath('/neighborhoods');
     revalidatePath('/admin');

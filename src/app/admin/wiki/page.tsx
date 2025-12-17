@@ -7,6 +7,7 @@ import { Trash2, Edit, Plus, Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { logAdminAction } from '@/app/actions/audit';
 
 // Dynamic import for ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -91,6 +92,9 @@ export default function AdminWikiPage() {
             console.error(error);
             toast.error('Failed to save guide: ' + error.message);
         } else {
+            const action = editingId ? 'UPDATE_GUIDE' : 'CREATE_GUIDE';
+            await logAdminAction(action, { title: payload.title, slug: payload.slug });
+
             toast.success(editingId ? 'Guide updated!' : 'Guide created!');
             if (!editingId) {
                 // Keep form open if editing, close/reset if new? Actually reset is better
@@ -113,6 +117,7 @@ export default function AdminWikiPage() {
         if (error) {
             toast.error('Failed to delete guide');
         } else {
+            await logAdminAction('DELETE_GUIDE', { id });
             toast.success('Guide deleted');
             fetchPages();
         }

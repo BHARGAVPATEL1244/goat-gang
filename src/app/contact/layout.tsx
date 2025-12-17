@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Join Discord',
-    description: 'Connect with the community, trade, and chat on our Discord server.',
+    title: 'Hay Day Discord & Trading',
+    description: 'Join the largest Hay Day Discord server. Trade BEMs, SEMs, and LEMs instantly. Chat with thousands of farmers worldwide.',
 };
 
 export default function ContactLayout({ children }: { children: React.ReactNode }) {

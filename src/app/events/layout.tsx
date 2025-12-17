@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Events & Derbies',
-    description: 'Participate in Main Events, Mini Events, and Weekly Derby Championships.',
+    title: 'Hay Day Events & Derby Guide',
+    description: 'Track the latest Hay Day events, truck orders, boat events, and triple crop bonus days. Win big in the Weekly Derby!',
 };
 
 export default function EventsLayout({ children }: { children: React.ReactNode }) {

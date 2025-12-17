@@ -7,8 +7,12 @@ import { LayoutDashboard, Settings } from 'lucide-react';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Goat Gang",
-  description: "The ultimate community for Hay Day players. Join a neighborhood, participate in events, and win big!",
+  title: {
+    template: '%s | Goat Gang',
+    default: 'Goat Gang - #1 Hay Day Community',
+  },
+  description: "The #1 Hay Day community! Join active neighborhoods, trade expansion materials, chat with players, and win the Derby.",
+  keywords: ['Hay Day', 'Hay Day Neighborhood', 'Hay Day Trading', 'Hay Day Discord', 'Hay Day Wiki', 'Supercell', 'Farm Game'],
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
@@ -17,11 +21,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Goat Gang',
-    title: 'Goat Gang - Join the Family',
-    description: 'The ultimate community for Hay Day players. Join a neighborhood, participate in events, and win big!',
+    title: 'Goat Gang - #1 Hay Day Community',
+    description: 'The #1 Hay Day community! Join active neighborhoods, trade expansion materials, chat with players, and win the Derby.',
     images: [
       {
-        url: '/logo.png', // Ideally this should be a wider 1200x630 og-image, but logo works for now
+        url: '/logo.png',
         width: 512,
         height: 512,
         alt: 'Goat Gang Logo',
@@ -29,9 +33,9 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: 'summary', // using summary because we occupy a square logo
-    title: 'Goat Gang',
-    description: 'Join the Goat Gang family!',
+    card: 'summary',
+    title: 'Goat Gang - #1 Hay Day Community',
+    description: 'The ultimate Hay Day community for trading and neighborhoods.',
     images: ['/logo.png'],
   },
 };

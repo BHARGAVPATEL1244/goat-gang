@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { m as motion, useMotionValue, useSpring } from 'framer-motion';
 import { useRef } from 'react';
 
 export default function MagneticButton({ children, className = "" }: { children: React.ReactNode, className?: string }) {

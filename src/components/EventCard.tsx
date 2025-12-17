@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { EventDB } from '@/lib/types';
 import { Trophy, User, DollarSign, Calendar } from 'lucide-react';
 

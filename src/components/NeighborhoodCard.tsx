@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { NeighborhoodDB } from '@/lib/types';
 import { Trophy, Users, Hash, AlertCircle, Edit, Trash, RefreshCw } from 'lucide-react';
 import Image from 'next/image';

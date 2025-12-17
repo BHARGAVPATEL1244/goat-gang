@@ -26,31 +26,34 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Auto-select center item on scroll using Viewport Coordinates
+    // Auto-select center item on scroll using offset optimization
     const handleScroll = () => {
         if (!scrollRef.current) return;
 
-        const container = scrollRef.current;
-        const containerRect = container.getBoundingClientRect();
-        const containerCenter = containerRect.left + containerRect.width / 2;
+        requestAnimationFrame(() => {
+            const container = scrollRef.current;
+            if (!container) return;
 
-        const cards = Array.from(container.children) as HTMLElement[];
-        let closestIndex = 0;
-        let closestDistance = Infinity;
+            const scrollCenter = container.scrollLeft + (container.offsetWidth / 2);
+            const cards = Array.from(container.children) as HTMLElement[];
 
-        cards.forEach((card, index) => {
-            const rect = card.getBoundingClientRect();
-            const cardCenter = rect.left + rect.width / 2;
-            const distance = Math.abs(containerCenter - cardCenter);
+            let closestIndex = 0;
+            let closestDistance = Infinity;
 
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestIndex = index;
+            cards.forEach((card, index) => {
+                const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
+                const distance = Math.abs(scrollCenter - cardCenter);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+
+            if (activeIndex !== closestIndex) {
+                setActiveIndex(closestIndex);
             }
         });
-
-        if (activeIndex !== closestIndex) {
-            setActiveIndex(closestIndex);
-        }
     };
 
     // Scroll active item into view smoothly using relative delta

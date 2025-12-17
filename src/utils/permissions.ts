@@ -141,6 +141,20 @@ export const PERMISSIONS = {
         return PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.ADMIN);
     },
 
+    canManageWiki: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_WIKI') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles) || PERMISSIONS.hasMinRoleLevel(userRoles, ROLE_LEVELS.CO_LEADER);
+    },
+
+    canViewAudit: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'VIEW_AUDIT_LOGS') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles);
+    },
+
     /**
      * Checks if user has a specific permission based on the DB check.
      */

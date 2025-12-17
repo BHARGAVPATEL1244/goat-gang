@@ -1,6 +1,7 @@
-import confetti from 'canvas-confetti';
+// Dynamically imported to reduce initial bundle size
 
-export const triggerCoinExplosion = (x: number, y: number) => {
+export const triggerCoinExplosion = async (x: number, y: number) => {
+    const confetti = (await import('canvas-confetti')).default;
     const scalar = 2;
     const coinShape = confetti.shapeFromText({ text: '🟡', scalar });
 
@@ -17,7 +18,8 @@ export const triggerCoinExplosion = (x: number, y: number) => {
     });
 };
 
-export const triggerGoatExplosion = (x: number, y: number) => {
+export const triggerGoatExplosion = async (x: number, y: number) => {
+    const confetti = (await import('canvas-confetti')).default;
     const scalar = 2.5;
     const goatShape = confetti.shapeFromText({ text: '🐐', scalar });
 

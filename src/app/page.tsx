@@ -7,9 +7,7 @@ import { ArrowRight, Users, Trophy, MessageCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Playfair_Display } from 'next/font/google';
-import { triggerCoinExplosion, triggerGoatExplosion } from '@/lib/confetti';
 import MagneticButton from '@/components/MagneticButton';
-
 // Dynamically import Scene3D to avoid SSR issues with R3F
 // const Scene3D = dynamic(() => import('@/components/Scene3D'), { ssr: false });
 
@@ -49,12 +47,6 @@ export default function HomePage() {
                         <MagneticButton>
                             <Link
                                 href="/neighborhoods"
-                                onClick={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    const x = (rect.left + rect.width / 2) / window.innerWidth;
-                                    const y = (rect.top + rect.height / 2) / window.innerHeight;
-                                    triggerGoatExplosion(x, y);
-                                }}
                                 className="group relative px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] flex items-center gap-2 overflow-hidden"
                             >
                                 <span className="relative z-10 flex items-center gap-2">Join a Hood <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></span>
@@ -64,12 +56,6 @@ export default function HomePage() {
                         <MagneticButton>
                             <Link
                                 href="/events"
-                                onClick={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    const x = (rect.left + rect.width / 2) / window.innerWidth;
-                                    const y = (rect.top + rect.height / 2) / window.innerHeight;
-                                    triggerCoinExplosion(x, y);
-                                }}
                                 className="px-8 py-4 bg-white/5 backdrop-blur-xl hover:bg-white/10 text-white font-bold rounded-full transition-all border border-white/10 hover:border-white/30 flex items-center gap-2"
                             >
                                 Events

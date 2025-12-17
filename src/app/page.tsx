@@ -78,7 +78,7 @@ export default function HomePage() {
                             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
                                 <Users className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">Neighborhoods</h3>
+                            <h2 className="text-3xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">Neighborhoods</h2>
                             <p className="text-gray-400 mb-6 leading-relaxed">
                                 Find your perfect community. Browse our top-tier neighborhoods, check requirements, and join the family.
                             </p>
@@ -108,7 +108,7 @@ export default function HomePage() {
                             <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
                                 <MessageCircle className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-green-400 transition-colors">Join Discord</h3>
+                            <h2 className="text-3xl font-bold mb-3 text-white group-hover:text-green-400 transition-colors">Join Discord</h2>
                             <p className="text-gray-400 mb-6 leading-relaxed">
                                 Connect with thousands of players. Trade, chat, and coordinate in our active Discord server.
                             </p>

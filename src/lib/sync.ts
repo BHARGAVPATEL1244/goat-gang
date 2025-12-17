@@ -39,93 +39,66 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     });
 
     if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`Bot API Error: ${err}`);
+        throw new Error(`Bot API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const members = data.members; // Array of { id, username, nickname, ... }
+    const data: { members: Member[] } = await response.json();
+    const discordMembers = data.members || [];
 
-    if (!members || members.length === 0) {
-        return { success: true, count: 0, message: 'No members found in Discord with that role' };
-    }
-
-    // 2. Fetch Global Config (Role IDs)
-    const { data: configRows } = await supabaseAdmin
+    // 2. Fetch Global Config & Local Hood Config
+    const { data: globalConfig } = await supabaseAdmin
         .from('app_config')
         .select('key, value')
-        .in('key', ['role_id_coleader', 'role_id_elder']);
+        .in('key', ['coleader_role_id', 'elder_role_id']);
 
-    const config = new Map(configRows?.map((r: any) => [r.key, r.value]));
-    const roleIdCoLeader = config.get('role_id_coleader');
-    const roleIdElder = config.get('role_id_elder');
+    const coLeaderRoleId = globalConfig?.find((c: any) => c.key === 'coleader_role_id')?.value;
+    const elderRoleId = globalConfig?.find((c: any) => c.key === 'elder_role_id')?.value;
 
-    // 3. Fetch Local Hood Config (Fixed IDs)
     const { data: hoodConfig } = await supabaseAdmin
         .from('map_districts')
         .select('leader_discord_id, coleader_discord_ids')
-        .eq('id', hood_db_id)
+        .eq('id', hoodId)
         .single();
 
     const fixedLeaderId = hoodConfig?.leader_discord_id;
     const fixedCoLeaderIds = hoodConfig?.coleader_discord_ids || [];
 
-    // 4. Prepare Data
-    const upsertData = members.map((m: any) => {
+    // 3. Process Members
+    const processedMembers = discordMembers.map(m => {
         let rank = 'Member';
 
-        // Priority 1: Fixed Leader
-        if (fixedLeaderId && m.id === fixedLeaderId) {
+        // 3a. Fixed Overrides (Highest Priority)
+        if (m.user.id === fixedLeaderId) {
             rank = 'Leader';
+        } else if (fixedCoLeaderIds.includes(m.user.id)) {
+            rank = 'Co-Leader';
         }
-        // Priority 2: Fixed Co-Leaders
-        else if (fixedCoLeaderIds.includes(m.id)) {
-            rank = 'CoLeader';
-        }
-        // Priority 3: Global Discord Roles
-        else if (roleIdCoLeader && m.roles.includes(roleIdCoLeader)) {
-            rank = 'CoLeader';
-        } else if (roleIdElder && m.roles.includes(roleIdElder)) {
-            rank = 'Elder';
+        // 3b. Global Roles (Fallback)
+        else {
+            if (coLeaderRoleId && m.roles.includes(coLeaderRoleId)) {
+                rank = 'Co-Leader';
+            } else if (elderRoleId && m.roles.includes(elderRoleId)) {
+                rank = 'Elder';
+            }
         }
 
         return {
-            user_id: m.id,
-            hood_id: hood_discord_role_id,
+            hood_id: hoodId,
+            discord_id: m.user.id,
+            username: m.user.username,
             rank: rank,
-            nickname: m.nickname || m.displayName,
-            username: m.username,
-            avatar_url: m.avatar
+            joined_at: new Date().toISOString()
         };
     });
 
-    // 5. Merge with Existing (Preserve Manual Promotions if no global rules override)
-    const { data: existing } = await supabaseAdmin
-        .from('hood_memberships')
-        .select('user_id, rank')
-        .eq('hood_id', hood_discord_role_id);
+});
 
-    const existingMap = new Map(existing?.map((e: any) => [e.user_id, e.rank]));
+// 6. Upsert
+const { error } = await supabaseAdmin.from('hood_memberships').upsert(finalData, {
+    onConflict: 'user_id,hood_id'
+});
 
-    const finalData = upsertData.map((m: any) => {
-        if (m.rank !== 'Member') return m;
+if (error) throw error;
 
-        // If no global rules configured, respect existing rank? 
-        // Or strictly enforce 'Member' if they don't have roles?
-        // Let's stick to strict sync for now, unless specific requirement. 
-        // But the previous code had a check:
-        if (!roleIdCoLeader && !roleIdElder) {
-            return { ...m, rank: existingMap.get(m.user_id) || 'Member' };
-        }
-        return m;
-    });
-
-    // 6. Upsert
-    const { error } = await supabaseAdmin.from('hood_memberships').upsert(finalData, {
-        onConflict: 'user_id,hood_id'
-    });
-
-    if (error) throw error;
-
-    return { success: true, count: members.length };
+return { success: true, count: members.length };
 }

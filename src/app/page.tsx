@@ -93,7 +93,7 @@ export default function HomePage() {
                             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
                                 <Trophy className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-3xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">Events & Derbies</h3>
+                            <h2 className="text-3xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">Events & Derbies</h2>
                             <p className="text-gray-400 mb-6 leading-relaxed">
                                 Participate in Main Events, Mini Events, and Weekly Derby Championships. Win big prizes!
                             </p>

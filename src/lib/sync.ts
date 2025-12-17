@@ -98,5 +98,5 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
     if (error) throw error;
 
-    return { success: true, count: members.length };
+    return { success: true, count: discordMembers.length };
 }

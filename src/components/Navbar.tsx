@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { usePathname } from 'next/navigation';
@@ -162,7 +163,14 @@ export default function Navbar() {
                     {/* Logo */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-gray-900 dark:text-white">
-                            <img src="/logo.png" alt="Goat Gang Logo" className="w-8 h-8 object-contain" />
+                            <NextImage
+                                src="/logo.png"
+                                alt="Goat Gang Logo"
+                                width={32}
+                                height={32}
+                                className="w-8 h-8 object-contain"
+                                priority
+                            />
                             <span className="hidden sm:block">Goat Gang</span>
                             <span className="sm:hidden">Goat Gang</span>
                         </Link>

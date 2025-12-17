@@ -12,9 +12,25 @@ import MagneticButton from '@/components/MagneticButton';
 // const Scene3D = dynamic(() => import('@/components/Scene3D'), { ssr: false });
 
 export default function HomePage() {
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Goat Gang',
+        url: 'https://goat-gang.vercel.app',
+        logo: 'https://goat-gang.vercel.app/logo.png',
+        sameAs: [
+            // Add social links here if available
+        ],
+        description: "The ultimate community for Hay Day players."
+    };
+
     return (
         // Negative margins to break out of the RootLayout container
         <div className="relative -mt-8 -mb-8 -mx-4 sm:-mx-6 lg:-mx-8 min-h-[calc(100vh-64px)] bg-black overflow-hidden selection:bg-yellow-500/30">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Minimal Modern Background */}
             <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>

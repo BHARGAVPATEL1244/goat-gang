@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types'; // Assuming you have types, if not use 'any'
 
 // Use Service Role for Cron/Backend operations to bypass RLS
-const supabaseAdmin = createClient(
+const supabaseAdmin = createClient<any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );

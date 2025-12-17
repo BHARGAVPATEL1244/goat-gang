@@ -65,7 +65,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, memb
                 </button>
 
                 <div className="text-center mb-10">
-                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-min mx-auto leading-tight">
+                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-min mx-auto leading-tight px-4 py-2">
                         {hoodName}
                     </h2>
                     <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />

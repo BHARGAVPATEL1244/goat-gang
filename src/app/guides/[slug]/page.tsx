@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
+import { createClient as createStaticClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 async function getGuide(slug: string) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data } = await supabase
         .from('wiki_pages')
         .select('*')
@@ -38,7 +39,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-    const supabase = createClient();
+    const supabase = createStaticClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { data: guides } = await supabase.from('wiki_pages').select('slug').eq('is_published', true);
     return guides?.map((guide) => ({
         slug: guide.slug,

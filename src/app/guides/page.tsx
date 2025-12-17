@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GuidesIndexPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: guides } = await supabase
         .from('wiki_pages')
         .select('*')

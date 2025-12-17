@@ -5,6 +5,7 @@ import { useRef } from 'react';
 
 export default function MagneticButton({ children, className = "" }: { children: React.ReactNode, className?: string }) {
     const ref = useRef<HTMLDivElement>(null);
+    const rectRef = useRef<DOMRect | null>(null);
 
     // Use MotionValues instead of React State to prevent re-renders on every mouse move
     const x = useMotionValue(0);
@@ -15,9 +16,17 @@ export default function MagneticButton({ children, className = "" }: { children:
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
+    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (ref.current) {
+            rectRef.current = ref.current.getBoundingClientRect();
+        }
+    };
+
     const handleMouseMove = (e: React.MouseEvent) => {
+        if (!rectRef.current) return;
+
         const { clientX, clientY } = e;
-        const { left, top, width, height } = ref.current?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
+        const { left, top, width, height } = rectRef.current;
         const center = { x: left + width / 2, y: top + height / 2 };
 
         // Calculate distance from center
@@ -37,6 +46,7 @@ export default function MagneticButton({ children, className = "" }: { children:
     return (
         <motion.div
             ref={ref}
+            onMouseEnter={handleMouseEnter}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ x: springX, y: springY }}

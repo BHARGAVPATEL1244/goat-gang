@@ -37,7 +37,7 @@
   "browserslist": [
     "chrome >= 100",
     "firefox >= 100",
-    "safari >= 15",
-    "ios >= 15"
+    "safari >= 16",
+    "ios >= 16"
   ]
 }

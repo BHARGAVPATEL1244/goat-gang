@@ -30,7 +30,10 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     const BOT_API_KEY = process.env.BOT_API_KEY;
 
     // 1. Fetch Members from Discord Bot
-    const response = await fetch(`${BOT_API_URL}/members/list?roleId=${roleId}`, {
+    const requestUrl = `${BOT_API_URL}/members/list?roleId=${roleId}`;
+    console.log(`[Sync] Fetching from: ${requestUrl}`);
+
+    const response = await fetch(requestUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -39,10 +42,13 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     });
 
     if (!response.ok) {
+        const errText = await response.text();
+        console.error(`[Sync] Bot API Error (${response.status}): ${errText}`);
         throw new Error(`Bot API error: ${response.statusText}`);
     }
 
     const data: { members: Member[] } = await response.json();
+    console.log(`[Sync] Bot Response: Found ${data.members?.length || 0} members`);
     const discordMembers = data.members || [];
 
     // 2. Fetch Global Config & Local Hood Config

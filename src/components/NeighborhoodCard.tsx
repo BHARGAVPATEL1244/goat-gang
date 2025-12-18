@@ -63,17 +63,17 @@ export default function NeighborhoodCard({ neighborhood, index, variant = 'card'
                 <div className="flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
 
                     {onEdit && (
-                        <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 hover:bg-blue-500/20 text-blue-500 rounded transition-colors" title="Edit">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 hover:bg-blue-500/20 text-blue-500 rounded transition-colors" title="Edit">
                             <Edit className="w-4 h-4" />
                         </button>
                     )}
                     {onSync && (
-                        <button onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-1.5 hover:bg-indigo-500/20 text-indigo-500 rounded transition-colors" title="Sync">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-1.5 hover:bg-indigo-500/20 text-indigo-500 rounded transition-colors" title="Sync">
                             <RefreshCw className="w-4 h-4" />
                         </button>
                     )}
                     {onDelete && (
-                        <button onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-1.5 hover:bg-red-500/20 text-red-500 rounded transition-colors" title="Delete">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-1.5 hover:bg-red-500/20 text-red-500 rounded transition-colors" title="Delete">
                             <Trash className="w-4 h-4" />
                         </button>
                     )}
@@ -161,17 +161,17 @@ export default function NeighborhoodCard({ neighborhood, index, variant = 'card'
                 <div className="absolute top-2 right-2 z-30 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
 
                     {onEdit && (
-                        <button onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 bg-blue-600/80 hover:bg-blue-500 text-white rounded-full backdrop-blur shadow-lg" title="Edit">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onEdit(neighborhood); }} className="p-1.5 bg-blue-600/80 hover:bg-blue-500 text-white rounded-full backdrop-blur shadow-lg" title="Edit">
                             <Edit className="w-3 h-3" />
                         </button>
                     )}
                     {onSync && (
-                        <button onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-1.5 bg-indigo-600/80 hover:bg-indigo-500 text-white rounded-full backdrop-blur shadow-lg" title="Sync">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onSync(neighborhood); }} className="p-1.5 bg-indigo-600/80 hover:bg-indigo-500 text-white rounded-full backdrop-blur shadow-lg" title="Sync">
                             <RefreshCw className="w-3 h-3" />
                         </button>
                     )}
                     {onDelete && (
-                        <button onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-full backdrop-blur shadow-lg" title="Delete">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onDelete(neighborhood); }} className="p-1.5 bg-red-600/80 hover:bg-red-500 text-white rounded-full backdrop-blur shadow-lg" title="Delete">
                             <Trash className="w-3 h-3" />
                         </button>
                     )}

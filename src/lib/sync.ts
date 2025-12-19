@@ -1,85 +1,129 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use Service Role for Cron/Backend operations to bypass RLS
+// Types representing the structure of data from the Discord Bot
+interface DiscordUser {
+    id: string;
+    username: string;
+    roles: string[];
+}
+
+interface BotResponse {
+    members: {
+        user: DiscordUser;
+        roles: string[];
+    }[];
+}
+
+// Helper: Get Supabase Admin Client (Bypasses RLS)
 const getSupabaseAdmin = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!url || !key) {
-        console.warn('Missing Supabase Service Role credentials. Sync operations will fail.');
-        return null;
+        console.error('[Sync] Missing Supabase Service Role credentials.');
+        return null; // Let the caller handle the error
     }
 
-    return createClient<any>(url, key);
+    return createClient(url, key, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    });
 };
 
-interface Member {
-    user: {
-        id: string;
-        username: string;
-        roles: string[];
-    };
-    roles: string[];
-}
-
+/**
+ * Syncs members of a specific neighborhood (district) from Discord to Supabase.
+ * 
+ * @param hoodId - The database ID of the neighborhood (map_districts.id)
+ * @param roleId - The Discord Role ID associated with this neighborhood
+ */
 export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
-    const supabaseAdmin = getSupabaseAdmin();
-    if (!supabaseAdmin) throw new Error('Service Role Key missing');
+    if (!hoodId || !roleId) {
+        throw new Error('Missing hoodId or roleId for sync.');
+    }
 
+    // 1. Initialize Admin Client
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+        throw new Error('Server Configuration Error: Missing SUPABASE_SERVICE_ROLE_KEY.');
+    }
+
+    // 2. Validate Environment Variables for Bot API
     const BOT_API_URL = process.env.BOT_API_URL;
     const BOT_API_KEY = process.env.BOT_API_KEY;
 
-    // 1. Fetch Members from Discord Bot
+    if (!BOT_API_URL) throw new Error('Configuration Error: Missing BOT_API_URL.');
+    // Note: API Key might be optional for some local setups, but required for prod
+    // We will warn but proceed if missing, though the request will likely fail 401.
+
+    // 3. Fetch Members from Discord Bot
     const requestUrl = `${BOT_API_URL}/members/list?roleId=${roleId}`;
-    console.log(`[Sync] Fetching from: ${requestUrl}`);
+    console.log(`[Sync] Requesting members from: ${requestUrl}`);
 
-    const response = await fetch(requestUrl, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': BOT_API_KEY || ''
-        }
-    });
-
-    if (!response.ok) {
-        const errText = await response.text();
-        console.error(`[Sync] Bot API Error (${response.status}): ${errText}`);
-        throw new Error(`Bot API error: ${response.statusText}`);
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+    };
+    if (BOT_API_KEY) {
+        headers['x-api-key'] = BOT_API_KEY;
     }
 
-    const data: { members: Member[] } = await response.json();
-    console.log(`[Sync] Bot Response: Found ${data.members?.length || 0} members`);
-    const discordMembers = data.members || [];
+    let discordMembers: BotResponse['members'] = [];
 
-    // 2. Fetch Global Config & Local Hood Config
-    const { data: globalConfig } = await supabaseAdmin
-        .from('app_config')
-        .select('key, value')
-        .in('key', ['coleader_role_id', 'elder_role_id']);
+    try {
+        const response = await fetch(requestUrl, { method: 'GET', headers });
 
-    const coLeaderRoleId = globalConfig?.find((c: any) => c.key === 'coleader_role_id')?.value;
-    const elderRoleId = globalConfig?.find((c: any) => c.key === 'elder_role_id')?.value;
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Sync] Bot API Failed: ${response.status} - ${errorText}`);
+            if (response.status === 401) {
+                throw new Error('Bot API Unauthorized: Check BOT_API_KEY in .env.local');
+            }
+            throw new Error(`Bot API error: ${response.statusText} (${errorText})`);
+        }
 
-    const { data: hoodConfig } = await supabaseAdmin
-        .from('map_districts')
-        .select('leader_discord_id, coleader_discord_ids')
-        .eq('id', hoodId)
-        .single();
+        const data = await response.json() as BotResponse;
+        discordMembers = data.members || [];
+        console.log(`[Sync] Successfully fetched ${discordMembers.length} members from Discord.`);
+
+    } catch (error: any) {
+        console.error('[Sync] Fetch failed:', error);
+        throw error; // Re-throw to be handled by the API route
+    }
+
+    // 4. Fetch Role Configurations (Global vs Local Overrides)
+    // We fetch these in parallel for speed
+    const [globalConfigRes, hoodConfigRes] = await Promise.all([
+        supabaseAdmin.from('app_config').select('key, value').in('key', ['coleader_role_id', 'elder_role_id']),
+        supabaseAdmin.from('map_districts').select('leader_discord_id, coleader_discord_ids').eq('id', hoodId).single()
+    ]);
+
+    const globalConfig = globalConfigRes.data || [];
+    const hoodConfig = hoodConfigRes.data;
+
+    const coLeaderRoleId = globalConfig.find(c => c.key === 'coleader_role_id')?.value;
+    const elderRoleId = globalConfig.find(c => c.key === 'elder_role_id')?.value;
 
     const fixedLeaderId = hoodConfig?.leader_discord_id;
-    const fixedCoLeaderIds = hoodConfig?.coleader_discord_ids || [];
+    // Ensure fixedCoLeaderIds is always an array of strings
+    let fixedCoLeaderIds: string[] = [];
+    if (Array.isArray(hoodConfig?.coleader_discord_ids)) {
+        fixedCoLeaderIds = hoodConfig.coleader_discord_ids;
+    } else if (typeof hoodConfig?.coleader_discord_ids === 'string') {
+        fixedCoLeaderIds = (hoodConfig.coleader_discord_ids as string).split(',').map(s => s.trim());
+    }
 
-    // 3. Process Members
+    // 5. Process & Map Members to DB Structure
     const processedMembers = discordMembers.map(m => {
         let rank = 'Member';
 
-        // 3a. Fixed Overrides (Highest Priority)
-        if (m.user.id === fixedLeaderId) {
+        // Priority 1: Fixed Overrides (Hood specific)
+        if (fixedLeaderId && m.user.id === fixedLeaderId) {
             rank = 'Leader';
         } else if (fixedCoLeaderIds.includes(m.user.id)) {
             rank = 'Co-Leader';
         }
-        // 3b. Global Roles (Fallback)
+        // Priority 2: Global Discord Roles
         else {
             if (coLeaderRoleId && m.roles.includes(coLeaderRoleId)) {
                 rank = 'Co-Leader';
@@ -94,15 +138,29 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             username: m.user.username,
             rank: rank,
             joined_at: new Date().toISOString()
+            // We update 'joined_at' on every sync? Usually better to keep original, 
+            // but for now we follow existing logic. Upsert will overwrite it.
         };
     });
 
-    // 6. Upsert
-    const { error } = await supabaseAdmin.from('hood_memberships').upsert(processedMembers, {
-        onConflict: 'user_id,hood_id'
-    });
+    if (processedMembers.length === 0) {
+        console.log('[Sync] No members to update.');
+        return { success: true, count: 0 };
+    }
 
-    if (error) throw error;
+    // 6. Upsert to Supabase
+    // We use a batched upsert, which is efficient
+    const { error: upsertError } = await supabaseAdmin
+        .from('hood_memberships')
+        .upsert(processedMembers, {
+            onConflict: 'user_id,hood_id', // Ensure this matches your DB constraint
+            ignoreDuplicates: false // We want to update ranks if they changed
+        });
 
-    return { success: true, count: discordMembers.length };
+    if (upsertError) {
+        console.error('[Sync] Database Upsert Failed:', upsertError);
+        throw new Error(`Database error: ${upsertError.message}`);
+    }
+
+    return { success: true, count: processedMembers.length };
 }

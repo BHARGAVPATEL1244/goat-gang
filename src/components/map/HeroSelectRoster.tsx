@@ -20,9 +20,9 @@ interface HeroSelectRosterProps {
 }
 
 export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, members, onBack }: HeroSelectRosterProps) {
-    // Determine Leader logic: Use passed leaderName if not found in list, but prefer list member for role consistency
-    const leaderMember = members.find(m => m.role === 'Leader');
-    const leaderRawName = leaderMember ? leaderMember.name : leaderName;
+    // Determine Leader logic: Prioritize the passed 'leaderName' prop (source of truth from map_districts)
+    // accessible from the neighborhood card. The members list might have inconsistencies or multiple leaders in rare cases.
+    const leaderRawName = leaderName;
     const { cleanName: leaderClean, level: leaderLevel } = parseUser(leaderRawName);
 
     // Filter out leader from the list if already shown on the left

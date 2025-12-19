@@ -103,10 +103,10 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     const globalConfig = globalConfigRes.data || [];
     const hoodConfig = hoodConfigRes.data;
 
-    const coLeaderRoleId = globalConfig.find(c => c.key === 'coleader_role_id')?.value;
-    const elderRoleId = globalConfig.find(c => c.key === 'elder_role_id')?.value;
+    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+    const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
 
-    console.log(`[Sync] Global Config - CoLeader: "${coLeaderRoleId}", Elder: "${elderRoleId}"`);
+    console.log(`[Sync] Global Config - CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
 
     const fixedLeaderId = hoodConfig?.leader_discord_id?.trim();
     // Ensure fixedCoLeaderIds is always an array of strings
@@ -119,7 +119,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
     // 5. Process & Map Members to DB Structure
     if (discordMembers.length > 0) {
-        console.log('[Sync] First member sample:', JSON.stringify(discordMembers[0], null, 2));
+        // console.log('[Sync] First member sample:', JSON.stringify(discordMembers[0], null, 2));
     }
 
     const processedMembers = discordMembers
@@ -147,13 +147,6 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
             const roles = m.roles || (m as any)._roles || []; // Fallback for various formats
 
-            // Debug logic for first member
-            if (idx === 0) {
-                console.log(`[Sync Debug] Checking Member: ${username} (${discordId})`);
-                console.log(`[Sync Debug] Member Roles:`, roles);
-                console.log(`[Sync Debug] Fixed Leader: ${fixedLeaderId}, Fixed CoLeaders:`, fixedCoLeaderIds);
-            }
-
             // Priority 1: Fixed Overrides (Hood specific)
             if (fixedLeaderId && discordId === fixedLeaderId) {
                 rank = 'Leader';
@@ -162,14 +155,18 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
                 rank = 'Co-Leader';
                 if (idx === 0) console.log('[Sync Debug] Assigned Co-Leader via Fixed ID');
             }
-            // Priority 2: Global Discord Roles
+            // Priority 2: Global Discord Roles (Checks against LIST of valid role IDs)
             else {
-                if (coLeaderRoleId && roles.includes(coLeaderRoleId)) {
+                // Check intersection: Does user have ANY of the Co-Leader roles?
+                const isCoLeader = roles.some(r => coLeaderRoleIds.includes(r));
+                const isElder = roles.some(r => elderRoleIds.includes(r));
+
+                if (isCoLeader) {
                     rank = 'Co-Leader';
-                    if (idx === 0) console.log('[Sync Debug] Assigned Co-Leader via Global Role Match');
-                } else if (elderRoleId && roles.includes(elderRoleId)) {
+                    // if (idx === 0) console.log('[Sync Debug] Assigned Co-Leader via Global Role Match');
+                } else if (isElder) {
                     rank = 'Elder';
-                    if (idx === 0) console.log('[Sync Debug] Assigned Elder via Global Role Match');
+                    // if (idx === 0) console.log('[Sync Debug] Assigned Elder via Global Role Match');
                 }
             }
 

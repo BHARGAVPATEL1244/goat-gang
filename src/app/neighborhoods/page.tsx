@@ -154,6 +154,7 @@ export default function NeighborhoodsPage() {
                 <HeroSelectRoster
                     hoodName={selectedDistrict?.name || 'Unknown'}
                     leaderName={selectedDistrict?.leader_name || 'Unknown'}
+                    leaderId={selectedDistrict?.leader_discord_id}
                     hoodImage={selectedDistrict?.image_url}
                     members={villageMembers}
                     onBack={handleBack}

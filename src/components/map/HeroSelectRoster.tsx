@@ -14,21 +14,25 @@ interface Member {
 interface HeroSelectRosterProps {
     hoodName: string;
     leaderName: string;
+    leaderId?: string; // Optional for backward compat, but we'll pass it
     hoodImage?: string;
     members: Member[];
     onBack: () => void;
 }
 
-export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, members, onBack }: HeroSelectRosterProps) {
+export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodImage, members, onBack }: HeroSelectRosterProps) {
     // Determine Leader logic: Prioritize the passed 'leaderName' prop (source of truth from map_districts)
     // accessible from the neighborhood card. The members list might have inconsistencies or multiple leaders in rare cases.
     const leaderRawName = leaderName;
     const { cleanName: leaderClean, level: leaderLevel } = parseUser(leaderRawName);
 
     // Filter out leader from the list if already shown on the left
-    // Logic: If members list contains the leader, exclude them from the right side list
+    // Logic: If members list contains the leader, exclude them from the right side list by ID if available, else name
     const otherMembers = members
-        .filter(m => m.role !== 'Leader' && m.name !== leaderName)
+        .filter(m => {
+            if (leaderId) return m.id !== leaderId;
+            return m.role !== 'Leader' && m.name !== leaderName;
+        })
         .map(m => ({ ...m, ...parseUser(m.name) }))
         .sort((a, b) => {
             // Sort by Role Priority

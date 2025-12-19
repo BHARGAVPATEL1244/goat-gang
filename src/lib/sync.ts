@@ -103,8 +103,8 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     const globalConfig = globalConfigRes.data || [];
     const hoodConfig = hoodConfigRes.data;
 
-    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
-    const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
 
     console.log(`[Sync] Global Config - CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
 

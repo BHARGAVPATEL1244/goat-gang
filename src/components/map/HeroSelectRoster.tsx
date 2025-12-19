@@ -28,7 +28,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, hoodImage, memb
     // Filter out leader from the list if already shown on the left
     // Logic: If members list contains the leader, exclude them from the right side list
     const otherMembers = members
-        .filter(m => m.role !== 'Leader')
+        .filter(m => m.role !== 'Leader' && m.name !== leaderName)
         .map(m => ({ ...m, ...parseUser(m.name) }))
         .sort((a, b) => {
             // Sort by Role Priority

@@ -107,7 +107,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
     console.log(`[Sync] Global Config - CoLeader: "${coLeaderRoleId}", Elder: "${elderRoleId}"`);
 
-    const fixedLeaderId = hoodConfig?.leader_discord_id;
+    const fixedLeaderId = hoodConfig?.leader_discord_id?.trim();
     // Ensure fixedCoLeaderIds is always an array of strings
     let fixedCoLeaderIds: string[] = [];
     if (Array.isArray(hoodConfig?.coleader_discord_ids)) {

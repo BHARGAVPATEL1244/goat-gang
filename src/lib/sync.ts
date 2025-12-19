@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { parseUser } from '@/utils/nameParser';
 
 // Types representing the structure of data from the Discord Bot
 interface DiscordUser {
@@ -136,8 +137,13 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
             // Username Priority: Nickname (Server Profile) -> Global Name -> Username -> Unknown
             // Note: Bot API might return 'nick' or 'nickname' at top level
-            const nickname = (m as any).nick || (m as any).nickname;
-            const username = nickname || m.user?.global_name || m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
+            const rawNickname = (m as any).nick || (m as any).nickname;
+            const rawUsername = rawNickname || m.user?.global_name || m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
+
+            // Clean the name (remove clan tags like [TAG] or {TAG})
+            // we use the local helper function inline or import it. importing is cleaner.
+            const { cleanName } = parseUser(rawUsername);
+            const username = cleanName;
 
             const roles = m.roles || (m as any)._roles || []; // Fallback for various formats
 

@@ -16,7 +16,9 @@ export async function POST(req: Request) {
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // 2. Call Shared Sync Logic
-        const result = await syncNeighborhoodMembers(hood_id, hood_db_id);
+        // 2. Call Shared Sync Logic
+        // Note: syncNeighborhoodMembers expects (hoodId [DB], roleId [Discord])
+        const result = await syncNeighborhoodMembers(hood_db_id, hood_id);
 
         return NextResponse.json(result);
 

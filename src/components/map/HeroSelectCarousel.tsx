@@ -85,7 +85,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
             {/* Header Text */}
             <div className="absolute top-10 z-20 text-center">
                 <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-white drop-shadow-lg tracking-tighter uppercase italic">
-                    Choose Your Squad
+                    Choose Your Neighborhood
                 </h1>
                 <p className="text-blue-300 tracking-widest mt-2 font-medium">SELECT A NEIGHBORHOOD</p>
             </div>

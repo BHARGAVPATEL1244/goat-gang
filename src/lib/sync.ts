@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 interface DiscordUser {
     id: string;
     username: string;
+    global_name?: string;
     roles: string[];
 }
 

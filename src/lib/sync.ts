@@ -96,17 +96,18 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     // 4. Fetch Role Configurations (Global vs Local Overrides)
     // We fetch these in parallel for speed
     const [globalConfigRes, hoodConfigRes] = await Promise.all([
-        supabaseAdmin.from('app_config').select('key, value').in('key', ['coleader_role_id', 'elder_role_id']),
+        supabaseAdmin.from('app_config').select('key, value').in('key', ['leader_role_id', 'coleader_role_id', 'elder_role_id']),
         supabaseAdmin.from('map_districts').select('leader_discord_id, coleader_discord_ids').eq('id', hoodId).single()
     ]);
 
     const globalConfig = globalConfigRes.data || [];
     const hoodConfig = hoodConfigRes.data;
 
+    const leaderRoleIds = (globalConfig.find(c => c.key === 'leader_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
     const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
     const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
 
-    console.log(`[Sync] Global Config - CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
+    console.log(`[Sync] Global Config - Leaders: [${leaderRoleIds.join(', ')}], CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
 
     const fixedLeaderId = hoodConfig?.leader_discord_id?.trim();
     // Ensure fixedCoLeaderIds is always an array of strings
@@ -157,11 +158,15 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             }
             // Priority 2: Global Discord Roles (Checks against LIST of valid role IDs)
             else {
-                // Check intersection: Does user have ANY of the Co-Leader roles?
+                // Check intersection: Does user have ANY of the target roles?
+                const isLeader = roles.some(r => leaderRoleIds.includes(r));
                 const isCoLeader = roles.some(r => coLeaderRoleIds.includes(r));
                 const isElder = roles.some(r => elderRoleIds.includes(r));
 
-                if (isCoLeader) {
+                if (isLeader) {
+                    rank = 'Leader';
+                    // if (idx === 0) console.log('[Sync Debug] Assigned Leader via Global Role Match');
+                } else if (isCoLeader) {
                     rank = 'Co-Leader';
                     // if (idx === 0) console.log('[Sync Debug] Assigned Co-Leader via Global Role Match');
                 } else if (isElder) {

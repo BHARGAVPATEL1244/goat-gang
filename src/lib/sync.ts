@@ -114,34 +114,48 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     }
 
     // 5. Process & Map Members to DB Structure
-    const processedMembers = discordMembers.map(m => {
-        let rank = 'Member';
+    if (discordMembers.length > 0) {
+        console.log('[Sync] First member sample:', JSON.stringify(discordMembers[0], null, 2));
+    }
 
-        // Priority 1: Fixed Overrides (Hood specific)
-        if (fixedLeaderId && m.user.id === fixedLeaderId) {
-            rank = 'Leader';
-        } else if (fixedCoLeaderIds.includes(m.user.id)) {
-            rank = 'Co-Leader';
-        }
-        // Priority 2: Global Discord Roles
-        else {
-            if (coLeaderRoleId && m.roles.includes(coLeaderRoleId)) {
+    const processedMembers = discordMembers
+        .filter(m => {
+            // Check if member matches expected structure or fallback
+            const valid = (m.user && m.user.id) || (m as any).id;
+            if (!valid) console.warn('[Sync] Skipping invalid member object:', m);
+            return valid;
+        })
+        .map(m => {
+            let rank = 'Member';
+
+            // Normalize structure: handle { user: { id... } } OR { id... }
+            const discordId = m.user?.id || (m as any).id;
+            const username = m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
+            const roles = m.roles || (m as any)._roles || []; // Fallback for various formats
+
+            // Priority 1: Fixed Overrides (Hood specific)
+            if (fixedLeaderId && discordId === fixedLeaderId) {
+                rank = 'Leader';
+            } else if (fixedCoLeaderIds.includes(discordId)) {
                 rank = 'Co-Leader';
-            } else if (elderRoleId && m.roles.includes(elderRoleId)) {
-                rank = 'Elder';
             }
-        }
+            // Priority 2: Global Discord Roles
+            else {
+                if (coLeaderRoleId && roles.includes(coLeaderRoleId)) {
+                    rank = 'Co-Leader';
+                } else if (elderRoleId && roles.includes(elderRoleId)) {
+                    rank = 'Elder';
+                }
+            }
 
-        return {
-            hood_id: hoodId,
-            discord_id: m.user.id,
-            username: m.user.username,
-            rank: rank,
-            joined_at: new Date().toISOString()
-            // We update 'joined_at' on every sync? Usually better to keep original, 
-            // but for now we follow existing logic. Upsert will overwrite it.
-        };
-    });
+            return {
+                hood_id: hoodId,
+                discord_id: discordId,
+                username: username,
+                rank: rank,
+                joined_at: new Date().toISOString()
+            };
+        });
 
     if (processedMembers.length === 0) {
         console.log('[Sync] No members to update.');

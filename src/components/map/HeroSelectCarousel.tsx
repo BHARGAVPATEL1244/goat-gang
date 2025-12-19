@@ -157,19 +157,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                     )}
 
                                     {/* Leader Badge */}
-                                    {isActive && (
-                                        <div className="absolute top-4 right-4 z-20 flex flex-col items-center">
-                                            <div className="w-12 h-12 rounded-full border-2 border-yellow-500 overflow-hidden bg-black/50 backdrop-blur-sm relative">
-                                                {/* We can fetch their avatar if we have it, for now using leader name initials or placeholder */}
-                                                <div className="w-full h-full flex items-center justify-center text-yellow-500 font-bold text-xs">
-                                                    {district.leader_name.substring(0, 2).toUpperCase()}
-                                                </div>
-                                            </div>
-                                            <div className="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full -mt-2 uppercase tracking-wide">
-                                                LEADER
-                                            </div>
-                                        </div>
-                                    )}
+
                                 </div>
 
                                 {/* Info Section */}

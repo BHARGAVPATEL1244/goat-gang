@@ -188,5 +188,16 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
         throw new Error(`Database error: ${upsertError.message}`);
     }
 
+    // 7. Auto-Update Neighborhood Leader Name
+    // If we identified a Leader, we should update the map_districts.leader_name to match
+    const newLeader = processedMembers.find(m => m.rank === 'Leader');
+    if (newLeader) {
+        console.log(`[Sync] Updating Hood Leader to: ${newLeader.username}`);
+        await supabaseAdmin
+            .from('map_districts')
+            .update({ leader_name: newLeader.username })
+            .eq('id', hoodId);
+    }
+
     return { success: true, count: processedMembers.length };
 }

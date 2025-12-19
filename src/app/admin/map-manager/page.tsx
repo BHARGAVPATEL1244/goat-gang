@@ -332,14 +332,15 @@ export default function MapManagerPage() {
                         />
                     </div>
 
-                    <div className="lg:col-span-2">
+                    {/* Leader Name Removed - Auto-fetched from Sync */}
+                    {/* <div className="lg:col-span-2">
                         <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Leader Name</label>
                         <input
                             type="text" placeholder="Leader Name"
                             className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
                             value={formData.leader_name} onChange={e => setFormData({ ...formData, leader_name: e.target.value })}
                         />
-                    </div>
+                    </div> */}
 
                     <div className="lg:col-span-1">
                         <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Tag</label>

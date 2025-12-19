@@ -151,8 +151,23 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                                 onClick={(e) => { e.stopPropagation(); onSelect(district); }}
                                                 className="bg-yellow-500 text-black font-bold uppercase px-6 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 shadow-lg shadow-yellow-500/20"
                                             >
-                                                Enter Roster <ArrowRight size={20} />
+                                                Enter <ArrowRight size={20} />
                                             </button>
+                                        </div>
+                                    )}
+
+                                    {/* Leader Badge */}
+                                    {isActive && (
+                                        <div className="absolute top-4 right-4 z-20 flex flex-col items-center">
+                                            <div className="w-12 h-12 rounded-full border-2 border-yellow-500 overflow-hidden bg-black/50 backdrop-blur-sm relative">
+                                                {/* We can fetch their avatar if we have it, for now using leader name initials or placeholder */}
+                                                <div className="w-full h-full flex items-center justify-center text-yellow-500 font-bold text-xs">
+                                                    {district.leader_name.substring(0, 2).toUpperCase()}
+                                                </div>
+                                            </div>
+                                            <div className="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full -mt-2 uppercase tracking-wide">
+                                                LEADER
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -171,7 +186,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                         <div className="flex items-center justify-between text-gray-300">
                                             <div className="flex items-center gap-2">
                                                 <Crown size={16} className="text-yellow-500" />
-                                                <span className="text-xs font-bold uppercase tracking-wider">Master</span>
+                                                <span className="text-xs font-bold uppercase tracking-wider">LEADER</span>
                                             </div>
                                             <span className="font-mono text-sm">{district.leader_name}</span>
                                         </div>

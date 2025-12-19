@@ -132,7 +132,12 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
             // Normalize structure: handle { user: { id... } } OR { id... }
             const discordId = m.user?.id || (m as any).id;
-            const username = m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
+
+            // Username Priority: Nickname (Server Profile) -> Global Name -> Username -> Unknown
+            // Note: Bot API might return 'nick' or 'nickname' at top level
+            const nickname = (m as any).nick || (m as any).nickname;
+            const username = nickname || m.user?.global_name || m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
+
             const roles = m.roles || (m as any)._roles || []; // Fallback for various formats
 
             // Debug logic for first member

@@ -150,7 +150,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
             return {
                 hood_id: hoodId,
-                discord_id: discordId,
+                user_id: discordId, // Matches 'user_id' column in DB (stores Discord ID)
                 username: username,
                 rank: rank,
                 joined_at: new Date().toISOString()

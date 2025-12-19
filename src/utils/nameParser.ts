@@ -13,7 +13,7 @@ export function parseUser(name: string): ParsedUser {
     // 2. Remove tags like [TAG] or [123] from name
     let clean = name
         .replace(/\[.*?\]/g, '') // Remove [] content
-        .replace(/\(.*?\)/g, '') // Remove () content
+        // .replace(/\(.*?\)/g, '') // User requested to ONLY remove [], keeping ()
         .trim();
 
     // 3. Remove leading/trailing symbols often used in gamer tags

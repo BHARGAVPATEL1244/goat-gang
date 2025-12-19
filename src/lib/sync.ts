@@ -152,8 +152,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
                 hood_id: hoodId,
                 user_id: discordId, // Matches 'user_id' column in DB (stores Discord ID)
                 username: username,
-                rank: rank,
-                joined_at: new Date().toISOString()
+                rank: rank
             };
         });
 

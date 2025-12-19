@@ -213,76 +213,41 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
     // 8. Prune Stale Members (Cleanup)
     // Remove members from DB who are no longer in the Discord list
+    // We use the "Read-Diff-Delete" Approach (Fail-proof)
     const currentMemberIds = processedMembers.map(m => m.user_id);
-    if (currentMemberIds.length > 0) {
-        const { error: deleteError } = await supabaseAdmin
-            .from('hood_memberships')
-            .delete()
-            .eq('hood_id', hoodId)
-            .not('user_id', 'in', `(${currentMemberIds.join(',')})`); // Note: PostgREST syntax for arrays is slightly different usually, but the JS client handles .in() with array.
-        // Wait, .not('user_id', 'in', array) is correct in JS client?
-        // Checking docs or standard usage. .not('column', 'in', ['a','b'])
-    }
 
-    // Correct Supabase Syntax for NOT IN:
-    if (currentMemberIds.length > 0) {
-        const { error: deleteError } = await supabaseAdmin
-            .from('hood_memberships')
-            .delete()
-            .eq('hood_id', hoodId)
-            .not('user_id', 'in', `(${currentMemberIds.map(id => `"${id}"`).join(',')})`);
-
-        // Actually, simplified approach to avoid syntax ambiguity:
-        // Fetch all DB members first? No, that's slow.
-        // Use the standard filter: .in() takes an array. .not() takes filter operator?
-        // Supabase JS 'not' modifier: .not('user_id', 'in', currentMemberIds) 
-        // verifying: .not(column, operator, value). So .not('user_id', 'in', currentMemberIds) -> "user_id not in (a,b,c)"
-    }
-
-    // The safest way is to use the filter directly if supported, or raw generic.
-    // Let's use the explicit .filter() or .not() if simple.
-    // .not('user_id', 'in', ['123', '456']) is usually how it works.
-
-    if (currentMemberIds.length > 0) {
-        const { error: deleteError } = await supabaseAdmin
-            .from('hood_memberships')
-            .delete()
-            .eq('hood_id', hoodId)
-            .not('user_id', 'in', `(${currentMemberIds.join(',')})`); // This might fail if IDs are strings needing quotes inside the parens for the 'in' string? 
-        // Actually, Supabase JS client handles arrays in `.in()`.
-        // But `.not()` expects the value format to match the operator.
-
-        // ALTERNATIVE: Use the `match` / `neq` combo? No.
-        // Let's try the standard JS way:
-        const { error: cleanupError } = await supabaseAdmin
-            .from('hood_memberships')
-            .delete()
-            .eq('hood_id', hoodId)
-            // Filter: user_id NOT IN list
-            .not('user_id', 'in', `(${currentMemberIds.join(',')})`);
-        // Wait, if IDs behave like strings/numbers, raw value passed to 'in' filter must be formatted.
-        // Since this is tricky without testing, I'll use a safer approach:
-        // Fetch ALL IDs for this hood, then delete the difference. It's safer.
-    }
-
-    // Safer "Read-Diff-Delete" Approach (Fail-proof)
+    // Fetch checks for existing members
     const { data: existingMembers } = await supabaseAdmin
         .from('hood_memberships')
         .select('user_id')
         .eq('hood_id', hoodId);
+
+    // Fetch hood name for better logging
+    const { data: hoodData } = await supabaseAdmin
+        .from('map_districts')
+        .select('name')
+        .eq('id', hoodId)
+        .single();
+
+    const hoodNameLog = hoodData?.name || hoodId;
 
     if (existingMembers) {
         const toDelete = existingMembers
             .map(m => m.user_id)
             .filter(id => !currentMemberIds.includes(id));
 
+        console.log(`[Sync] Hood "${hoodNameLog}": DB has ${existingMembers.length}, Discord List has ${currentMemberIds.length}. Stale Members: ${toDelete.length}`);
+
         if (toDelete.length > 0) {
-            console.log(`[Sync] Pruning ${toDelete.length} stale members:`, toDelete);
+            console.log(`[Sync] Pruning ${toDelete.length} stale members from "${hoodNameLog}":`, toDelete);
             await supabaseAdmin
                 .from('hood_memberships')
                 .delete()
                 .eq('hood_id', hoodId)
                 .in('user_id', toDelete);
+            console.log(`[Sync] Pruning Complete for "${hoodNameLog}".`);
+        } else {
+            console.log(`[Sync] No stale members to prune for "${hoodNameLog}".`);
         }
     }
 

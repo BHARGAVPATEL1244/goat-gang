@@ -11,9 +11,11 @@ export function parseUser(name: string): ParsedUser {
     let level = levelMatch ? levelMatch[1] : null;
 
     // 2. Remove tags like [TAG] or [123] from name
+    // 2. Remove tags like [TAG] or {TAG}, BUT preserve [123] (Levels)
+    // We use a negative lookahead to skip if it's just digits inside brackets
     let clean = name
-        .replace(/\[.*?\]/g, '') // Remove [] content
-        // .replace(/\(.*?\)/g, '') // User requested to ONLY remove [], keeping ()
+        .replace(/\[(?!\d+\]).*?\]/g, '') // Remove [] if content IS NOT just digits
+        // .replace(/\(.*?\)/g, '') // Keep ()
         .trim();
 
     // 3. Remove leading/trailing symbols often used in gamer tags

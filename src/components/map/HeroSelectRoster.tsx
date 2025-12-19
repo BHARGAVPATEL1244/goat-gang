@@ -91,15 +91,15 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                 </div>
 
                 <div className="text-center">
-                    <h3 className="text-gray-400 uppercase tracking-[0.2em] text-sm mb-2">Guild Master</h3>
+                    <h3 className="text-gray-400 uppercase tracking-[0.2em] text-sm mb-2">Hood Leader</h3>
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{leaderClean}</h1>
 
-                    {/* Leader Level Display */}
-                    {leaderLevel && (
+                    {/* Leader Level Display (Hidden by request) */}
+                    {/* {leaderLevel && (
                         <div className="inline-block bg-yellow-500/20 text-yellow-300 px-4 py-1 rounded-full border border-yellow-500/50 font-mono font-bold text-sm tracking-widest">
                             LVL {leaderLevel}
                         </div>
-                    )}
+                    )} */}
                 </div>
             </motion.div>
 
@@ -112,7 +112,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
             >
                 <div className="max-w-4xl mx-auto">
                     <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between">
-                        <span>Active Roster</span>
+                        <span>Active Members</span>
                         <span className="text-base not-italic font-mono text-gray-500 bg-gray-800 px-3 py-1 rounded">{members.length} Members</span>
                     </h2>
 

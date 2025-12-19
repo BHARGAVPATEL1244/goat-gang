@@ -181,23 +181,23 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             };
         });
 
-    if (processedMembers.length === 0) {
-        console.log('[Sync] No members to update.');
-        return { success: true, count: 0 };
-    }
-
     // 6. Upsert to Supabase
-    // We use a batched upsert, which is efficient
-    const { error: upsertError } = await supabaseAdmin
-        .from('hood_memberships')
-        .upsert(processedMembers, {
-            onConflict: 'user_id,hood_id', // Ensure this matches your DB constraint
-            ignoreDuplicates: false // We want to update ranks if they changed
-        });
+    // Only upsert if we actually have members. If empty, we skip to pruning.
+    if (processedMembers.length > 0) {
+        // We use a batched upsert, which is efficient
+        const { error: upsertError } = await supabaseAdmin
+            .from('hood_memberships')
+            .upsert(processedMembers, {
+                onConflict: 'user_id,hood_id', // Ensure this matches your DB constraint
+                ignoreDuplicates: false // We want to update ranks if they changed
+            });
 
-    if (upsertError) {
-        console.error('[Sync] Database Upsert Failed:', upsertError);
-        throw new Error(`Database error: ${upsertError.message}`);
+        if (upsertError) {
+            console.error('[Sync] Database Upsert Failed:', upsertError);
+            throw new Error(`Database error: ${upsertError.message}`);
+        }
+    } else {
+        console.log('[Sync] No members found in Discord Role. Proceeding to cleanup...');
     }
 
     // 7. Auto-Update Neighborhood Leader Name

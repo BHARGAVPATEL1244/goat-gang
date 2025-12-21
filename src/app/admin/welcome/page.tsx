@@ -41,6 +41,7 @@ const DEFAULT_CONFIG: WelcomeConfig = {
 };
 
 export default function WelcomeManagerPage() {
+    const router = useRouter();
     const [config, setConfig] = useState<WelcomeConfig>(DEFAULT_CONFIG);
     const [channels, setChannels] = useState<Channel[]>([]);
     const [loading, setLoading] = useState(true);

@@ -31,6 +31,7 @@ const DEFAULT_TEMPLATE = {
 };
 
 export default function FeedManagerPage() {
+    const router = useRouter();
     const supabase = createClient();
     const [feeds, setFeeds] = useState<FeedConfig[]>([]);
     const [loading, setLoading] = useState(true);

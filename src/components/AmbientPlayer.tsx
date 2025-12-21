@@ -11,9 +11,11 @@ export default function AmbientPlayer() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [volume, setVolume] = useState(0.5); // Increased volume
+    const [isReady, setIsReady] = useState(false);
 
     // Browser policy prevents autoplay with sound. We wait for user interaction to toggle play.
     const togglePlay = () => {
+        if (!isReady) return;
         setIsPlaying(!isPlaying);
     };
 
@@ -23,8 +25,8 @@ export default function AmbientPlayer() {
 
     return (
         <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2">
-            {/* Hidden Player */}
-            <div className="fixed pointer-events-none opacity-0">
+            {/* Hidden Player - positioned offscreen but 'visible' to DOM */}
+            <div className="fixed bottom-0 left-0 opacity-0 pointer-events-none" style={{ zIndex: -1 }}>
                 <ReactPlayer
                     url='https://www.youtube.com/watch?v=Kwp2Lhn-DmA'
                     playing={isPlaying}
@@ -34,7 +36,10 @@ export default function AmbientPlayer() {
                     width="1px"
                     height="1px"
                     playsinline={true}
-                    onReady={() => console.log('Music Player Ready')}
+                    onReady={() => {
+                        console.log('Music Player Ready');
+                        setIsReady(true);
+                    }}
                     onStart={() => console.log('Music Started Playing')}
                     onError={(e: any) => console.error('Music Player Error:', e)}
                 />
@@ -73,9 +78,12 @@ export default function AmbientPlayer() {
 
             <button
                 onClick={togglePlay}
+                disabled={!isReady}
                 className={`
                     w-10 h-10 rounded-full flex items-center justify-center border transition-all shadow-lg
-                    ${isPlaying ? 'bg-red-600 border-red-500 text-white' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white'}
+                    ${!isReady ? 'opacity-50 cursor-not-allowed bg-gray-900 border-gray-700 text-gray-600' : ''}
+                    ${isReady && isPlaying ? 'bg-red-600 border-red-500 text-white' : ''}
+                    ${isReady && !isPlaying ? 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white' : ''}
                 `}
             >
                 {isPlaying ? <Pause size={18} fill="currentColor" /> : <Music size={18} />}

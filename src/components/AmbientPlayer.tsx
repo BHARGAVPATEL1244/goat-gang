@@ -10,7 +10,7 @@ const ReactPlayer = dynamic(() => import('react-player'), { ssr: false }) as any
 export default function AmbientPlayer() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
-    const [volume, setVolume] = useState(0.2); // Start low
+    const [volume, setVolume] = useState(0.5); // Increased volume
 
     // Browser policy prevents autoplay with sound. We wait for user interaction to toggle play.
     const togglePlay = () => {
@@ -24,16 +24,19 @@ export default function AmbientPlayer() {
     return (
         <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2">
             {/* Hidden Player */}
-            <div className="hidden">
+            <div className="fixed pointer-events-none opacity-0">
                 <ReactPlayer
                     url='https://www.youtube.com/watch?v=Kwp2Lhn-DmA'
                     playing={isPlaying}
                     muted={isMuted}
                     volume={volume}
                     loop={true}
-                    width="0"
-                    height="0"
-                    playsinline={true} // Crucial for mobile
+                    width="1px"
+                    height="1px"
+                    playsinline={true}
+                    onReady={() => console.log('Music Player Ready')}
+                    onStart={() => console.log('Music Started Playing')}
+                    onError={(e: any) => console.error('Music Player Error:', e)}
                 />
             </div>
 

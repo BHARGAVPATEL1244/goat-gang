@@ -70,14 +70,12 @@ export default function AmbientPlayer() {
                 {isPlaying ? <Pause size={18} fill="currentColor" /> : <Music size={18} />}
             </button>
 
-            {/* Native Audio Element (DEBUG MODE: Visible) */}
+            {/* Native Audio Element */}
             <audio
                 ref={audioRef}
                 src="/sounds/hayday.m4a"
                 loop
                 onEnded={() => setIsPlaying(false)}
-                controls
-                className="fixed bottom-20 right-4 z-[9999] bg-white rounded shadow-xl"
             />
         </div>
     );

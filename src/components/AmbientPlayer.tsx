@@ -25,9 +25,8 @@ export default function AmbientPlayer() {
     return (
         <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2">
             {/* Hidden Player - positioned offscreen but 'visible' to DOM */}
-            {/* Hidden Player - positioned offscreen but 'visible' to DOM */}
-            {/* We use 1px opacity cleanly. Increasing size to avoid browser throttling */}
-            <div className="fixed bottom-0 right-0 opacity-0 pointer-events-none">
+            {/* DEBUG MODE: Video is visible so we can see if it plays */}
+            <div className="fixed bottom-20 right-4 opacity-100 z-50 border-2 border-red-500 bg-black rounded-lg overflow-hidden shadow-2xl">
                 <ReactPlayer
                     url='https://www.youtube.com/watch?v=Kwp2Lhn-DmA'
                     playing={isPlaying}

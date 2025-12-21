@@ -108,6 +108,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                 {districts.map((district, index) => {
                     const isActive = index === activeIndex;
                     const { cleanName: cleanLeaderName } = parseUser(district.leader_name);
+                    const activeColor = district.color || '#EAB308';
 
                     return (
                         <div
@@ -120,11 +121,17 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                             `}
                         >
                             {/* Card Frame */}
-                            <div className={`
-                                w-full h-full rounded-2xl border-4 overflow-hidden relative shadow-2xl
-                                ${isActive ? 'border-yellow-400 shadow-yellow-500/50' : 'border-gray-600 shadow-black'}
-                                bg-gray-800 flex flex-col
-                            `}>
+                            <div
+                                className={`
+                                    w-full h-full rounded-2xl border-4 overflow-hidden relative shadow-2xl
+                                    ${isActive ? '' : 'border-gray-600 shadow-black'}
+                                    bg-gray-800 flex flex-col transition-colors duration-300
+                                `}
+                                style={{
+                                    borderColor: isActive ? activeColor : undefined,
+                                    boxShadow: isActive ? `0 0 30px ${activeColor}50` : undefined
+                                }}
+                            >
                                 {/* Image / Mascot Placeholder */}
                                 <div className="flex-1 bg-gray-800 flex items-center justify-center relative group overflow-hidden">
                                     {/* Full Image or Avatar Fallback */}
@@ -151,7 +158,11 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm z-10">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onSelect(district); }}
-                                                className="bg-yellow-500 text-black font-bold uppercase px-6 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 shadow-lg shadow-yellow-500/20"
+                                                className="text-black font-bold uppercase px-6 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 shadow-lg"
+                                                style={{
+                                                    backgroundColor: activeColor,
+                                                    boxShadow: `0 0 20px ${activeColor}40`
+                                                }}
                                             >
                                                 Enter <ArrowRight size={20} />
                                             </button>
@@ -170,12 +181,15 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                     <h2 className="text-3xl font-black text-white uppercase italic leading-none mb-1 truncate">
                                         {district.name}
                                     </h2>
-                                    <div className="w-12 h-1 bg-yellow-500 mb-4" />
+                                    <div
+                                        className="w-12 h-1 mb-4"
+                                        style={{ backgroundColor: activeColor }}
+                                    />
 
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-gray-300">
                                             <div className="flex items-center gap-2">
-                                                <Crown size={16} className="text-yellow-500" />
+                                                <Crown size={16} style={{ color: activeColor }} />
                                                 <span className="text-xs font-bold uppercase tracking-wider">LEADER</span>
                                             </div>
                                             <span className="font-mono text-sm">{cleanLeaderName}</span>

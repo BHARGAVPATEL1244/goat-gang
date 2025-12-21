@@ -28,10 +28,20 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
 
     // Filter out leader from the list if already shown on the left
     // Logic: If members list contains the leader, exclude them from the right side list by ID if available, else name
+    // Logic: If members list contains the leader, exclude them from the right side list by ID if available, else name
+    // We compare CLEAN names to be robust against raw/clean mismatches
     const otherMembers = members
         .filter(m => {
-            if (leaderId) return m.id !== leaderId;
-            return m.role !== 'Leader' && m.name !== leaderName;
+            // 1. Strict ID Check
+            if (leaderId && m.id === leaderId) return false;
+
+            // 2. Role Check
+            if (m.role === 'Leader') return false;
+
+            // 3. Name Check (Clean vs Clean)
+            // Use local parsing to ensure we compare apples to apples
+            const memberClean = parseUser(m.name).cleanName;
+            return memberClean !== leaderClean;
         })
         .map(m => ({ ...m, ...parseUser(m.name) }))
         .sort((a, b) => {

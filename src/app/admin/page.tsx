@@ -12,7 +12,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
     Users, Map, Calendar, BookOpen, Shield, Settings,
-    Activity, LayoutDashboard, Trophy, FileText, Lock
+    Activity, LayoutDashboard, Trophy, FileText, Lock,
+    HeartHandshake, Radio
 } from 'lucide-react';
 
 function AdminDashboardContent() {
@@ -318,7 +319,7 @@ function AdminDashboardContent() {
                     <ModuleCard
                         title="Welcome Manager"
                         desc="Configure welcome embeds and settings."
-                        icon={HeartHand}
+                        icon={HeartHandshake}
                         color="from-green-500 to-teal-600"
                         bg="bg-green-900/10 hover:bg-green-900/20"
                         border="border-green-500/20 hover:border-green-500/50"

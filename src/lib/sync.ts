@@ -93,7 +93,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
 
     // 4. Fetch Role Configurations (Global vs Local Overrides)
     const [globalConfigRes, hoodConfigRes] = await Promise.all([
-        supabaseAdmin.from('app_config').select('key, value').in('key', ['coleader_role_id', 'elder_role_id']),
+        supabaseAdmin.from('app_config').select('key, value').in('key', ['role_id_coleader', 'role_id_elder']),
         supabaseAdmin.from('map_districts').select('leader_discord_id, name').eq('id', hoodId).single()
     ]);
 
@@ -101,8 +101,8 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     const hoodConfig = hoodConfigRes.data;
 
     // Parse Global Role IDs
-    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
-    const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'role_id_coleader')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    const elderRoleIds = (globalConfig.find(c => c.key === 'role_id_elder')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
 
     console.log(`[Sync] Global Config - CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
 
@@ -112,7 +112,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
     // 5. Process & Map Members to DB Structure
     // Logic: 
     // - Leader: Matches fixedLeaderId (Top Priority)
-    // - Co-Leader: Has Global Co-Leader Role
+    // - CoLeader: Has Global Co-Leader Role
     // - Elder: Has Global Elder Role
     // - Member: Everyone else
 
@@ -144,7 +144,7 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             }
             // 2. Global Co-Leader Check
             else if (roles.some(r => coLeaderRoleIds.includes(r))) {
-                rank = 'Co-Leader';
+                rank = 'CoLeader';
             }
             // 3. Global Elder Check
             else if (roles.some(r => elderRoleIds.includes(r))) {

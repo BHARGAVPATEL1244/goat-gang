@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { Plus, Edit, Trash, Save, Hexagon, Upload, Trophy, ArrowUp } from 'lucide-react';
+import { Plus, Edit, Trash, Save, Hexagon, Upload, Trophy, ArrowUp, ArrowLeft } from 'lucide-react';
 import NeighborhoodCard from '@/components/NeighborhoodCard';
 import { useRouter } from 'next/navigation';
 

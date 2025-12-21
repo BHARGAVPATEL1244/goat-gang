@@ -71,18 +71,18 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                 initial={{ x: -100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="w-full md:w-1/3 bg-gradient-to-br from-gray-800 to-black border-r border-white/10 p-8 flex flex-col items-center justify-center relative z-10"
+                className="w-full md:w-1/3 bg-gradient-to-br from-gray-800 to-black border-b md:border-b-0 md:border-r border-white/10 p-6 md:p-8 flex flex-col items-center justify-center relative z-10 shrink-0"
             >
                 <button
                     onClick={onBack}
-                    className="absolute top-6 left-6 flex items-center gap-2 text-gray-400 hover:text-white uppercase font-bold tracking-widest text-xs transition-colors"
+                    className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 text-gray-400 hover:text-white uppercase font-bold tracking-widest text-[10px] md:text-xs transition-colors bg-black/20 p-2 rounded-full md:bg-transparent md:p-0 z-50 backdrop-blur-sm"
                 >
-                    <ArrowLeft size={16} /> Back to Select
+                    <ArrowLeft size={16} /> <span className="hidden xs:inline">Back</span>
                 </button>
 
-                <div className="text-center mb-10">
+                <div className="text-center mb-6 md:mb-10 w-full px-4 pt-8 md:pt-0">
                     <h2
-                        className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text drop-shadow-lg break-words w-min mx-auto leading-tight px-4 py-2"
+                        className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text drop-shadow-lg break-words w-full mx-auto leading-tight px-2"
                         style={{
                             backgroundImage: `linear-gradient(to bottom, #FFF, ${activeColor})`
                         }}
@@ -90,13 +90,13 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                         {hoodName}
                     </h2>
                     <div
-                        className="w-24 h-2 mx-auto mt-2"
+                        className="w-16 md:w-24 h-1.5 md:h-2 mx-auto mt-2"
                         style={{ backgroundColor: activeColor, boxShadow: `0 0 10px ${activeColor}` }}
                     />
                 </div>
 
                 {/* Big Avatar */}
-                <div className="w-48 h-48 md:w-64 md:h-64 mb-8 relative group">
+                <div className="w-32 h-32 md:w-64 md:h-64 mb-6 md:mb-8 relative group shrink-0">
                     {/* Image Container (Clipped) */}
                     <div
                         className="w-full h-full rounded-full border-4 overflow-hidden bg-gray-700 flex items-center justify-center transition-all duration-500"
@@ -108,26 +108,26 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                         {hoodImage ? (
                             <img src={hoodImage} alt={hoodName} className="w-full h-full object-cover" />
                         ) : (
-                            <span className="text-6xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
+                            <span className="text-4xl md:text-8xl font-black text-white/10">{leaderClean.substring(0, 1)}</span>
                         )}
                     </div>
 
                     {/* Crown (Outside Clip) */}
-                    <Crown size={48} className="absolute -top-2 -right-2 drop-shadow-md animate-bounce z-20" style={{ color: activeColor }} />
+                    <Crown size={32} className="absolute -top-1 -right-1 md:-top-2 md:-right-2 drop-shadow-md animate-bounce z-20 md:w-12 md:h-12" style={{ color: activeColor }} />
                 </div>
 
                 <div className="text-center">
-                    <h3 className="text-gray-400 uppercase tracking-[0.2em] text-sm mb-2">Hood Leader</h3>
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{leaderClean}</h1>
+                    <h3 className="text-gray-400 uppercase tracking-[0.2em] text-xs md:text-sm mb-1 md:mb-2">Hood Leader</h3>
+                    <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 truncate max-w-[300px]">{leaderClean}</h1>
 
                     {/* Leader Level Display */}
                     {leaderLevel && (
                         <div
-                            className="inline-flex items-center justify-center bg-gray-900 border px-6 py-2 rounded-lg mt-4 shadow-lg backdrop-blur-sm transition-colors"
+                            className="inline-flex items-center justify-center bg-gray-900 border px-4 py-1.5 md:px-6 md:py-2 rounded-lg mt-2 md:mt-4 shadow-lg backdrop-blur-sm transition-colors"
                             style={{ borderColor: `${activeColor}40` }}
                         >
-                            <span className="font-black text-sm tracking-widest mr-2" style={{ color: activeColor }}>LEVEL</span>
-                            <span className="text-white font-mono font-bold text-lg">{leaderLevel}</span>
+                            <span className="font-black text-xs md:text-sm tracking-widest mr-2" style={{ color: activeColor }}>LEVEL</span>
+                            <span className="text-white font-mono font-bold text-base md:text-lg">{leaderLevel}</span>
                         </div>
                     )}
                 </div>
@@ -138,15 +138,15 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="w-full md:w-2/3 p-6 md:p-12 overflow-y-auto z-10"
+                className="w-full md:w-2/3 p-4 md:p-12 overflow-y-auto z-10 bg-gray-900/50 md:bg-transparent"
             >
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-black uppercase italic mb-8 border-b border-white/10 pb-4 flex items-center justify-between">
+                    <h2 className="text-xl md:text-3xl font-black uppercase italic mb-6 border-b border-white/10 pb-4 flex items-center justify-between sticky top-0 bg-gray-900/95 md:bg-transparent z-20 py-2 backdrop-blur-md md:backdrop-filter-none">
                         <span>Active Members</span>
-                        <span className="text-base not-italic font-mono text-gray-500 bg-gray-800 px-3 py-1 rounded">{members.length} Members</span>
+                        <span className="text-xs md:text-base not-italic font-mono text-gray-500 bg-gray-800 px-2 py-1 md:px-3 rounded">{members.length} Members</span>
                     </h2>
 
-                    <div className="space-y-3 pb-20">
+                    <div className="space-y-2 md:space-y-3 pb-20">
                         {/* Co-Leaders & Elders First */}
                         {otherMembers.map((member, i) => (
                             <motion.div
@@ -155,38 +155,38 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.05 * i }}
                                 className={`
-                                    flex items-center justify-between p-4 rounded-lg border backdrop-blur-sm
+                                    flex items-center justify-between p-3 md:p-4 rounded-lg border backdrop-blur-sm
                                     hover:bg-white/5 transition-colors cursor-default group
                                     ${getRoleColor(member.role)}
                                 `}
                             >
-                                <div className="flex items-center gap-4 flex-1">
+                                <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                                     {/* Role Icon */}
-                                    <div className="w-10 h-10 rounded bg-black/30 flex items-center justify-center flex-shrink-0">
-                                        {member.role === 'CoLeader' && <Shield size={20} />}
-                                        {member.role === 'Elder' && <Shield size={16} />}
-                                        {member.role === 'Member' && <User size={16} />}
+                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded bg-black/30 flex items-center justify-center flex-shrink-0">
+                                        {member.role === 'CoLeader' && <Shield size={16} className="md:w-5 md:h-5" />}
+                                        {member.role === 'Elder' && <Shield size={14} className="md:w-4 md:h-4" />}
+                                        {member.role === 'Member' && <User size={14} className="md:w-4 md:h-4" />}
                                     </div>
 
                                     {/* Level Box (Before Name) */}
                                     {member.level && (
-                                        <div className="w-14 h-8 flex items-center justify-center bg-black/40 border border-white/10 rounded text-xs font-mono font-bold text-gray-400">
+                                        <div className="w-10 h-6 md:w-14 md:h-8 flex items-center justify-center bg-black/40 border border-white/10 rounded text-[10px] md:text-xs font-mono font-bold text-gray-400 shrink-0">
                                             {member.level}
                                         </div>
                                     )}
 
                                     {/* Name */}
-                                    <span className="font-bold text-lg truncate">{member.cleanName}</span>
+                                    <span className="font-bold text-sm md:text-lg truncate">{member.cleanName}</span>
                                 </div>
 
-                                <span className="font-mono text-xs uppercase tracking-widest opacity-60 ml-4 hidden sm:block">
+                                <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest opacity-60 ml-2 md:ml-4 whitespace-nowrap">
                                     {member.role === 'CoLeader' ? 'Co-Leader' : member.role}
                                 </span>
                             </motion.div>
                         ))}
 
                         {otherMembers.length === 0 && (
-                            <div className="text-center text-gray-500 py-10 font-mono">
+                            <div className="text-center text-gray-500 py-10 font-mono text-sm">
                                 No other members found.
                             </div>
                         )}

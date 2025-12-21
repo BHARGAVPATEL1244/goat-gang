@@ -267,163 +267,178 @@ export default function MapManagerPage() {
     return (
         <div className="p-8 text-white min-h-screen">
             <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
-                <Hexagon className="text-yellow-500" /> Map Manager
+                <Hexagon className="text-yellow-500" /> Hood Manager
             </h1>
 
-            {/* GLOBAL CONFIGURATION REMOVED - Using Strict Leader/Member Logic */}
-            {/* <div className="bg-blue-900/20 p-6 rounded-xl border border-blue-500/30 mb-8">...</div> */}
-
-            <div className="mb-8 flex justify-end">
-                <button onClick={handleSyncAll} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold text-sm flex items-center justify-center gap-2">
-                    Sync All Neighborhoods 🔄
-                </button>
+            {/* GLOBAL CONFIGURATION */}
+            <div className="bg-blue-900/20 p-4 rounded-xl border border-blue-500/30 mb-8">
+                <h2 className="text-sm font-bold text-blue-300 mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    Global Discord Roles (Applies to All Hoods)
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label className="text-[10px] text-orange-400 uppercase font-bold mb-1 block">Global Co-Leader Role ID</label>
+                        <input
+                            type="text" placeholder="Discord Role ID"
+                            className="bg-gray-900 border border-gray-700 rounded px-2 py-1 w-full font-mono text-xs"
+                            value={globalConfig.role_id_coleader}
+                            onChange={e => setGlobalConfig(prev => ({ ...prev, role_id_coleader: e.target.value }))}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] text-purple-400 uppercase font-bold mb-1 block">Global Elder Role ID</label>
+                        <input
+                            type="text" placeholder="Discord Role ID"
+                            className="bg-gray-900 border border-gray-700 rounded px-2 py-1 w-full font-mono text-xs"
+                            value={globalConfig.role_id_elder}
+                            onChange={e => setGlobalConfig(prev => ({ ...prev, role_id_elder: e.target.value }))}
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={saveGlobalConfig} className="bg-blue-600 hover:bg-blue-500 px-4 py-1 rounded font-bold text-xs flex-1 h-8">
+                            Save Globals
+                        </button>
+                        <button onClick={handleSyncAll} className="bg-green-600 hover:bg-green-500 px-4 py-1 rounded font-bold text-xs flex-1 h-8 flex items-center justify-center gap-1">
+                            Sync All 🔄
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Editor Form */}
-            <div id="editor-form" className="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
-                <h2 className="text-lg font-semibold mb-4 text-gray-300">
-                    {editingId ? 'Edit District' : 'Add New District'}
+            <div id="editor-form" className="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-8">
+                <h2 className="text-sm font-bold mb-4 text-gray-300 uppercase tracking-wider border-b border-gray-700 pb-2">
+                    {editingId ? 'Edit Hood' : 'Add New Hood'}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="lg:col-span-1">
-                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Sort Order</label>
+
+                {/* ROW 1: Compact Basic Info */}
+                <div className="flex flex-col md:flex-row gap-3 mb-3">
+                    <div className="w-20 flex-shrink-0">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Sort</label>
                         <input
                             type="number"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full text-center font-mono text-yellow-500 font-bold"
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-center font-mono text-yellow-500 font-bold text-sm"
                             value={formData.sort_order} onChange={e => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
                         />
                     </div>
-
-                    <div className="lg:col-span-3">
-                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Hood Name</label>
+                    <div className="flex-1">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Hood Name</label>
                         <input
                             type="text" placeholder="Hood Name"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-sm font-bold"
                             value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
                         />
                     </div>
-
-                    {/* Leader Name Removed - Auto-fetched from Sync */}
-                    {/* <div className="lg:col-span-2">
-                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Leader Name</label>
+                    <div className="w-24 flex-shrink-0">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Tag</label>
                         <input
-                            type="text" placeholder="Leader Name"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
-                            value={formData.leader_name} onChange={e => setFormData({ ...formData, leader_name: e.target.value })}
-                        />
-                    </div> */}
-
-                    <div className="lg:col-span-1">
-                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Tag</label>
-                        <input
-                            type="text" placeholder="Tag (#XYZ)"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full"
+                            type="text" placeholder="#Tag"
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-sm"
                             value={formData.tag} onChange={e => setFormData({ ...formData, tag: e.target.value })}
                         />
                     </div>
-
-                    <div className="lg:col-span-1">
-                        <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Discord Role ID</label>
+                    <div className="w-40 flex-shrink-0">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Discord Role ID</label>
                         <input
                             type="text" placeholder="Role ID"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-sm"
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full font-mono text-xs"
                             value={formData.hood_id} onChange={e => setFormData({ ...formData, hood_id: e.target.value })}
                         />
                     </div>
                 </div>
 
-                <div className="mt-6 border-t border-gray-700 pt-4">
-                    <h3 className="text-sm font-bold text-yellow-500 uppercase mb-3 text-xs tracking-wider flex items-center gap-2">
-                        <Trophy size={14} /> Trophies & Image
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
-                            <label className="text-xs text-yellow-500 block mb-1">GOLD</label>
+                {/* ROW 2: Trophies & Image */}
+                <div className="flex flex-col md:flex-row gap-3 mb-3 items-end">
+                    <div className="flex gap-2">
+                        <div className="w-16">
+                            <label className="text-[10px] text-yellow-500 block mb-1 text-center">GOLD</label>
                             <input
                                 type="number"
-                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-center font-bold text-xs"
                                 value={formData.trophy_gold} onChange={e => setFormData({ ...formData, trophy_gold: parseInt(e.target.value) || 0 })}
                             />
                         </div>
-                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
-                            <label className="text-xs text-gray-400 block mb-1">SILVER</label>
+                        <div className="w-16">
+                            <label className="text-[10px] text-gray-400 block mb-1 text-center">SILVER</label>
                             <input
                                 type="number"
-                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-center font-bold text-xs"
                                 value={formData.trophy_silver} onChange={e => setFormData({ ...formData, trophy_silver: parseInt(e.target.value) || 0 })}
                             />
                         </div>
-                        <div className="bg-gray-900 p-2 rounded border border-gray-700 text-center">
-                            <label className="text-xs text-orange-500 block mb-1">BRONZE</label>
+                        <div className="w-16">
+                            <label className="text-[10px] text-orange-500 block mb-1 text-center">BRONZE</label>
                             <input
                                 type="number"
-                                className="bg-transparent border-none text-center w-full font-bold text-xl"
+                                className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-center font-bold text-xs"
                                 value={formData.trophy_bronze} onChange={e => setFormData({ ...formData, trophy_bronze: parseInt(e.target.value) || 0 })}
                             />
                         </div>
+                    </div>
 
-                        <div className="relative">
-                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Hood Image</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Image URL"
-                                    className="bg-gray-900 border border-gray-700 rounded p-2 w-full text-xs"
-                                    value={formData.image_url}
-                                    onChange={e => setFormData({ ...formData, image_url: e.target.value })}
-                                />
-                                <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded flex items-center justify-center">
-                                    <Upload size={16} />
-                                    <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
-                                </label>
-                            </div>
-                            {uploading && <div className="text-xs text-blue-400 mt-1">Uploading...</div>}
+                    <div className="flex-1">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Hood Image</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Image URL"
+                                className="bg-gray-900 border border-gray-700 rounded p-1 w-full text-xs"
+                                value={formData.image_url}
+                                onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                            />
+                            <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded flex items-center justify-center text-xs font-bold">
+                                <Upload size={12} className="mr-1" /> Upload
+                                <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
+                            </label>
                         </div>
+                        {uploading && <div className="text-[10px] text-blue-400 mt-1">Uploading...</div>}
                     </div>
                 </div>
 
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-900/50 p-4 rounded border border-gray-700/50">
+                {/* ROW 3: Fixed IDs (Advanced) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 bg-black/20 p-2 rounded border border-white/5">
                     <div>
-                        <label className="text-xs text-yellow-500 uppercase font-bold mb-1 block">Fixed Leader Discord ID (Optional)</label>
+                        <label className="text-[10px] text-yellow-500 uppercase font-bold mb-1 block">Fixed Leader ID (Required for Leader)</label>
                         <input
-                            type="text" placeholder="User ID (Overrides dynamic detection)"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            type="text" placeholder="Leader User ID"
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full font-mono text-xs"
                             value={formData.leader_discord_id} onChange={e => setFormData({ ...formData, leader_discord_id: e.target.value })}
                         />
                     </div>
                     <div>
-                        <label className="text-xs text-orange-500 uppercase font-bold mb-1 block">Fixed Co-Leader IDs (Comma Separated)</label>
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Fixed Co-Leader IDs (Optional Overrides)</label>
                         <input
-                            type="text" placeholder="ID1, ID2, ID3..."
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
+                            type="text" placeholder="ID1, ID2..."
+                            className="bg-gray-900 border border-gray-700 rounded p-1 w-full font-mono text-xs"
                             value={formData.coleader_discord_ids} onChange={e => setFormData({ ...formData, coleader_discord_ids: e.target.value })}
                         />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {/* ROW 4: Requirements */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <textarea
-                        rows={3} placeholder="Requirements (one per line)"
-                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        rows={2} placeholder="Requirements (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs"
                         value={formData.hood_reqs_text} onChange={e => setFormData({ ...formData, hood_reqs_text: e.target.value })}
                     />
                     <textarea
-                        rows={3} placeholder="Derby Rules (one per line)"
-                        className="w-full bg-gray-900 border border-gray-700 rounded p-2"
+                        rows={2} placeholder="Derby Rules (one per line)"
+                        className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-xs"
                         value={formData.derby_reqs_text} onChange={e => setFormData({ ...formData, derby_reqs_text: e.target.value })}
                     />
                 </div>
 
-                <div className="mt-6 flex gap-2">
-                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold flex items-center gap-2">
-                        <Save className="w-4 h-4" /> Save District
-                    </button>
+                <div className="mt-4 flex gap-2 justify-end">
                     {editingId && (
-                        <button onClick={() => { setEditingId(null); resetForm(); }} className="bg-gray-700 px-4 py-2 rounded">
+                        <button onClick={() => { setEditingId(null); resetForm(); }} className="bg-gray-700 px-4 py-1 rounded text-xs font-bold">
                             Cancel
                         </button>
                     )}
+                    <button onClick={handleSave} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold text-sm flex items-center gap-2 shadow-lg">
+                        <Save className="w-4 h-4" /> {editingId ? 'Save Changes' : 'Add Hood'}
+                    </button>
                 </div>
             </div>
 

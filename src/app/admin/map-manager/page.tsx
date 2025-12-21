@@ -270,42 +270,13 @@ export default function MapManagerPage() {
                 <Hexagon className="text-yellow-500" /> Map Manager
             </h1>
 
-            {/* GLOBAL CONFIGURATION */}
-            <div className="bg-blue-900/20 p-6 rounded-xl border border-blue-500/30 mb-8">
-                <h2 className="text-lg font-bold text-blue-300 mb-4 flex items-center gap-2">
-                    Global Configuration
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
-                    <div>
-                        <label className="text-xs text-orange-400 uppercase font-bold mb-1 block">Global Co-Leader Role ID</label>
-                        <input
-                            type="text" placeholder="Discord Role ID"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
-                            value={globalConfig.role_id_coleader}
-                            onChange={e => setGlobalConfig(prev => ({ ...prev, role_id_coleader: e.target.value }))}
-                        />
-                    </div>
-                    <div>
-                        <label className="text-xs text-purple-400 uppercase font-bold mb-1 block">Global Elder Role ID</label>
-                        <input
-                            type="text" placeholder="Discord Role ID"
-                            className="bg-gray-900 border border-gray-700 rounded p-2 w-full font-mono text-xs"
-                            value={globalConfig.role_id_elder}
-                            onChange={e => setGlobalConfig(prev => ({ ...prev, role_id_elder: e.target.value }))}
-                        />
-                    </div>
-                    <div>
-                        <button onClick={saveGlobalConfig} className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold text-sm w-full mb-2">
-                            Save Global Settings
-                        </button>
-                        <button onClick={handleSyncAll} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold text-sm w-full flex items-center justify-center gap-2">
-                            Global Auto-Sync 🔄
-                        </button>
-                    </div>
-                </div>
-                <p className="text-xs text-gray-400 mt-2">
-                    * These Role IDs will be used for ALL neighborhoods to automatically assign Co-Leader and Elder ranks during Sync.
-                </p>
+            {/* GLOBAL CONFIGURATION REMOVED - Using Strict Leader/Member Logic */}
+            {/* <div className="bg-blue-900/20 p-6 rounded-xl border border-blue-500/30 mb-8">...</div> */}
+
+            <div className="mb-8 flex justify-end">
+                <button onClick={handleSyncAll} className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold text-sm flex items-center justify-center gap-2">
+                    Sync All Neighborhoods 🔄
+                </button>
             </div>
 
             {/* Editor Form */}

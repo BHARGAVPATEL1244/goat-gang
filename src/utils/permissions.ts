@@ -155,6 +155,20 @@ export const PERMISSIONS = {
         return PERMISSIONS.isAdmin(userRoles);
     },
 
+    canManageFeeds: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_FEEDS') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles);
+    },
+
+    canManageWelcome: (userRoles: string[], dbPermissions?: RolePermission[]): boolean => {
+        if (dbPermissions) {
+            return PERMISSIONS.hasPermission(userRoles, dbPermissions, 'MANAGE_WELCOME') || PERMISSIONS.isAdmin(userRoles);
+        }
+        return PERMISSIONS.isAdmin(userRoles);
+    },
+
     /**
      * Checks if user has a specific permission based on the DB check.
      */

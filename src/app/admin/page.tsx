@@ -112,12 +112,14 @@ function AdminDashboardContent() {
     const showNeighborhoods = PERMISSIONS.canManageNeighborhoods(userRoles, dbPermissions);
     const showBarLeaderboard = PERMISSIONS.canViewBarLeaderboard(userRoles, dbPermissions);
     const showEvents = PERMISSIONS.canManageEvents(userRoles, dbPermissions);
-    const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles, dbPermissions); // Kept for completeness, not used in current cards
-    const showEmbeds = PERMISSIONS.canManageEmbeds(userRoles, dbPermissions); // Kept for completeness, not used in current cards
-    const showGiveaways = PERMISSIONS.canManageGiveaways(userRoles, dbPermissions); // Kept for completeness, not used in current cards
-    const showPermissions = PERMISSIONS.canManagePermissions(userRoles, dbPermissions); // Kept for completeness, not used in current cards
+    const showFarmNames = PERMISSIONS.canManageFarmNames(userRoles, dbPermissions);
+    const showEmbeds = PERMISSIONS.canManageEmbeds(userRoles, dbPermissions);
+    const showGiveaways = PERMISSIONS.canManageGiveaways(userRoles, dbPermissions);
+    const showPermissions = PERMISSIONS.canManagePermissions(userRoles, dbPermissions);
     const showWiki = PERMISSIONS.canManageWiki(userRoles, dbPermissions);
     const showAudit = PERMISSIONS.canViewAudit(userRoles, dbPermissions);
+    const showWelcome = PERMISSIONS.canManageWelcome(userRoles, dbPermissions);
+    const showFeeds = PERMISSIONS.canManageFeeds(userRoles, dbPermissions);
 
     // Navigation Handler
     const navigateTo = (view: string, externalUrl?: string) => {
@@ -137,7 +139,7 @@ function AdminDashboardContent() {
     );
 
     // Check if user has ANY access (Internal OR External)
-    const hasAnyAccess = showData || showNeighborhoods || showBarLeaderboard || showEvents || showFarmNames || showEmbeds || showGiveaways || showPermissions || showWiki || showAudit;
+    const hasAnyAccess = showData || showNeighborhoods || showBarLeaderboard || showEvents || showFarmNames || showEmbeds || showGiveaways || showPermissions || showWiki || showAudit || showWelcome || showFeeds;
 
     if (!hasAnyAccess) {
         return (
@@ -158,6 +160,8 @@ function AdminDashboardContent() {
                     <p>Events: {showEvents ? 'YES' : 'NO'}</p>
                     <p>Wiki: {showWiki ? 'YES' : 'NO'}</p>
                     <p>Audit: {showAudit ? 'YES' : 'NO'}</p>
+                    <p>Welcome: {showWelcome ? 'YES' : 'NO'}</p>
+                    <p>Feeds: {showFeeds ? 'YES' : 'NO'}</p>
                 </div>
             </div>
         );
@@ -173,11 +177,11 @@ function AdminDashboardContent() {
                         <LayoutDashboard className="text-blue-500" size={36} />
                         Command Center
                     </h1>
-                    <p className="text-gray-400 mt-2">Welcome back, Admin. System is operational.</p>
+                    <p className="text-gray-400 mt-2">Welcome back. Select a module to begin.</p>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-full px-4 py-2">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span className="text-xs font-mono text-gray-400">Database Connected</span>
+                    <span className="text-xs font-mono text-gray-400">System Online</span>
                 </div>
             </div>
 
@@ -189,52 +193,27 @@ function AdminDashboardContent() {
                 <StatsCard label="Wiki Guides" value={stats.guides} icon={BookOpen} color="green" />
             </div>
 
-            {/* Modules Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* 1. Hood Manager */}
-                {showNeighborhoods && (
+            {/* Modules Grid - 12 Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+                {/* 1. Bar Logs (Data Management) */}
+                {showData && (
                     <ModuleCard
-                        title="Hood Manager"
-                        desc="Manage neighborhood cards, leaders, and custom colors."
-                        icon={Map}
-                        color="from-yellow-500 to-orange-600"
-                        bg="bg-yellow-900/10 hover:bg-yellow-900/20"
-                        border="border-yellow-500/20 hover:border-yellow-500/50"
-                        onClick={() => navigateTo('neighborhoods')}
+                        title="Bar Logs"
+                        desc="View raw data logs and farm submissions."
+                        icon={FileText}
+                        color="from-gray-500 to-slate-600"
+                        bg="bg-gray-800/50 hover:bg-gray-800"
+                        border="border-gray-700 hover:border-gray-500"
+                        onClick={() => navigateTo('management')}
                     />
                 )}
 
-                {/* 2. Event Planner */}
-                {showEvents && (
-                    <ModuleCard
-                        title="Event Planner"
-                        desc="Schedule derbies, main events, and track winners."
-                        icon={Calendar}
-                        color="from-purple-500 to-pink-600"
-                        bg="bg-purple-900/10 hover:bg-purple-900/20"
-                        border="border-purple-500/20 hover:border-purple-500/50"
-                        onClick={() => navigateTo('events')}
-                    />
-                )}
-
-                {/* 3. Wiki Studio */}
-                {showWiki && (
-                    <ModuleCard
-                        title="Wiki Studio"
-                        desc="Write and publish guides and articles."
-                        icon={BookOpen}
-                        color="from-green-500 to-emerald-600"
-                        bg="bg-green-900/10 hover:bg-green-900/20"
-                        border="border-green-500/20 hover:border-green-500/50"
-                        onClick={() => navigateTo('wiki', '/admin/wiki')} // External Route
-                    />
-                )}
-
-                {/* 4. Bar Vault */}
+                {/* 2. Bar Vault (Leaderboard) */}
                 {showBarLeaderboard && (
                     <ModuleCard
                         title="Bar Vault"
-                        desc="Manage bar submissions (Legacy Dashboard)."
+                        desc="Manage bar inventory and leaderboard."
                         icon={Trophy}
                         color="from-blue-500 to-indigo-600"
                         bg="bg-blue-900/10 hover:bg-blue-900/20"
@@ -243,29 +222,133 @@ function AdminDashboardContent() {
                     />
                 )}
 
-                {/* 5. Audit Logs */}
-                {showAudit && (
+                {/* 3. Hood Manager */}
+                {showNeighborhoods && (
                     <ModuleCard
-                        title="Audit Logs"
-                        desc="View security logs and admin actions."
-                        icon={Shield}
-                        color="from-red-500 to-rose-600"
-                        bg="bg-red-900/10 hover:bg-red-900/20"
-                        border="border-red-500/20 hover:border-red-500/50"
-                        onClick={() => navigateTo('audit', '/admin/audit')} // External Route
+                        title="Hood Manager"
+                        desc="Manage neighborhoods, colors, and leaders."
+                        icon={Map}
+                        color="from-yellow-500 to-orange-600"
+                        bg="bg-yellow-900/10 hover:bg-yellow-900/20"
+                        border="border-yellow-500/20 hover:border-yellow-500/50"
+                        onClick={() => navigateTo('neighborhoods')} // Uses internal view or redirects
                     />
                 )}
 
-                {/* 6. System Settings */}
-                {showData && ( // Using showData as proxy for general settings
+                {/* 4. Events */}
+                {showEvents && (
                     <ModuleCard
-                        title="System Settings"
-                        desc="Configure global roles and integrations."
-                        icon={Settings}
-                        color="from-gray-500 to-slate-600"
-                        bg="bg-gray-800/50 hover:bg-gray-800"
-                        border="border-gray-700 hover:border-gray-500"
-                        onClick={() => navigateTo('management')}
+                        title="Events"
+                        desc="Plan derbies, main events, and track winners."
+                        icon={Calendar}
+                        color="from-purple-500 to-pink-600"
+                        bg="bg-purple-900/10 hover:bg-purple-900/20"
+                        border="border-purple-500/20 hover:border-purple-500/50"
+                        onClick={() => navigateTo('events')}
+                    />
+                )}
+
+                {/* 5. Farm Names */}
+                {showFarmNames && (
+                    <ModuleCard
+                        title="Farm Names"
+                        desc="Approve or edit farm name change requests."
+                        icon={FileText}
+                        color="from-cyan-500 to-blue-600"
+                        bg="bg-cyan-900/10 hover:bg-cyan-900/20"
+                        border="border-cyan-500/20 hover:border-cyan-500/50"
+                        onClick={() => navigateTo('farm_names', '/admin/farm-names')}
+                    />
+                )}
+
+                {/* 6. Permissions */}
+                {showPermissions && (
+                    <ModuleCard
+                        title="Permissions"
+                        desc="Manage admin roles and feature access."
+                        icon={Lock}
+                        color="from-red-500 to-pink-600"
+                        bg="bg-red-900/10 hover:bg-red-900/20"
+                        border="border-red-500/20 hover:border-red-500/50"
+                        onClick={() => navigateTo('permissions', '/admin/permissions')}
+                    />
+                )}
+
+                {/* 7. Audit Logs */}
+                {showAudit && (
+                    <ModuleCard
+                        title="Audit Logs"
+                        desc="Track admin actions and security logs."
+                        icon={Shield}
+                        color="from-rose-500 to-red-600"
+                        bg="bg-rose-900/10 hover:bg-rose-900/20"
+                        border="border-rose-500/20 hover:border-rose-500/50"
+                        onClick={() => navigateTo('audit', '/admin/audit')}
+                    />
+                )}
+
+                {/* 8. Embed Builder */}
+                {showEmbeds && (
+                    <ModuleCard
+                        title="Embed Builder"
+                        desc="Create and edit Discord embeds visually."
+                        icon={LayoutDashboard}
+                        color="from-indigo-500 to-purple-600"
+                        bg="bg-indigo-900/10 hover:bg-indigo-900/20"
+                        border="border-indigo-500/20 hover:border-indigo-500/50"
+                        onClick={() => navigateTo('embeds', '/admin/embed-builder')}
+                    />
+                )}
+
+                {/* 9. Giveaways */}
+                {showGiveaways && (
+                    <ModuleCard
+                        title="Giveaways"
+                        desc="Manage contests and random winners."
+                        icon={Trophy}
+                        color="from-yellow-400 to-yellow-600"
+                        bg="bg-yellow-900/10 hover:bg-yellow-900/20"
+                        border="border-yellow-500/20 hover:border-yellow-500/50"
+                        onClick={() => navigateTo('giveaways', '/admin/giveaways')}
+                    />
+                )}
+
+                {/* 10. Welcome Manager */}
+                {showWelcome && (
+                    <ModuleCard
+                        title="Welcome Manager"
+                        desc="Configure welcome embeds and settings."
+                        icon={HeartHand}
+                        color="from-green-500 to-teal-600"
+                        bg="bg-green-900/10 hover:bg-green-900/20"
+                        border="border-green-500/20 hover:border-green-500/50"
+                        onClick={() => navigateTo('welcome', '/admin/welcome')}
+                    />
+                )}
+
+                {/* 11. Feed Manager */}
+                {showFeeds && (
+                    <ModuleCard
+                        title="Feed Manager"
+                        desc="Set up automated text or social feeds."
+                        icon={Radio}
+                        color="from-orange-500 to-red-600"
+                        bg="bg-orange-900/10 hover:bg-orange-900/20"
+                        border="border-orange-500/20 hover:border-orange-500/50"
+                        onClick={() => navigateTo('feeds', '/admin/feeds')}
+                    />
+                )}
+
+                {/* 12. Wiki / Guides */}
+                {showWiki && (
+                    <ModuleCard
+                        title="Wiki / Guides"
+                        desc="Write and publish community guides."
+                        icon={BookOpen}
+                        color="from-emerald-500 to-green-600"
+                        bg="bg-emerald-900/10 hover:bg-emerald-900/20"
+                        border="border-emerald-500/20 hover:border-emerald-500/50"
+                        onClick={() => navigateTo('wiki', '/admin/wiki')}
                     />
                 )}
             </div>

@@ -111,6 +111,11 @@ function AdminNavContent() {
 
     const isPageActive = (path: string) => pathname === path;
 
+    // Hide Nav on the main dashboard grid (Command Center)
+    if (pathname === '/admin' && (!currentView || currentView === 'dashboard')) {
+        return null;
+    }
+
     return (
         <div className="bg-gray-900 border-b border-gray-800 sticky top-16 z-30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">

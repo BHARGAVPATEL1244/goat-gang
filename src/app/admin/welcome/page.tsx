@@ -33,8 +33,8 @@ const DEFAULT_CONFIG: WelcomeConfig = {
     message_content: 'Welcome to the Goat Gang, {user}!',
     embed_title: 'Welcome, {user}!',
     embed_description: 'We are glad to have you here. Please familiarize yourself with the rules and enjoy your stay!',
-    embed_footer: 'Goat Gang Management',
-    embed_color: '#FACC15',
+    embed_footer: 'Goat Gang',
+    embed_color: '#404040',
     embed_image_url: '',
     show_user_pfp: true,
     is_enabled: true

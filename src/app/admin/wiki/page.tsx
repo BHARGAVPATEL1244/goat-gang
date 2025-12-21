@@ -24,7 +24,9 @@ export default function AdminWikiPage() {
         slug: '',
         category: 'General',
         image_url: '',
-        content: ''
+        excerpt: '',
+        content: '',
+        is_published: false
     });
 
     useEffect(() => {
@@ -74,12 +76,14 @@ export default function AdminWikiPage() {
             slug: p.slug,
             category: p.category || 'General',
             image_url: p.image_url || '',
-            content: p.content || ''
+            excerpt: p.excerpt || '',
+            content: p.content || '',
+            is_published: p.is_published || false
         });
     };
 
     const resetForm = () => {
-        setFormData({ title: '', slug: '', category: 'General', image_url: '', content: '' });
+        setFormData({ title: '', slug: '', category: 'General', image_url: '', excerpt: '', content: '', is_published: false });
         setEditingId(null);
     };
 
@@ -135,7 +139,10 @@ export default function AdminWikiPage() {
                                 onClick={() => startEdit(p)}
                                 className={`p-3 rounded-lg cursor-pointer border transition-colors ${editingId === p.id ? 'bg-purple-900/30 border-purple-500' : 'bg-gray-800 border-transparent hover:bg-gray-750'}`}
                             >
-                                <div className="font-bold truncate">{p.title}</div>
+                                <div className="flex justify-between items-start">
+                                    <div className="font-bold truncate">{p.title}</div>
+                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-2 ${p.is_published ? 'bg-green-500' : 'bg-gray-500'}`} title={p.is_published ? "Published" : "Draft"} />
+                                </div>
                                 <div className="flex justify-between items-center mt-1">
                                     <span className="text-xs text-gray-500 bg-gray-900 px-2 py-0.5 rounded">{p.category}</span>
                                     <button
@@ -154,16 +161,32 @@ export default function AdminWikiPage() {
                 {/* EDITOR COLUMN */}
                 <div className="lg:col-span-2 bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col h-[calc(100vh-150px)]">
                     <div className="mb-4 grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Title</label>
-                            <input
-                                type="text"
-                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 font-bold text-lg"
-                                placeholder="Guide Title"
-                                value={formData.title}
-                                onChange={handleTitleChange}
-                            />
+                        <div className="col-span-2 flex gap-4">
+                            <div className="flex-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Title</label>
+                                <input
+                                    type="text"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded p-2 font-bold text-lg"
+                                    placeholder="Guide Title"
+                                    value={formData.title}
+                                    onChange={handleTitleChange}
+                                />
+                            </div>
+                            <div className="pt-6">
+                                <label className="flex items-center gap-2 cursor-pointer bg-gray-900 px-4 py-2 rounded border border-gray-700 select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.is_published}
+                                        onChange={e => setFormData({ ...formData, is_published: e.target.checked })}
+                                        className="w-4 h-4 rounded text-green-500 focus:ring-green-500 bg-gray-800 border-gray-600"
+                                    />
+                                    <span className={`font-bold text-sm ${formData.is_published ? 'text-green-500' : 'text-gray-500'}`}>
+                                        {formData.is_published ? 'PUBLISHED' : 'DRAFT'}
+                                    </span>
+                                </label>
+                            </div>
                         </div>
+
                         <div>
                             <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Slug (URL)</label>
                             <input
@@ -187,6 +210,16 @@ export default function AdminWikiPage() {
                                 <option>Money Making</option>
                                 <option>Events</option>
                             </select>
+                        </div>
+                        <div className="col-span-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Excerpt (Short Description)</label>
+                            <input
+                                type="text"
+                                className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm"
+                                placeholder="Brief summary for the card preview..."
+                                value={formData.excerpt}
+                                onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
+                            />
                         </div>
                         <div className="col-span-2">
                             <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Header Image URL</label>

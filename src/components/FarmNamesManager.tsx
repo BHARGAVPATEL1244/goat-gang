@@ -251,101 +251,94 @@ export default function FarmNamesManager() {
                     ) : members.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">No members found with this role.</div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="text-gray-400 border-b border-gray-700 text-sm uppercase">
-                                        <th className="py-3 px-4">Farm Name (Server Name)</th>
-                                        <th className="py-3 px-4">Edit Name</th>
-                                        <th className="py-3 px-4 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-700">
-                                    {(() => {
-                                        // --- SORTING LOGIC START ---
-                                        const currentHoodName = selectedRoleName.toLowerCase();
-                                        // Get Rank of current hood from DB hierarchy
-                                        // Default to 999 if not found (lowest priority)
-                                        const currentRank = hoodHierarchy[currentHoodName] || 999;
+                        <div className="flex flex-col gap-4">
+                            {/* Header - Hidden on Mobile */}
+                            <div className="hidden md:flex text-gray-400 border-b border-gray-700 text-sm uppercase px-4 py-3 font-bold tracking-wider">
+                                <div className="flex-1">Farm Name (Server Name)</div>
+                                <div className="w-1/3 px-4">Edit Name</div>
+                                <div className="w-32 text-right">Action</div>
+                            </div>
 
-                                        // Threshold for "Top Tier" hoods that take the FIRST level (Index 0)
-                                        // Usually top 3 (Meadows, Elysian, Springs).
-                                        // If rank is 1, 2, 3 -> Use Level 0.
-                                        // If rank > 3 -> Use Level 1.
-                                        const IS_TOP_TIER = currentRank <= 3;
+                            {/* List Items */}
+                            <div className="space-y-4 md:space-y-0 text-white">
+                                {(() => {
+                                    // --- SORTING LOGIC START ---
+                                    const currentHoodName = selectedRoleName.toLowerCase();
+                                    const currentRank = hoodHierarchy[currentHoodName] || 999;
+                                    const IS_TOP_TIER = currentRank <= 3;
 
-                                        const getRelevantLevel = (nickname: string | null) => {
-                                            if (!nickname) return 0;
-                                            const matches = nickname.match(/\[(\d+)\]/g);
-                                            const levels = matches ? matches.map((lvl: string) => parseInt(lvl.replace('[', '').replace(']', ''))) : [];
+                                    const getRelevantLevel = (nickname: string | null) => {
+                                        if (!nickname) return 0;
+                                        const matches = nickname.match(/\[(\d+)\]/g);
+                                        const levels = matches ? matches.map((lvl: string) => parseInt(lvl.replace('[', '').replace(']', ''))) : [];
+                                        if (levels.length === 0) return 0;
+                                        if (IS_TOP_TIER) return levels[0];
+                                        return levels[1] !== undefined ? levels[1] : levels[0];
+                                    };
 
-                                            if (levels.length === 0) return 0;
+                                    // computed sorted list
+                                    const sortedMembers = [...members].sort((a, b) => {
+                                        const levelA = getRelevantLevel(a.nickname);
+                                        const levelB = getRelevantLevel(b.nickname);
+                                        return levelB - levelA; // Descending
+                                    });
+                                    // --- SORTING LOGIC END ---
 
-                                            // If strict hierarchy matching was requested (1st level to 1st hood, 2nd to 2nd):
-                                            // But user really means: "If I am in a TOP hood, show my Main Level. If I am in a BOTTOM hood, show my Mini Level."
-                                            // Amity (Rank ~4) is "Bottom". Meadows (Rank 1) is "Top".
+                                    return sortedMembers.map(member => (
+                                        <div key={member.id} className="flex flex-col md:flex-row md:items-center bg-gray-900 md:bg-transparent p-4 md:p-0 md:px-4 md:py-3 rounded-xl md:rounded-none border border-gray-700 md:border-0 md:border-b md:border-gray-800 gap-4 hover:bg-gray-800/50 transition-colors">
+                                            {/* User Info */}
+                                            <div className="flex items-center gap-3 flex-1">
+                                                <img
+                                                    src={member.avatar || '/logo.png'}
+                                                    alt={member.username}
+                                                    className="w-12 h-12 md:w-10 md:h-10 rounded-full border border-gray-600 shadow-sm"
+                                                />
+                                                <div>
+                                                    <div className="font-bold text-white text-base md:text-lg">{member.displayName}</div>
+                                                    <div className="text-sm text-gray-500 font-mono">@{member.username}</div>
+                                                </div>
+                                            </div>
 
-                                            if (IS_TOP_TIER) return levels[0];
+                                            {/* Input Field */}
+                                            <div className="w-full md:w-1/3 md:px-4">
+                                                <label className="block md:hidden text-xs text-gray-500 uppercase font-bold mb-1">Update Farm Name</label>
+                                                <input
+                                                    type="text"
+                                                    maxLength={32}
+                                                    value={nicknames[member.id] || ''}
+                                                    onChange={(e) => handleNicknameChange(member.id, e.target.value)}
+                                                    className="bg-gray-800 md:bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 md:py-2 text-white w-full focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none placeholder-gray-500 text-lg md:text-sm shadow-inner"
+                                                    placeholder={member.nickname ? "Edit Farm Name" : "Set Name"}
+                                                />
+                                            </div>
 
-                                            // Use 2nd level if available, otherwise fallback to 1st
-                                            return levels[1] !== undefined ? levels[1] : levels[0];
-                                        };
-
-                                        // computed sorted list
-                                        const sortedMembers = [...members].sort((a, b) => {
-                                            const levelA = getRelevantLevel(a.nickname);
-                                            const levelB = getRelevantLevel(b.nickname);
-                                            return levelB - levelA; // Descending
-                                        });
-                                        // --- SORTING LOGIC END ---
-
-                                        return sortedMembers.map(member => (
-                                            <tr key={member.id} className="hover:bg-gray-700/50 transition-colors">
-                                                <td className="py-3 px-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <img
-                                                            src={member.avatar || '/logo.png'}
-                                                            alt={member.username}
-                                                            className="w-10 h-10 rounded-full border border-gray-600"
-                                                        />
-                                                        <div>
-                                                            <div className="font-semibold text-white text-lg">{member.displayName}</div>
-                                                            <div className="text-xs text-gray-500">@{member.username}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="py-3 px-4">
-                                                    <input
-                                                        type="text"
-                                                        maxLength={32}
-                                                        value={nicknames[member.id] || ''}
-                                                        onChange={(e) => handleNicknameChange(member.id, e.target.value)}
-                                                        className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white w-full focus:border-yellow-500 focus:outline-none placeholder-gray-600"
-                                                        placeholder={member.nickname ? "Edit Farm Name" : "Set Farm Name"}
-                                                    />
-                                                </td>
-                                                <td className="py-3 px-4 text-right">
-                                                    <button
-                                                        onClick={() => handleUpdate(member)}
-                                                        disabled={
-                                                            updating === member.id ||
-                                                            (nicknames[member.id] === (member.nickname || ''))
-                                                        }
-                                                        className={`px-4 py-2 rounded font-bold text-sm transition-all ${updating === member.id
-                                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                            : (nicknames[member.id] === (member.nickname || ''))
-                                                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50'
-                                                                : 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-lg shadow-yellow-900/20'
-                                                            }`}
-                                                    >
-                                                        {updating === member.id ? 'Saving...' : 'Update'}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    })()}
-                                </tbody>
-                            </table>
+                                            {/* Action Button */}
+                                            <div className="w-full md:w-32 text-right">
+                                                <button
+                                                    onClick={() => handleUpdate(member)}
+                                                    disabled={
+                                                        updating === member.id ||
+                                                        (nicknames[member.id] === (member.nickname || ''))
+                                                    }
+                                                    className={`w-full md:w-auto px-6 py-3 md:py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center ${updating === member.id
+                                                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                                        : (nicknames[member.id] === (member.nickname || ''))
+                                                            ? 'bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed'
+                                                            : 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)] transform hover:scale-105 active:scale-95'
+                                                        }`}
+                                                >
+                                                    {updating === member.id ? (
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                                                            Saving
+                                                        </span>
+                                                    ) : 'Update'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                })()}
+                            </div>
                         </div>
                     )}
                 </div>

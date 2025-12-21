@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import AdminPanel from '@/components/AdminPanel';
 import Leaderboard from '@/components/Leaderboard';

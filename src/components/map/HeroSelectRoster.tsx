@@ -4,6 +4,8 @@ import React from 'react';
 import { ArrowLeft, Crown, Shield, User } from 'lucide-react';
 import { m as motion } from 'framer-motion';
 import { parseUser } from '@/utils/nameParser';
+import { useSwipeable } from 'react-swipeable';
+import { useHaptic } from '@/hooks/useHaptic';
 
 interface Member {
     id: string;
@@ -14,19 +16,35 @@ interface Member {
 interface HeroSelectRosterProps {
     hoodName: string;
     leaderName: string;
-    leaderId?: string; // Optional for backward compat, but we'll pass it
+    leaderId?: string;
     hoodImage?: string;
     members: Member[];
     onBack: () => void;
+    onNext: () => void;
+    onPrev: () => void;
     color?: string;
 }
 
-export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodImage, members, onBack, color }: HeroSelectRosterProps) {
+export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodImage, members, onBack, onNext, onPrev, color }: HeroSelectRosterProps) {
     // Determine Leader logic: Prioritize the passed 'leaderName' prop (source of truth from map_districts)
     // accessible from the neighborhood card. The members list might have inconsistencies or multiple leaders in rare cases.
     const leaderRawName = leaderName;
     const { cleanName: leaderClean, level: leaderLevel } = parseUser(leaderRawName);
     const activeColor = color || '#EAB308'; // Default Yellow
+    const { trigger: haptic } = useHaptic();
+
+    // Swipe Handlers
+    const handlers = useSwipeable({
+        onSwipedLeft: () => {
+            haptic('medium');
+            onNext();
+        },
+        onSwipedRight: () => {
+            haptic('medium');
+            onPrev();
+        },
+        trackMouse: false
+    });
 
     // Filter out leader from the list if already shown on the left
     // Logic: If members list contains the leader, exclude them from the right side list by ID if available, else name
@@ -61,7 +79,10 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
     };
 
     return (
-        <div className="w-full h-full bg-gray-900 text-white flex flex-col md:flex-row overflow-hidden relative">
+        <div
+            {...handlers}
+            className="w-full h-full bg-gray-900 text-white flex flex-col md:flex-row overflow-hidden relative"
+        >
 
             {/* Background Texture */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none" />
@@ -74,7 +95,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                 className="w-full md:w-1/3 bg-gradient-to-br from-gray-800 to-black border-b md:border-b-0 md:border-r border-white/10 p-6 md:p-8 flex flex-col items-center justify-center relative z-10 shrink-0"
             >
                 <button
-                    onClick={onBack}
+                    onClick={() => { haptic('light'); onBack(); }}
                     className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 text-gray-400 hover:text-white uppercase font-bold tracking-widest text-[10px] md:text-xs transition-colors bg-black/20 p-2 rounded-full md:bg-transparent md:p-0 z-50 backdrop-blur-sm"
                 >
                     <ArrowLeft size={16} /> <span className="hidden xs:inline">Back</span>

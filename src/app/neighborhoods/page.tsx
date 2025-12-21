@@ -143,6 +143,20 @@ export default function NeighborhoodsPage() {
         setSelectedDistrict(null);
     };
 
+    const handleNext = () => {
+        if (!selectedDistrict || districts.length === 0) return;
+        const currentIndex = districts.findIndex(d => d.id === selectedDistrict.id);
+        const nextIndex = (currentIndex + 1) % districts.length;
+        setSelectedDistrict(districts[nextIndex]);
+    };
+
+    const handlePrev = () => {
+        if (!selectedDistrict || districts.length === 0) return;
+        const currentIndex = districts.findIndex(d => d.id === selectedDistrict.id);
+        const prevIndex = (currentIndex - 1 + districts.length) % districts.length;
+        setSelectedDistrict(districts[prevIndex]);
+    };
+
     return (
         <div className="w-full h-screen bg-black overflow-hidden relative">
             {viewMode === 'CAROUSEL' ? (
@@ -159,6 +173,8 @@ export default function NeighborhoodsPage() {
                     color={selectedDistrict?.color}
                     members={villageMembers}
                     onBack={handleBack}
+                    onNext={handleNext}
+                    onPrev={handlePrev}
                 />
             )}
         </div>

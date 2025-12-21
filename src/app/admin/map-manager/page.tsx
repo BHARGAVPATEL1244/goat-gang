@@ -30,7 +30,8 @@ export default function MapManagerPage() {
         trophy_silver: 0,
         trophy_bronze: 0,
         leader_discord_id: '',
-        coleader_discord_ids: '' // We will manage as comma-separated string in UI
+        coleader_discord_ids: '', // We will manage as comma-separated string in UI
+        color: '#EAB308' // Default Yellow
     });
 
     const [globalConfig, setGlobalConfig] = useState({
@@ -96,6 +97,7 @@ export default function MapManagerPage() {
                 trophy_bronze: formData.trophy_bronze,
                 leader_discord_id: formData.leader_discord_id,
                 coleader_discord_ids: formData.coleader_discord_ids.split(',').map(s => s.trim()).filter(Boolean),
+                color: formData.color,
                 type: 'District' // Default type (matches DB constraint 'Capital'/'District')
             };
 
@@ -126,7 +128,7 @@ export default function MapManagerPage() {
             name: '', hood_id: '', tag: '', derby_req: '', level_req: 0,
             hood_reqs_text: '', derby_reqs_text: '', leader_name: '',
             image_url: '', sort_order: 0, trophy_gold: 0, trophy_silver: 0, trophy_bronze: 0,
-            leader_discord_id: '', coleader_discord_ids: ''
+            leader_discord_id: '', coleader_discord_ids: '', color: '#EAB308'
         });
     };
 
@@ -153,7 +155,8 @@ export default function MapManagerPage() {
             trophy_silver: d.trophy_silver || 0,
             trophy_bronze: d.trophy_bronze || 0,
             leader_discord_id: d.leader_discord_id || '',
-            coleader_discord_ids: d.coleader_discord_ids ? d.coleader_discord_ids.join(', ') : ''
+            coleader_discord_ids: d.coleader_discord_ids ? d.coleader_discord_ids.join(', ') : '',
+            color: d.color || '#EAB308'
         });
         // Scroll to form
         document.getElementById('editor-form')?.scrollIntoView({ behavior: 'smooth' });
@@ -261,7 +264,8 @@ export default function MapManagerPage() {
             silver: d.trophy_silver || 0,
             bronze: d.trophy_bronze || 0
         },
-        order: d.sort_order
+        order: d.sort_order,
+        color: d.color || '#EAB308'
     });
 
     return (
@@ -307,12 +311,22 @@ export default function MapManagerPage() {
 
             {/* Editor Form */}
             <div id="editor-form" className="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-8">
-                <h2 className="text-sm font-bold mb-4 text-gray-300 uppercase tracking-wider border-b border-gray-700 pb-2">
+                <h2 className="text-sm font-bold mb-4 text-gray-300 uppercase tracking-wider border-b border-gray-700 pb-2 flex items-center gap-2">
                     {editingId ? 'Edit Hood' : 'Add New Hood'}
+                    <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: formData.color }}></div>
                 </h2>
 
                 {/* ROW 1: Compact Basic Info */}
                 <div className="flex flex-col md:flex-row gap-3 mb-3">
+                    <div className="w-16 flex-shrink-0">
+                        <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Color</label>
+                        <input
+                            type="color"
+                            className="w-full h-[30px] rounded cursor-pointer bg-transparent border border-gray-700 p-0"
+                            value={formData.color}
+                            onChange={e => setFormData({ ...formData, color: e.target.value })}
+                        />
+                    </div>
                     <div className="w-20 flex-shrink-0">
                         <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Sort</label>
                         <input

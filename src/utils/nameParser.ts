@@ -10,19 +10,11 @@ export function parseUser(name: string): ParsedUser {
     const levelMatch = name.match(/\[(\d+)\]/) || name.match(/\((\d+)\)/);
     let level = levelMatch ? levelMatch[1] : null;
 
-    // 2. Remove tags like [TAG] or [123] from name
-    // 2. Remove tags like [TAG] or {TAG}, BUT preserve [123] (Levels)
-    // We use a negative lookahead to skip if it's just digits inside brackets
-    let clean = name
-        .replace(/\[(?!\d+\]).*?\]/g, '') // Remove [] if content IS NOT just digits
-        // .replace(/\(.*?\)/g, '') // Keep ()
-        .trim();
-
-    // 3. Remove leading/trailing symbols often used in gamer tags
-
+    // 2. Strict Clean: Search for first '[' and take everything before it
+    const clean = name.split('[')[0].trim();
 
     return {
-        cleanName: clean || name, // Fallback to original if everything removed
+        cleanName: clean || name, // Fallback to original if valid
         level
     };
 }

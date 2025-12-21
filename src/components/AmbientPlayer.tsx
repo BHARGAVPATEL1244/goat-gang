@@ -25,15 +25,17 @@ export default function AmbientPlayer() {
     return (
         <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2">
             {/* Hidden Player - positioned offscreen but 'visible' to DOM */}
-            <div className="fixed bottom-0 left-0 opacity-0 pointer-events-none" style={{ zIndex: -1 }}>
+            {/* Hidden Player - positioned offscreen but 'visible' to DOM */}
+            {/* We use 1px opacity cleanly. Increasing size to avoid browser throttling */}
+            <div className="fixed bottom-0 right-0 opacity-0 pointer-events-none">
                 <ReactPlayer
                     url='https://www.youtube.com/watch?v=Kwp2Lhn-DmA'
                     playing={isPlaying}
                     muted={isMuted}
                     volume={volume}
                     loop={true}
-                    width="1px"
-                    height="1px"
+                    width="200px"
+                    height="200px"
                     playsinline={true}
                     onReady={() => {
                         console.log('Music Player Ready');

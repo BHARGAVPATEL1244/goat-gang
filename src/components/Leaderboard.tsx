@@ -201,19 +201,19 @@ export default function Leaderboard({ allowRequestView = false, isAdmin = false 
                     <table className="w-full text-left text-sm">
                         <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-medium">
                             <tr>
-                                <th className="px-6 py-3 w-16">Rank</th>
-                                <th className="px-6 py-3">{activeTab === 'neighborhood' ? 'Neighborhood' : 'Farm Name'}</th>
-                                {activeTab === 'user' && isAdmin && <th className="px-6 py-3 hidden sm:table-cell">Username</th>}
+                                <th className="px-6 py-3 w-16 whitespace-nowrap">Rank</th>
+                                <th className="px-6 py-3 whitespace-nowrap min-w-[180px]">{activeTab === 'neighborhood' ? 'Neighborhood' : 'Farm Name'}</th>
+                                {activeTab === 'user' && isAdmin && <th className="px-6 py-3 hidden sm:table-cell whitespace-nowrap">Username</th>}
                                 {activeTab === 'user' && (
                                     <>
-                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider">Silver</th>
-                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider">Gold</th>
-                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider">Plat</th>
-                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider">Iron</th>
-                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider">Coal</th>
+                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider whitespace-nowrap">Silver</th>
+                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider whitespace-nowrap">Gold</th>
+                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider whitespace-nowrap">Plat</th>
+                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider whitespace-nowrap">Iron</th>
+                                        <th className="px-4 py-3 text-right text-xs uppercase tracking-wider whitespace-nowrap">Coal</th>
                                     </>
                                 )}
-                                <th className="px-6 py-3 text-right font-bold">
+                                <th className="px-6 py-3 text-right font-bold whitespace-nowrap">
                                     {viewType === 'donation' ? 'Total' : 'Total'}
                                 </th>
                             </tr>
@@ -226,11 +226,11 @@ export default function Leaderboard({ allowRequestView = false, isAdmin = false 
                             ) : activeTab === 'neighborhood' ? (
                                 neighborhoodStats.map((item) => (
                                     <tr key={item.name} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
-                                        <td className="px-6 py-4 flex items-center justify-center">
+                                        <td className="px-6 py-4 flex items-center justify-center whitespace-nowrap">
                                             {getRankIcon(item.rank)}
                                         </td>
-                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{item.name}</td>
-                                        <td className="px-6 py-4 text-right font-medium text-gray-900 dark:text-white">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">{item.name}</td>
+                                        <td className="px-6 py-4 text-right font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                             {item.total.toLocaleString()}
                                         </td>
                                     </tr>
@@ -243,19 +243,19 @@ export default function Leaderboard({ allowRequestView = false, isAdmin = false 
                                             onClick={() => setSelectedUser({ username: item.username, farmName: item.farmName })}
                                             className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
                                         >
-                                            <td className="px-6 py-4 flex items-center justify-center">
+                                            <td className="px-6 py-4 flex items-center justify-center whitespace-nowrap">
                                                 {getRankIcon(item.rank)}
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{item.farmName}</td>
-                                            {isAdmin && <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{item.username}</td>}
+                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">{item.farmName}</td>
+                                            {isAdmin && <td className="px-6 py-4 text-gray-600 dark:text-gray-300 hidden sm:table-cell whitespace-nowrap">{item.username}</td>}
 
-                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400">{item.bars.silver}</td>
-                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400">{item.bars.gold}</td>
-                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400">{item.bars.platinum}</td>
-                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400">{item.bars.iron}</td>
-                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400">{item.bars.coal}</td>
+                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">{item.bars.silver}</td>
+                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">{item.bars.gold}</td>
+                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">{item.bars.platinum}</td>
+                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">{item.bars.iron}</td>
+                                            <td className="px-4 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">{item.bars.coal}</td>
 
-                                            <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">
+                                            <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white whitespace-nowrap">
                                                 {item.total.toLocaleString()}
                                             </td>
                                         </tr>

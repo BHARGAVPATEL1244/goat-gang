@@ -46,7 +46,7 @@ export default function HomePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 drop-shadow-2xl">
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 drop-shadow-2xl px-4 md:px-0 leading-tight">
                             GOAT GANG
                         </h1>
                     </motion.div>
@@ -58,12 +58,12 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.5 }}
-                        className="flex flex-wrap justify-center gap-6 pt-8 pointer-events-auto"
+                        className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 pt-8 pointer-events-auto w-full max-w-md sm:max-w-none mx-auto"
                     >
                         <MagneticButton>
                             <Link
                                 href="/neighborhoods"
-                                className="group relative px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] flex items-center gap-2 overflow-hidden"
+                                className="group relative w-full sm:w-auto px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full transition-all transform hover:scale-105 hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] flex items-center justify-center gap-2 overflow-hidden"
                             >
                                 <span className="relative z-10 flex items-center gap-2">Join a Hood <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></span>
                             </Link>
@@ -72,7 +72,7 @@ export default function HomePage() {
                         <MagneticButton>
                             <Link
                                 href="/events"
-                                className="px-8 py-4 bg-white/5 backdrop-blur-xl hover:bg-white/10 text-white font-bold rounded-full transition-all border border-white/10 hover:border-white/30 flex items-center gap-2"
+                                className="w-full sm:w-auto px-8 py-4 bg-white/5 backdrop-blur-xl hover:bg-white/10 text-white font-bold rounded-full transition-all border border-white/10 hover:border-white/30 flex items-center justify-center gap-2"
                             >
                                 Events
                             </Link>

@@ -124,8 +124,9 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             const rawUsername = rawNickname || m.user?.global_name || m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
 
             // Clean the name
-            const { cleanName } = parseUser(rawUsername);
-            const username = cleanName;
+            // Note: We store the RAW name in the DB to preserve Level/Tag info for the UI to parse.
+            // Converting to cleanName here would lose the level data forever.
+            const username = rawUsername;
 
             // Strict Leader Check
             if (fixedLeaderId && discordId === fixedLeaderId) {

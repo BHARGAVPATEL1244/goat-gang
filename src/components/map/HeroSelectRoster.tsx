@@ -18,13 +18,15 @@ interface HeroSelectRosterProps {
     hoodImage?: string;
     members: Member[];
     onBack: () => void;
+    color?: string;
 }
 
-export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodImage, members, onBack }: HeroSelectRosterProps) {
+export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodImage, members, onBack, color }: HeroSelectRosterProps) {
     // Determine Leader logic: Prioritize the passed 'leaderName' prop (source of truth from map_districts)
     // accessible from the neighborhood card. The members list might have inconsistencies or multiple leaders in rare cases.
     const leaderRawName = leaderName;
     const { cleanName: leaderClean, level: leaderLevel } = parseUser(leaderRawName);
+    const activeColor = color || '#EAB308'; // Default Yellow
 
     // Filter out leader from the list if already shown on the left
     // Logic: If members list contains the leader, exclude them from the right side list by ID if available, else name
@@ -79,16 +81,30 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                 </button>
 
                 <div className="text-center mb-10">
-                    <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-lg break-words w-min mx-auto leading-tight px-4 py-2">
+                    <h2
+                        className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text drop-shadow-lg break-words w-min mx-auto leading-tight px-4 py-2"
+                        style={{
+                            backgroundImage: `linear-gradient(to bottom, #FFF, ${activeColor})`
+                        }}
+                    >
                         {hoodName}
                     </h2>
-                    <div className="w-24 h-2 bg-yellow-500 mx-auto mt-2" />
+                    <div
+                        className="w-24 h-2 mx-auto mt-2"
+                        style={{ backgroundColor: activeColor, boxShadow: `0 0 10px ${activeColor}` }}
+                    />
                 </div>
 
                 {/* Big Avatar */}
                 <div className="w-48 h-48 md:w-64 md:h-64 mb-8 relative group">
                     {/* Image Container (Clipped) */}
-                    <div className="w-full h-full rounded-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(234,179,8,0.3)] overflow-hidden bg-gray-700 flex items-center justify-center">
+                    <div
+                        className="w-full h-full rounded-full border-4 overflow-hidden bg-gray-700 flex items-center justify-center transition-all duration-500"
+                        style={{
+                            borderColor: activeColor,
+                            boxShadow: `0 0 50px ${activeColor}40`
+                        }}
+                    >
                         {hoodImage ? (
                             <img src={hoodImage} alt={hoodName} className="w-full h-full object-cover" />
                         ) : (
@@ -97,7 +113,7 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                     </div>
 
                     {/* Crown (Outside Clip) */}
-                    <Crown size={48} className="absolute -top-2 -right-2 text-yellow-400 drop-shadow-md animate-bounce z-20" />
+                    <Crown size={48} className="absolute -top-2 -right-2 drop-shadow-md animate-bounce z-20" style={{ color: activeColor }} />
                 </div>
 
                 <div className="text-center">
@@ -106,8 +122,11 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
 
                     {/* Leader Level Display */}
                     {leaderLevel && (
-                        <div className="inline-flex items-center justify-center bg-gray-900 border border-yellow-500/30 px-6 py-2 rounded-lg mt-4 shadow-lg backdrop-blur-sm group-hover:border-yellow-500/60 transition-colors">
-                            <span className="text-yellow-500 font-black text-sm tracking-widest mr-2">LEVEL</span>
+                        <div
+                            className="inline-flex items-center justify-center bg-gray-900 border px-6 py-2 rounded-lg mt-4 shadow-lg backdrop-blur-sm transition-colors"
+                            style={{ borderColor: `${activeColor}40` }}
+                        >
+                            <span className="font-black text-sm tracking-widest mr-2" style={{ color: activeColor }}>LEVEL</span>
                             <span className="text-white font-mono font-bold text-lg">{leaderLevel}</span>
                         </div>
                     )}

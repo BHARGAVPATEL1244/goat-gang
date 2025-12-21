@@ -156,6 +156,7 @@ export default function NeighborhoodsPage() {
                     leaderName={selectedDistrict?.leader_name || 'Unknown'}
                     leaderId={selectedDistrict?.leader_discord_id}
                     hoodImage={selectedDistrict?.image_url}
+                    color={selectedDistrict?.color}
                     members={villageMembers}
                     onBack={handleBack}
                 />

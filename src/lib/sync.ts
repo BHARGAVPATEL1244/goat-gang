@@ -91,21 +91,30 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
         throw error; // Re-throw to be handled by the API route
     }
 
-    // 4. Fetch Neighborhood Configuration (Fixed Leader ID)
-    const { data: hoodConfig } = await supabaseAdmin
-        .from('map_districts')
-        .select('leader_discord_id, name')
-        .eq('id', hoodId)
-        .single();
+    // 4. Fetch Role Configurations (Global vs Local Overrides)
+    const [globalConfigRes, hoodConfigRes] = await Promise.all([
+        supabaseAdmin.from('app_config').select('key, value').in('key', ['coleader_role_id', 'elder_role_id']),
+        supabaseAdmin.from('map_districts').select('leader_discord_id, name').eq('id', hoodId).single()
+    ]);
+
+    const globalConfig = globalConfigRes.data || [];
+    const hoodConfig = hoodConfigRes.data;
+
+    // Parse Global Role IDs
+    const coLeaderRoleIds = (globalConfig.find(c => c.key === 'coleader_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+    const elderRoleIds = (globalConfig.find(c => c.key === 'elder_role_id')?.value || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+
+    console.log(`[Sync] Global Config - CoLeaders: [${coLeaderRoleIds.join(', ')}], Elders: [${elderRoleIds.join(', ')}]`);
 
     const fixedLeaderId = hoodConfig?.leader_discord_id?.trim();
     const hoodNameLog = hoodConfig?.name || hoodId;
 
     // 5. Process & Map Members to DB Structure
-    // Simplified Logic: 
-    // - Leader: Matches fixedLeaderId
+    // Logic: 
+    // - Leader: Matches fixedLeaderId (Top Priority)
+    // - Co-Leader: Has Global Co-Leader Role
+    // - Elder: Has Global Elder Role
     // - Member: Everyone else
-    // - No Co-Leaders, No Elders
 
     const processedMembers = discordMembers
         .filter(m => {
@@ -119,19 +128,27 @@ export async function syncNeighborhoodMembers(hoodId: string, roleId: string) {
             // Normalize structure
             const discordId = m.user?.id || (m as any).id;
 
-            // Username Priority: Nickname (Server Profile) -> Global Name -> Username -> Unknown
+            // Username Priority
             const rawNickname = (m as any).nick || (m as any).nickname;
             const rawUsername = rawNickname || m.user?.global_name || m.user?.username || (m as any).username || (m as any).user?.username || 'Unknown';
 
-            // Clean the name
-            // Note: We store the RAW name in the DB to preserve Level/Tag info for the UI to parse.
-            // Converting to cleanName here would lose the level data forever.
+            // Store RAW name in DB
             const username = rawUsername;
 
-            // Strict Leader Check
+            const roles = m.roles || (m as any)._roles || []; // Fallback for various formats
+
+            // 1. Strict Leader Check (Fixed ID)
             if (fixedLeaderId && discordId === fixedLeaderId) {
                 rank = 'Leader';
                 console.log(`[Sync] Identified Leader: ${username} (${discordId})`);
+            }
+            // 2. Global Co-Leader Check
+            else if (roles.some(r => coLeaderRoleIds.includes(r))) {
+                rank = 'Co-Leader';
+            }
+            // 3. Global Elder Check
+            else if (roles.some(r => elderRoleIds.includes(r))) {
+                rank = 'Elder';
             }
 
             return {

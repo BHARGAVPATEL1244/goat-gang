@@ -36,6 +36,12 @@ export default function AmbientPlayer() {
                     width="200px"
                     height="200px"
                     playsinline={true}
+                    controls={true} // Allow manual intervention
+                    config={{
+                        youtube: {
+                            playerVars: { showinfo: 1, controls: 1 }
+                        }
+                    }}
                     onReady={() => {
                         console.log('Music Player Ready');
                         setIsReady(true);

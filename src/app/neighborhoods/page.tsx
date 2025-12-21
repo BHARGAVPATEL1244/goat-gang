@@ -29,11 +29,11 @@ export default function NeighborhoodsPage() {
     useEffect(() => {
         if (viewMode === 'ROSTER' && selectedDistrict) {
             async function fetchMembers() {
-                if (selectedDistrict.hood_id) {
+                if (selectedDistrict.id) {
                     const { data } = await supabase
                         .from('hood_memberships')
                         .select('*')
-                        .eq('hood_id', selectedDistrict.hood_id)
+                        .eq('hood_id', selectedDistrict.id) // Query by DB ID, not Discord Role ID
                         // Use a simple sort by rank for now via JS if DB view doesn't handle it
                         ;
 

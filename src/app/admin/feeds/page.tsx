@@ -166,6 +166,13 @@ export default function FeedManagerPage() {
 
     return (
         <div className="p-8 min-h-screen bg-gray-900 text-white">
+            <button
+                onClick={() => router.push('/admin')}
+                className="mb-6 flex items-center text-gray-400 hover:text-white transition-colors group"
+            >
+                <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                Back to Dashboard
+            </button>
             <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
                 <Rss className="text-yellow-500" /> Feed Manager
             </h1>

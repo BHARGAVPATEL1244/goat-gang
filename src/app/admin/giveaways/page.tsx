@@ -143,6 +143,13 @@ export default function GiveawaysPage() {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-8">
+            <button
+                onClick={() => router.push('/admin')}
+                className="mb-6 flex items-center text-gray-400 hover:text-white transition-colors group"
+            >
+                <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                Back to Dashboard
+            </button>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
                     Giveaways

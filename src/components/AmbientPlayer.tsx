@@ -37,7 +37,7 @@ export default function AmbientPlayer() {
                         className="bg-gray-900 border border-t border-r border-gray-700 rounded-lg p-2 flex items-center gap-2 overflow-hidden shadow-xl"
                     >
                         <span className="text-xs font-mono text-green-400 whitespace-nowrap ml-2">
-                            Goat Gang Radio
+                            Hay Day Radio
                         </span>
 
                         {/* Visualizer Bars */}
@@ -73,7 +73,7 @@ export default function AmbientPlayer() {
             {/* Native Audio Element */}
             <audio
                 ref={audioRef}
-                src="/sounds/lofi.m4a"
+                src="/sounds/hayday.m4a"
                 loop
                 onEnded={() => setIsPlaying(false)}
             />

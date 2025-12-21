@@ -15,7 +15,6 @@ export default function AmbientPlayer() {
 
     // Browser policy prevents autoplay with sound. We wait for user interaction to toggle play.
     const togglePlay = () => {
-        if (!isReady) return;
         setIsPlaying(!isPlaying);
     };
 
@@ -78,12 +77,9 @@ export default function AmbientPlayer() {
 
             <button
                 onClick={togglePlay}
-                disabled={!isReady}
                 className={`
                     w-10 h-10 rounded-full flex items-center justify-center border transition-all shadow-lg
-                    ${!isReady ? 'opacity-50 cursor-not-allowed bg-gray-900 border-gray-700 text-gray-600' : ''}
-                    ${isReady && isPlaying ? 'bg-red-600 border-red-500 text-white' : ''}
-                    ${isReady && !isPlaying ? 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white' : ''}
+                    ${isPlaying ? 'bg-red-600 border-red-500 text-white' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white'}
                 `}
             >
                 {isPlaying ? <Pause size={18} fill="currentColor" /> : <Music size={18} />}

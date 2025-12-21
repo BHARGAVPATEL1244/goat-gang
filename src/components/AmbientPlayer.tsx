@@ -28,7 +28,7 @@ export default function AmbientPlayer() {
             {/* DEBUG MODE: Video is visible so we can see if it plays */}
             <div className="fixed bottom-20 right-4 opacity-100 z-50 border-2 border-red-500 bg-black rounded-lg overflow-hidden shadow-2xl">
                 <ReactPlayer
-                    url='https://www.youtube.com/watch?v=Kwp2Lhn-DmA'
+                    url='https://www.youtube.com/watch?v=jfKfPfyJRdk' // Lofi Girl - reliable embed
                     playing={isPlaying}
                     muted={isMuted}
                     volume={volume}
@@ -71,7 +71,7 @@ export default function AmbientPlayer() {
                             ))}
                         </div>
                         <span className="text-xs font-mono text-red-400 whitespace-nowrap ml-2">
-                            Hay Day Lofi
+                            Lofi Girl
                         </span>
 
                         {/* Volume Control */}

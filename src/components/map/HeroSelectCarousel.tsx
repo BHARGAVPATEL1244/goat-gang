@@ -113,7 +113,13 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                     return (
                         <div
                             key={district.id}
-                            onClick={() => scrollToItem(index)}
+                            onClick={() => {
+                                if (isActive) {
+                                    onSelect(district);
+                                } else {
+                                    scrollToItem(index);
+                                }
+                            }}
                             className={`
                                 relative flex-shrink-0 transition-all duration-300 ease-out cursor-pointer snap-center
                                 w-[300px] h-[520px]

@@ -1,0 +1,12 @@
+{
+    "HomePage": {
+        "title": "GOAT GANG",
+        "subtitle": "The #1 Hay Day Community"
+    },
+    "Navigation": {
+        "home": "Home",
+        "neighborhoods": "Neighborhoods",
+        "events": "Events",
+        "contact": "Contact"
+    }
+}

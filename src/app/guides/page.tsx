@@ -1,19 +1,32 @@
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server'; // Use server client for server components
 import { Metadata } from 'next';
+import CategoryFilter from './CategoryFilter';
 
 export const metadata: Metadata = {
     title: 'Hay Day Guides & Wiki | Goat Gang',
     description: 'Expert tips, tricks, and guides for Hay Day. Master the Derby, perfect your trading, and build the ultimate farm.',
 };
 
-export default async function GuidesIndexPage() {
+interface Props {
+    searchParams: Promise<{ category?: string }>;
+}
+
+export default async function GuidesIndexPage({ searchParams }: Props) {
+    const { category } = await searchParams;
     const supabase = await createClient();
-    const { data: guides } = await supabase
+
+    let query = supabase
         .from('wiki_pages')
         .select('*')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
+
+    if (category && category !== 'All') {
+        query = query.eq('category', category);
+    }
+
+    const { data: guides } = await query;
 
     return (
         <div className="max-w-4xl mx-auto space-y-12">
@@ -26,6 +39,8 @@ export default async function GuidesIndexPage() {
                 </p>
             </div>
 
+            <CategoryFilter />
+
             <div className="grid gap-8 md:grid-cols-2">
                 {guides?.map(guide => (
                     <Link key={guide.slug} href={`/guides/${guide.slug}`} className="group">
@@ -37,6 +52,11 @@ export default async function GuidesIndexPage() {
                                         alt={guide.title}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
+                                    {guide.category && (
+                                        <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20">
+                                            {guide.category}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             <div className="p-8 flex flex-col flex-grow">
@@ -56,7 +76,7 @@ export default async function GuidesIndexPage() {
 
                 {(!guides || guides.length === 0) && (
                     <div className="col-span-2 text-center text-gray-500 py-12">
-                        No guides published yet. Check back soon!
+                        {category ? `No guides found in "${category}".` : 'No guides published yet. Check back soon!'}
                     </div>
                 )}
             </div>

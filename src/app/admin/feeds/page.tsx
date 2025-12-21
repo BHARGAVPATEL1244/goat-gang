@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
-import { Rss, Youtube, MessageSquare, Trash, Save, Plus, ChevronRight, ChevronDown, Clock, Filter } from 'lucide-react';
+import { Rss, Youtube, MessageSquare, Trash, Save, Plus, ChevronRight, ChevronDown, Clock, Filter, ArrowLeft } from 'lucide-react';
 import SearchableSelect from '@/components/admin/SearchableSelect';
+import { useRouter } from 'next/navigation';
 
 interface FeedConfig {
     id?: string;

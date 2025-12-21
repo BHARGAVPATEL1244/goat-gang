@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PERMISSIONS } from '@/utils/permissions';
 import { getRolePermissions } from '@/app/actions/permissions';
-import { Loader2, Upload, X, Save } from 'lucide-react';
+import { Loader2, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
 import EmbedPreview from '@/components/EmbedPreview';
 import GuildSelector from './components/GuildSelector';

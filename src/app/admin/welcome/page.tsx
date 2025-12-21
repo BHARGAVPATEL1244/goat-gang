@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import SearchableSelect from '@/components/admin/SearchableSelect';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Channel {
     id: string;

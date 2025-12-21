@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { PERMISSIONS } from '@/utils/permissions';
 import { getRolePermissions } from '@/app/actions/permissions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 
 export default function GiveawaysPage() {
     const router = useRouter();

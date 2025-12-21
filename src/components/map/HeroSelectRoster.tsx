@@ -94,12 +94,13 @@ export default function HeroSelectRoster({ hoodName, leaderName, leaderId, hoodI
                     <h3 className="text-gray-400 uppercase tracking-[0.2em] text-sm mb-2">Hood Leader</h3>
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{leaderClean}</h1>
 
-                    {/* Leader Level Display (Hidden by request) */}
-                    {/* {leaderLevel && (
-                        <div className="inline-block bg-yellow-500/20 text-yellow-300 px-4 py-1 rounded-full border border-yellow-500/50 font-mono font-bold text-sm tracking-widest">
-                            LVL {leaderLevel}
+                    {/* Leader Level Display */}
+                    {leaderLevel && (
+                        <div className="inline-flex items-center justify-center bg-gray-900 border border-yellow-500/30 px-6 py-2 rounded-lg mt-4 shadow-lg backdrop-blur-sm group-hover:border-yellow-500/60 transition-colors">
+                            <span className="text-yellow-500 font-black text-sm tracking-widest mr-2">LEVEL</span>
+                            <span className="text-white font-mono font-bold text-lg">{leaderLevel}</span>
                         </div>
-                    )} */}
+                    )}
                 </div>
             </motion.div>
 

@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Users, Crown, ArrowRight, Trophy } from 'lucide-react';
+import { parseUser } from '@/utils/nameParser';
 
 interface District {
     id: string;
@@ -106,6 +107,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
 
                 {districts.map((district, index) => {
                     const isActive = index === activeIndex;
+                    const { cleanName: cleanLeaderName } = parseUser(district.leader_name);
 
                     return (
                         <div
@@ -176,7 +178,7 @@ export default function HeroSelectCarousel({ districts, onSelect }: HeroSelectCa
                                                 <Crown size={16} className="text-yellow-500" />
                                                 <span className="text-xs font-bold uppercase tracking-wider">LEADER</span>
                                             </div>
-                                            <span className="font-mono text-sm">{district.leader_name}</span>
+                                            <span className="font-mono text-sm">{cleanLeaderName}</span>
                                         </div>
 
                                         {/* Trophies Display */}

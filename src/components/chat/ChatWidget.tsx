@@ -102,6 +102,9 @@ export default function ChatWidget() {
         // Or specific UX? Implemented below.
     }
 
+    // If not logged in, do not render anything
+    if (!user) return null;
+
     return (
         <div className="fixed bottom-4 right-4 z-[60] flex flex-col items-end">
             <AnimatePresence>

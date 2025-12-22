@@ -159,10 +159,13 @@ export default function ChatWidget() {
                                             {(() => {
                                                 // Helper to format content
                                                 const content = msg.content;
+                                                // console.log('[ChatWidget] Rendering:', content); // Debug log
+
+                                                // Better Split: Capture URLs, Emojis, and Newlines
                                                 const parts = content.split(/(\s+|https?:\/\/[^\s]+|<a?:.+?:\d+>)/g).filter(Boolean);
 
                                                 return parts.map((part, i) => {
-                                                    // 1. Custom Emojis: <:name:id> or <a:name:id> (animated)
+                                                    // 1. Custom Emojis: <:name:id> or <a:name:id>
                                                     const emojiMatch = part.match(/<(a?):(.+?):(\d+)>/);
                                                     if (emojiMatch) {
                                                         const isAnimated = emojiMatch[1] === 'a';
@@ -170,35 +173,42 @@ export default function ChatWidget() {
                                                         const url = `https://cdn.discordapp.com/emojis/${id}.${isAnimated ? 'gif' : 'png'}`;
                                                         return (
                                                             <img
-                                                                key={i}
+                                                                key={`${msg.id}-emoji-${i}`}
                                                                 src={url}
                                                                 alt={emojiMatch[2]}
-                                                                className="inline-block w-5 h-5 align-middle mx-0.5"
+                                                                className="inline-block w-6 h-6 align-middle mx-0.5"
                                                                 loading="lazy"
+                                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                                             />
                                                         );
                                                     }
 
-                                                    // 2. Image Links (Basic Check)
-                                                    if (part.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)) {
+                                                    // 2. Image Links (Permissive)
+                                                    // Matches URLs ending in image extensions or any Discord/Media URL (they usually render images)
+                                                    // We exclude known non-image extensions just in case.
+                                                    const isImageLink = (part.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i))
+                                                        || ((part.includes('cdn.discordapp.com') || part.includes('media.discordapp.net')) && !part.includes('.pdf'));
+
+                                                    if (isImageLink) {
                                                         return (
-                                                            <div key={i} className="mt-2 block max-w-full overflow-hidden rounded-lg">
+                                                            <div key={`${msg.id}-img-${i}`} className="mt-2 block w-full overflow-hidden rounded-lg">
                                                                 <img
                                                                     src={part}
                                                                     alt="Attachment"
-                                                                    className="max-w-full max-h-48 object-cover rounded-md cursor-pointer hover:opacity-90"
+                                                                    className="w-full max-h-60 object-cover rounded-md cursor-pointer hover:opacity-90 transition-opacity"
                                                                     loading="lazy"
                                                                     onClick={() => window.open(part, '_blank')}
+                                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                                                 />
                                                             </div>
                                                         );
                                                     }
 
-                                                    // 3. Regular Links
+                                                    // 3. Regular Links (Non-Image)
                                                     if (part.match(/^https?:\/\/[^\s]+$/)) {
                                                         return (
                                                             <a
-                                                                key={i}
+                                                                key={`${msg.id}-link-${i}`}
                                                                 href={part}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
@@ -209,8 +219,8 @@ export default function ChatWidget() {
                                                         );
                                                     }
 
-                                                    // 4. Text (Preserve newlines if needed, but flex handles wrapping)
-                                                    return <span key={i}>{part}</span>;
+                                                    // 4. Text
+                                                    return <span key={`${msg.id}-text-${i}`}>{part}</span>;
                                                 });
                                             })()}
                                         </div>

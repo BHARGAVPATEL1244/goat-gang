@@ -46,7 +46,7 @@ export async function POST(request: Request) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 content: content,
-                username: `${username} (App)`, // Append "App" or similar to distinguish, or keep clean if user prefers.
+                username: username, // Send pure username
                 avatar_url: avatar,
                 // allowed_mentions: { parse: [] } // Disable @everyone
             })

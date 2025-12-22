@@ -138,20 +138,24 @@ export default function ChatWidget() {
                                     </div>
 
                                     {/* Bubble */}
-                                    <div className={`max-w-[80%] flex flex-col ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? 'items-end' : 'items-start'}`}>
+                                    <div className={`max-w-[85%] flex flex-col ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? 'items-end' : 'items-start'}`}>
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] text-gray-400 font-bold">{msg.author_name}</span>
+                                            <span className="text-[12px] font-medium text-gray-400">
+                                                {msg.author_name}
+                                            </span>
                                             {msg.source === 'discord' && (
-                                                <span className="text-[8px] bg-[#5865F2] text-white px-1 rounded">BOT</span>
+                                                <span className="text-[9px] bg-[#5865F2] text-white px-1 py-0.5 rounded font-bold tracking-wide">
+                                                    DISCORD
+                                                </span>
                                             )}
                                         </div>
-                                        <div className={`p-2 rounded-lg text-sm break-words ${msg.source === 'web'
-                                                ? 'bg-green-600/20 text-green-100 border border-green-500/30'
-                                                : 'bg-gray-800 text-gray-200 border border-gray-700'
+                                        <div className={`px-3 py-2 rounded-2xl text-[14px] leading-snug break-words shadow-sm ${msg.source === 'web'
+                                            ? 'bg-green-600 text-white rounded-tr-sm'
+                                            : 'bg-[#36393f] text-gray-100 rounded-tl-sm border border-gray-700'
                                             }`}>
                                             {msg.content}
                                         </div>
-                                        <span className="text-[10px] text-gray-600 mt-1">
+                                        <span className="text-[10px] text-gray-500 mt-1 px-1">
                                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>

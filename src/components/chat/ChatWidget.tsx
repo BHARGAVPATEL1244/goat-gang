@@ -156,7 +156,63 @@ export default function ChatWidget() {
                                             ? 'bg-green-600 text-white rounded-tr-sm'
                                             : 'bg-[#36393f] text-gray-100 rounded-tl-sm border border-gray-700'
                                             }`}>
-                                            {msg.content}
+                                            {(() => {
+                                                // Helper to format content
+                                                const content = msg.content;
+                                                const parts = content.split(/(\s+|https?:\/\/[^\s]+|<a?:.+?:\d+>)/g).filter(Boolean);
+
+                                                return parts.map((part, i) => {
+                                                    // 1. Custom Emojis: <:name:id> or <a:name:id> (animated)
+                                                    const emojiMatch = part.match(/<(a?):(.+?):(\d+)>/);
+                                                    if (emojiMatch) {
+                                                        const isAnimated = emojiMatch[1] === 'a';
+                                                        const id = emojiMatch[3];
+                                                        const url = `https://cdn.discordapp.com/emojis/${id}.${isAnimated ? 'gif' : 'png'}`;
+                                                        return (
+                                                            <img
+                                                                key={i}
+                                                                src={url}
+                                                                alt={emojiMatch[2]}
+                                                                className="inline-block w-5 h-5 align-middle mx-0.5"
+                                                                loading="lazy"
+                                                            />
+                                                        );
+                                                    }
+
+                                                    // 2. Image Links (Basic Check)
+                                                    if (part.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)) {
+                                                        return (
+                                                            <div key={i} className="mt-2 block max-w-full overflow-hidden rounded-lg">
+                                                                <img
+                                                                    src={part}
+                                                                    alt="Attachment"
+                                                                    className="max-w-full max-h-48 object-cover rounded-md cursor-pointer hover:opacity-90"
+                                                                    loading="lazy"
+                                                                    onClick={() => window.open(part, '_blank')}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    // 3. Regular Links
+                                                    if (part.match(/^https?:\/\/[^\s]+$/)) {
+                                                        return (
+                                                            <a
+                                                                key={i}
+                                                                href={part}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-400 hover:underline break-all"
+                                                            >
+                                                                {part}
+                                                            </a>
+                                                        );
+                                                    }
+
+                                                    // 4. Text (Preserve newlines if needed, but flex handles wrapping)
+                                                    return <span key={i}>{part}</span>;
+                                                });
+                                            })()}
                                         </div>
                                         <span className="text-[10px] text-gray-500 mt-1 px-1">
                                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

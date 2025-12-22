@@ -46,6 +46,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from 'sonner';
 import LazyMotionProvider from "@/components/LazyMotionProvider";
 import AmbientPlayer from "@/components/AmbientPlayer";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 export default function RootLayout({
   children,
@@ -60,6 +61,7 @@ export default function RootLayout({
             <Toaster position="top-right" />
             <Navbar />
             <AmbientPlayer />
+            <ChatWidget />
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
               <Analytics />

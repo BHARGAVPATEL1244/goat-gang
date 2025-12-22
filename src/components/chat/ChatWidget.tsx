@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { MessageCircle, X, Send, Reply } from 'lucide-react';
 import Image from 'next/image';
 
 interface ChatMessage {
@@ -19,6 +19,7 @@ export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
+    const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
     const [user, setUser] = useState<any>(null);
     const [isSending, setIsSending] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -74,7 +75,21 @@ export default function ChatWidget() {
         if (!newMessage.trim() || !user || isSending) return;
 
         setIsSending(true);
-        const tempContent = newMessage;
+        setIsSending(true);
+        let finalContent = newMessage;
+
+        // Prepend Reply Quote if replying
+        if (replyingTo) {
+            const shortContent = replyingTo.content.length > 50
+                ? replyingTo.content.substring(0, 50) + '...'
+                : replyingTo.content;
+
+            // Discord Blockquote format
+            finalContent = `> **${replyingTo.author_name}:** ${shortContent}\n\n${newMessage}`;
+            setReplyingTo(null); // Clear reply state
+        }
+
+        const tempContent = finalContent;
         setNewMessage(''); // Optimistic clear
 
         try {
@@ -129,7 +144,7 @@ export default function ChatWidget() {
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 backdrop-blur-sm scrollbar-thin scrollbar-thumb-gray-700">
                             {messages.map((msg) => (
-                                <div key={msg.id} className={`flex gap-3 ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? 'flex-row-reverse' : ''}`}>
+                                <div key={msg.id} className={`group flex gap-3 ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? 'flex-row-reverse' : ''}`}>
                                     {/* Avatar */}
                                     <div className="flex-shrink-0 w-8 h-8 relative rounded-full overflow-hidden border border-gray-700">
                                         <Image
@@ -142,7 +157,7 @@ export default function ChatWidget() {
 
                                     {/* Bubble */}
                                     <div className={`max-w-[85%] flex flex-col ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? 'items-end' : 'items-start'}`}>
-                                        <div className="flex items-center gap-2 mb-1">
+                                        <div className="flex items-center gap-2 mb-1 w-full relative">
                                             <span className="text-[12px] font-medium text-gray-400">
                                                 {msg.author_name}
                                             </span>
@@ -151,6 +166,15 @@ export default function ChatWidget() {
                                                     DISCORD
                                                 </span>
                                             )}
+
+                                            {/* Reply Button (Only visible on group hover) */}
+                                            <button
+                                                onClick={() => setReplyingTo(msg)}
+                                                className={`opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-white absolute ${msg.source === 'web' && msg.author_name === user?.user_metadata?.full_name ? '-left-6' : '-right-6'}`}
+                                                title="Reply"
+                                            >
+                                                <Reply size={14} />
+                                            </button>
                                         </div>
                                         <div className={`px-3 py-2 rounded-2xl text-[14px] leading-snug break-words shadow-sm ${msg.source === 'web'
                                             ? 'bg-green-600 text-white rounded-tr-sm'
@@ -235,6 +259,25 @@ export default function ChatWidget() {
 
                         {/* Input Area */}
                         <div className="p-3 bg-gray-800 border-t border-gray-700">
+                            {/* Replying Banner */}
+                            <AnimatePresence>
+                                {replyingTo && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="flex items-center justify-between bg-gray-700/50 p-2 rounded-t-lg mb-2 text-xs text-gray-300 border-l-2 border-green-500"
+                                    >
+                                        <span className="truncate">
+                                            Replying to <b>{replyingTo.author_name}</b>
+                                        </span>
+                                        <button onClick={() => setReplyingTo(null)} className="hover:text-white">
+                                            <X size={14} />
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             {user ? (
                                 <form onSubmit={handleSend} className="flex gap-2">
                                     <input

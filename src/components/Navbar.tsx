@@ -128,6 +128,7 @@ export default function Navbar() {
         { href: '/neighborhoods', label: 'Hoods' },
         { href: '/events', label: 'Events' },
         { href: '/guides', label: 'Wiki' },
+        { href: '/bumps', label: 'Bumps' }, // Added Bumps Link
         { href: '/contact', label: 'Join' },
     ];
 

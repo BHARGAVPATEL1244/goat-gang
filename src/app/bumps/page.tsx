@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { getTopBumpers } from '@/actions/bumps';
 import { motion } from 'framer-motion';
-import { Trophy, Clock, Zap } from 'lucide-react';
-import Image from 'next/image';
+import { Trophy, Clock, Zap, Crown } from 'lucide-react';
 
 type Bumper = {
     user_id: string;
@@ -27,13 +26,11 @@ export default function BumpsPage() {
         load();
     }, []);
 
-    // Countdown Logic (Reset on 1st of Month)
     useEffect(() => {
         const calculateTime = () => {
             const now = new Date();
             const currentYear = now.getFullYear();
             const currentMonth = now.getMonth();
-            // Next month, date 1, 00:00:00
             const nextReset = new Date(currentYear, currentMonth + 1, 1, 0, 0, 0);
 
             const diff = nextReset.getTime() - now.getTime();
@@ -45,110 +42,155 @@ export default function BumpsPage() {
             setTimeLeft(`${days}d ${hours}h ${minutes}m`);
         };
 
-        const timer = setInterval(calculateTime, 60000); // Update every minute
+        const timer = setInterval(calculateTime, 60000);
         calculateTime();
-
         return () => clearInterval(timer);
     }, []);
 
     if (loading) {
         return (
-            <div className="w-full h-screen bg-[#111] flex items-center justify-center text-white">
-                <div className="text-2xl font-bold animate-pulse">Scanning server logs...</div>
+            <div className="w-full h-screen bg-[#050505] flex items-center justify-center">
+                <div className="relative">
+                    <div className="w-16 h-16 border-4 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center text-yellow-500">🐐</div>
+                </div>
             </div>
         );
     }
 
     const top3 = bumpers.slice(0, 3);
-    const rest = bumpers.slice(3, 20); // Show top 20 list
+    const rest = bumpers.slice(3, 50);
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white p-6 pb-20 overflow-y-auto">
-            {/* Header */}
-            <div className="max-w-4xl mx-auto text-center mb-12 mt-8">
-                <motion.h1
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
-                >
-                    Monthly Bump Race
-                </motion.h1>
-                <div className="flex items-center justify-center gap-2 text-zinc-400 font-mono text-sm">
-                    <Clock size={16} />
-                    <span>RESETS IN: <span className="text-white font-bold">{timeLeft}</span></span>
-                </div>
+        <div className="min-h-screen bg-[#050505] text-white overflow-hidden relative font-sans selection:bg-yellow-500/30">
+            {/* Background Effects */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-yellow-600/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
+                <div className="absolute top-[20%] right-[30%] w-[300px] h-[300px] bg-blue-600/5 rounded-full blur-[100px]" />
             </div>
 
-            {/* Podium */}
-            <div className="flex flex-col md:flex-row justify-center items-end gap-4 max-w-4xl mx-auto mb-16 h-[400px]">
-                {/* 2nd Place */}
-                {top3[1] && <PodiumStep bumper={top3[1]} rank={2} color="bg-zinc-400" height="h-48" delay={0.2} />}
+            <div className="relative z-10 max-w-6xl mx-auto px-6 pb-20 pt-12">
 
-                {/* 1st Place */}
-                {top3[0] && <PodiumStep bumper={top3[0]} rank={1} color="bg-yellow-500" height="h-64" delay={0} />}
-
-                {/* 3rd Place */}
-                {top3[2] && <PodiumStep bumper={top3[2]} rank={3} color="bg-amber-700" height="h-32" delay={0.4} />}
-            </div>
-
-            {/* The Rest List */}
-            <div className="max-w-2xl mx-auto space-y-3">
-                {rest.map((bumper, i) => (
+                {/* Header */}
+                <div className="text-center mb-16 space-y-4">
                     <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.5 + (i * 0.05) }}
-                        key={bumper.user_id}
-                        className="flex items-center justify-between bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-colors"
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-xs font-mono text-zinc-400 mb-2"
                     >
-                        <div className="flex items-center gap-4">
-                            <span className="text-zinc-500 font-mono w-6 text-right">0{i + 4}</span>
-                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs border border-zinc-700">
-                                {bumper.name[0]}
-                            </div>
-                            <span className="font-semibold">{bumper.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-yellow-500 font-mono">
-                            <span className="text-lg font-bold">{bumper.count}</span>
-                            <Zap size={14} className="fill-current" />
-                        </div>
+                        <Clock size={12} className="text-yellow-500" />
+                        <span>RESETS IN: <span className="text-yellow-400 font-bold">{timeLeft}</span></span>
                     </motion.div>
-                ))}
 
-                {rest.length === 0 && top3.length === 0 && (
-                    <div className="text-center text-zinc-500 py-10">
-                        No bumps yet this month. Be the first!
-                    </div>
-                )}
+                    <motion.h1
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-6xl md:text-7xl font-black bg-gradient-to-b from-white via-white to-zinc-500 bg-clip-text text-transparent tracking-tight"
+                    >
+                        MONTHLY BUMP
+                    </motion.h1>
+                    <p className="text-zinc-500 text-lg max-w-md mx-auto">
+                        Compete for the crown. Top bumpers get automated rewards and eternal glory.
+                    </p>
+                </div>
+
+                {/* Podium */}
+                <div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-24 min-h-[450px]">
+                    {/* 2nd Place */}
+                    {top3[1] && <GlassPodium bumper={top3[1]} rank={2} color="from-zinc-300 to-zinc-500" height="h-[320px]" delay={0.2} />}
+
+                    {/* 1st Place */}
+                    {top3[0] && <GlassPodium bumper={top3[0]} rank={1} color="from-yellow-300 via-yellow-500 to-amber-600" height="h-[400px]" delay={0} isWinner />}
+
+                    {/* 3rd Place */}
+                    {top3[2] && <GlassPodium bumper={top3[2]} rank={3} color="from-amber-700 to-amber-900" height="h-[280px]" delay={0.4} />}
+                </div>
+
+                {/* Leaderboard List */}
+                <div className="max-w-3xl mx-auto space-y-3">
+                    <div className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4 pl-4">Runner Ups</div>
+                    {rest.map((bumper, i) => (
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.6 + (i * 0.03) }}
+                            key={bumper.user_id}
+                            className="group flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all backdrop-blur-sm"
+                        >
+                            <div className="flex items-center gap-6">
+                                <span className="text-zinc-500 font-mono w-6 text-right group-hover:text-white transition-colors">0{i + 4}</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center text-sm font-bold border border-white/10 shadow-inner">
+                                        {bumper.name[0].toUpperCase()}
+                                    </div>
+                                    <span className="font-semibold text-zinc-200 group-hover:text-white transition-colors">{bumper.name}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-black/30 rounded-full border border-white/5">
+                                <span className="text-yellow-500 font-bold font-mono">{bumper.count}</span>
+                                <Zap size={14} className="text-yellow-500 fill-yellow-500" />
+                            </div>
+                        </motion.div>
+                    ))}
+
+                    {rest.length === 0 && top3.length === 0 && (
+                        <div className="text-center text-zinc-600 py-10 font-mono text-sm border border-dashed border-zinc-800 rounded-xl">
+                            No data for this month yet. Be the first to BUMP!
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
 
-function PodiumStep({ bumper, rank, color, height, delay }: { bumper: Bumper, rank: number, color: string, height: string, delay: number }) {
+function GlassPodium({ bumper, rank, color, height, delay, isWinner = false }: { bumper: Bumper, rank: number, color: string, height: string, delay: number, isWinner?: boolean }) {
     return (
         <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            transition={{ type: "spring", damping: 15, delay }}
-            className="flex flex-col items-center flex-1 min-w-[100px]"
+            initial={{ height: "100px", opacity: 0 }}
+            animate={{ height, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 100, damping: 20, delay }}
+            className={`relative flex flex-col items-center flex-1 min-w-[140px] md:min-w-[200px] rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-transparent backdrop-blur-xl shadow-2xl overflow-hidden group ${isWinner ? 'ring-1 ring-yellow-500/50 shadow-yellow-900/20' : ''}`}
         >
-            <div className="mb-3 text-center">
-                <div className="w-16 h-16 mx-auto bg-zinc-800 rounded-full border-2 border-zinc-700 flex items-center justify-center text-xl font-bold mb-2">
-                    {bumper.name[0]}
+            {/* Glow Effect for Winner */}
+            {isWinner && (
+                <div className="absolute inset-0 bg-yellow-500/10 blur-[50px] pointer-events-none" />
+            )}
+
+            {/* Content Container (Pushed to bottom) */}
+            <div className="absolute bottom-0 w-full p-6 flex flex-col items-center z-10">
+                {/* Rank Badge */}
+                <div className={`text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b ${color} opacity-80 mb-4`}>
+                    {rank}
                 </div>
-                <div className="font-bold text-sm truncate max-w-[120px]">{bumper.name}</div>
-                <div className="text-yellow-500 font-mono text-xs flex items-center justify-center gap-1">
-                    {bumper.count} <Zap size={10} className="fill-current" />
+
+                {/* Avatar */}
+                <div className={`relative mb-4 ${isWinner ? 'scale-110' : ''} transition-transform duration-500 group-hover:scale-110`}>
+                    <div className={`w-20 h-20 rounded-full bg-zinc-900 flex items-center justify-center text-2xl font-bold border-2 ${isWinner ? 'border-yellow-500 text-yellow-500' : 'border-zinc-700 text-zinc-400'} shadow-lg z-10 relative`}>
+                        {bumper.name[0].toUpperCase()}
+                    </div>
+                    {isWinner && (
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-yellow-400 drop-shadow-lg animate-bounce">
+                            <Crown size={32} fill="currentColor" />
+                        </div>
+                    )}
+                </div>
+
+                {/* Name */}
+                <div className="font-bold text-lg text-white mb-1 text-center truncate w-full px-2">
+                    {bumper.name}
+                </div>
+
+                {/* Score */}
+                <div className="flex items-center gap-1.5 text-xs font-mono bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                    <span className="text-yellow-400 font-bold text-base">{bumper.count}</span>
+                    <span className="text-zinc-500 uppercase tracking-wider">Bumps</span>
                 </div>
             </div>
 
-            <div className={`w-full ${height} ${color} rounded-t-lg relative flex justify-center p-4 bg-opacity-90 backdrop-blur-sm shadow-2xl`}>
-                <span className="text-4xl font-black text-black/50 absolute bottom-4">
-                    {rank}
-                </span>
-                {rank === 1 && <Trophy className="text-yellow-900 w-8 h-8 animate-bounce" />}
-            </div>
+            {/* Decorative background lines */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 mix-blend-overlay"></div>
         </motion.div>
     );
 }

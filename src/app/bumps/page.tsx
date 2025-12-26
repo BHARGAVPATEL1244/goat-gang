@@ -70,10 +70,10 @@ export default function BumpsPage() {
                 <div className="absolute top-[20%] right-[30%] w-[300px] h-[300px] bg-blue-600/5 rounded-full blur-[100px]" />
             </div>
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 pb-20 pt-12">
+            <div className="relative z-10 max-w-6xl mx-auto px-6 pb-20 pt-6">
 
                 {/* Header */}
-                <div className="text-center mb-16 space-y-4">
+                <div className="text-center mb-6 space-y-2">
                     <motion.div
                         initial={{ y: -20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -96,15 +96,15 @@ export default function BumpsPage() {
                 </div>
 
                 {/* Podium */}
-                <div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-24 min-h-[450px]">
+                <div className="flex flex-col md:flex-row justify-center items-end gap-4 mb-12 min-h-[350px]">
                     {/* 2nd Place */}
-                    {top3[1] && <GlassPodium bumper={top3[1]} rank={2} color="from-zinc-300 to-zinc-500" height="h-[320px]" delay={0.2} />}
+                    {top3[1] && <GlassPodium bumper={top3[1]} rank={2} color="from-zinc-300 to-zinc-500" height="h-[220px]" delay={0.2} />}
 
                     {/* 1st Place */}
-                    {top3[0] && <GlassPodium bumper={top3[0]} rank={1} color="from-yellow-300 via-yellow-500 to-amber-600" height="h-[400px]" delay={0} isWinner />}
+                    {top3[0] && <GlassPodium bumper={top3[0]} rank={1} color="from-yellow-300 via-yellow-500 to-amber-600" height="h-[280px]" delay={0} isWinner />}
 
                     {/* 3rd Place */}
-                    {top3[2] && <GlassPodium bumper={top3[2]} rank={3} color="from-amber-700 to-amber-900" height="h-[280px]" delay={0.4} />}
+                    {top3[2] && <GlassPodium bumper={top3[2]} rank={3} color="from-amber-700 to-amber-900" height="h-[180px]" delay={0.4} />}
                 </div>
 
                 {/* Leaderboard List */}
